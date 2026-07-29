@@ -6,12 +6,9 @@ export const NAV_DATA = [
     items: [
       {
         title: "Dashboard",
+        url: "/",
         icon: Icons.HomeIcon,
         items: [
-          {
-            title: "eCommerce",
-            url: "/",
-          },
         ],
       },
       {
@@ -30,6 +27,12 @@ export const NAV_DATA = [
         title: "Data Kelas",
         url: "/kelas",
         icon: Icons.User,
+        items: [],
+      },
+            {
+        title: "Rekap & Pembayaran",
+        url: "/rekap",
+        icon: Icons.Table,
         items: [],
       },
       {

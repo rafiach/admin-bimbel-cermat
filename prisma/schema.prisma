@@ -137,6 +137,8 @@ model LaporanBulanan {
   kedisiplinan     Int      @map("kedisiplinan")       // 1-5
   catatanSiswa     String?  @map("catatan_siswa")
   saranBimbel      String?  @map("saran_bimbel")
+  statusBayarOrtu  String   @default("belum") @map("status_bayar_ortu")
+  statusBayarTutor String   @default("belum") @map("status_bayar_tutor")
   createdAt        DateTime @default(now()) @map("created_at")
 
   @@unique([kelasId, bulan, tahun])
