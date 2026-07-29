@@ -89,16 +89,17 @@ model Siswa {
 }
 
 model Tutor {
-  id        String   @id @default(cuid())
-  nama      String
-  noHp      String?  @map("no_hp")
-  alamat    String?
-  jenjang   String?
-  status    String   @default("aktif")
-  userId    String?  @unique @map("user_id")   // buat nyambung ke akun login nanti
-  kelasList Kelas[]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id         String   @id @default(cuid())
+  nama       String
+  alamat     String?
+  jenjang    String?
+  noHp       String?  @map("no_hp")
+  norekTutor String?  @map("norek_tutor")
+  status     String   @default("aktif")
+  userId     String?  @unique @map("user_id")
+  kelasList      Kelas[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@map("tutor")
 }
@@ -114,20 +115,30 @@ model Kelas {
   biayaOrtu  Int        @map("biaya_ortu")  // per pertemuan, ditagih ke ortu
   feeTutor   Int        @map("fee_tutor")   // per pertemuan, dibayar ke tutor
   status     String     @default("aktif")
-  presensi   Presensi[]
+  laporan    LaporanBulanan[]
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
 
   @@map("kelas")
 }
 
-model Presensi {
-  id        String   @id @default(cuid())
-  kelasId   String   @map("kelas_id")
-  kelas     Kelas    @relation(fields: [kelasId], references: [id], onDelete: Cascade)
-  tanggal   DateTime
-  hadir     Boolean  @default(true)
-  createdAt DateTime @default(now()) @map("created_at")
+model LaporanBulanan {
+  id               String   @id @default(cuid())
+  kelasId          String   @map("kelas_id")
+  kelas            Kelas    @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  bulan            Int
+  tahun            Int
+  jumlahHadir      Int      @map("jumlah_hadir")
+  jumlahIzin       Int      @default(0) @map("jumlah_izin")
+  materiDipelajari String?  @map("materi_dipelajari")
+  pemahamanMateri  Int      @map("pemahaman_materi")   // 1-5
+  keaktifanBelajar Int      @map("keaktifan_belajar")  // 1-5
+  kemandirian      Int      @map("kemandirian")        // 1-5
+  kedisiplinan     Int      @map("kedisiplinan")       // 1-5
+  catatanSiswa     String?  @map("catatan_siswa")
+  saranBimbel      String?  @map("saran_bimbel")
+  createdAt        DateTime @default(now()) @map("created_at")
 
-  @@map("presensi")
+  @@unique([kelasId, bulan, tahun])
+  @@map("laporan_bulanan")
 }

@@ -29,6 +29,7 @@ export default async function EditTutorPage({
           <InputGroup label="No HP" name="noHp" type="text" placeholder="08xxxxxxxxxx" defaultValue={tutor.noHp ?? ""} />
           <InputGroup label="Alamat" name="alamat" type="text" placeholder="Alamat tutor" defaultValue={tutor.alamat ?? ""} />
           <InputGroup label="Jenjang" name="jenjang" type="text" placeholder="Isi jenjang atau mapel" defaultValue={tutor.jenjang ?? ""} />
+          <InputGroup label="No Rekening / E-Wallet" name="norekTutor" type="text" placeholder="Misal: BCA 1234567890 a.n. ..." defaultValue={tutor.norekTutor ?? ""} />
           <Select
             label="Status"
             name="status"
