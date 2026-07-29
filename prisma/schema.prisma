@@ -80,7 +80,7 @@ model Siswa {
   noHpOrtu      String?      @map("no_hp_ortu")
   tanggalDaftar DateTime     @default(now()) @map("tanggal_daftar")
   status        String       @default("aktif")
-  pembayaran    Pembayaran[]
+  presensi      Presensi[]
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -99,22 +99,6 @@ model Tutor {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("tutor")
-}
-
-model Pembayaran {
-  id           String    @id @default(cuid())
-  siswaId      String    @map("siswa_id")
-  siswa        Siswa     @relation(fields: [siswaId], references: [id], onDelete: Cascade)
-  bulan        Int
-  tahun        Int
-  jumlah       Int
-  status       String    @default("belum") // "lunas" | "belum"
-  tanggalBayar DateTime? @map("tanggal_bayar")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt @map("updated_at")
-
-  @@unique([siswaId, bulan, tahun])
-  @@map("pembayaran")
 }
 
 model Pertemuan {
