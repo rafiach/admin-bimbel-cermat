@@ -27,8 +27,8 @@ export const NAV_DATA = [
         items: [],
       },
       {
-        title: "Jadwal & Pertemuan",
-        url: "/pertemuan",
+        title: "Data Kelas",
+        url: "/kelas",
         icon: Icons.User,
         items: [],
       },
