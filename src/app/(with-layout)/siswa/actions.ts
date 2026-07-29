@@ -9,6 +9,10 @@ export async function createSiswa(formData: FormData) {
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
   const noHpOrtu = formData.get("noHpOrtu") as string;
+  const noRekOrtu = formData.get("noRekOrtu") as string;
+  const biayaBimbelRaw = formData.get("biayaBimbel") as string;
+  const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
+  const notes = formData.get("notes") as string;
   const status = (formData.get("status") as string) || "aktif";
 
   if (!nama?.trim()) {
@@ -16,7 +20,7 @@ export async function createSiswa(formData: FormData) {
   }
 
   await db.siswa.create({
-    data: { nama, sekolah, kelas, noHpOrtu, status },
+    data: { nama, sekolah, kelas, noHpOrtu, noRekOrtu, biayaBimbel, notes,status },
   });
 
   revalidatePath("/siswa");
@@ -28,11 +32,15 @@ export async function updateSiswa(id: string, formData: FormData) {
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
   const noHpOrtu = formData.get("noHpOrtu") as string;
+  const noRekOrtu = formData.get("noRekOrtu") as string;
+  const biayaBimbelRaw = formData.get("biayaBimbel") as string;
+  const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
+  const notes = formData.get("notes") as string;
   const status = formData.get("status") as string;
 
   await db.siswa.update({
     where: { id },
-    data: { nama, sekolah, kelas, noHpOrtu, status },
+    data: { nama, sekolah, kelas, noHpOrtu, noRekOrtu, biayaBimbel, notes, status },
   });
 
   revalidatePath("/siswa");

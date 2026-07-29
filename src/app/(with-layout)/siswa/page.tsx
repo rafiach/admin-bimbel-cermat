@@ -34,13 +34,16 @@ export default async function SiswaPage() {
           </Link>
         </div>
 
-        <Table>
+        <Table className="min-w-[960px]">
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
-              <TableHead className="xl:pl-7.5">Nama</TableHead>
+              <TableHead className="sticky left-0 z-10 bg-[#F7F9FC] xl:pl-7.5 dark:bg-dark-2">Nama</TableHead>
               <TableHead>Sekolah</TableHead>
               <TableHead>Kelas</TableHead>
               <TableHead>No HP Ortu</TableHead>
+              <TableHead>No Rekening Ortu</TableHead>
+              <TableHead>Biaya Bimbel</TableHead>
+              <TableHead>Kendala Belajar Siswa</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right xl:pr-7.5">Aksi</TableHead>
             </TableRow>
@@ -60,6 +63,15 @@ export default async function SiswaPage() {
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {s.noHpOrtu || "-"}
+                </TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {s.noRekOrtu || "-"}
+                </TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {s.biayaBimbel || "-"}
+                </TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {s.notes || "-"}
                 </TableCell>
                 <TableCell>
                   <span
