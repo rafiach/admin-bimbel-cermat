@@ -70,3 +70,79 @@ model Verification {
   @@index([identifier], map: "verification_identifier_idx")
   @@map("verification")
 }
+
+
+model Siswa {
+  id            String       @id @default(cuid())
+  nama          String
+  sekolah       String?
+  kelas         String?
+  noHpOrtu      String?      @map("no_hp_ortu")
+  tanggalDaftar DateTime     @default(now()) @map("tanggal_daftar")
+  status        String       @default("aktif")
+  pembayaran    Pembayaran[]
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@map("siswa")
+}
+
+model Tutor {
+  id        String   @id @default(cuid())
+  nama      String
+  mapel     String?
+  noHp      String?  @map("no_hp")
+  status    String   @default("aktif")
+  userId    String?  @unique @map("user_id")   // buat nyambung ke akun login nanti
+  pertemuan Pertemuan[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("tutor")
+}
+
+model Pembayaran {
+  id           String    @id @default(cuid())
+  siswaId      String    @map("siswa_id")
+  siswa        Siswa     @relation(fields: [siswaId], references: [id], onDelete: Cascade)
+  bulan        Int
+  tahun        Int
+  jumlah       Int
+  status       String    @default("belum") // "lunas" | "belum"
+  tanggalBayar DateTime? @map("tanggal_bayar")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@unique([siswaId, bulan, tahun])
+  @@map("pembayaran")
+}
+
+model Pertemuan {
+  id        String     @id @default(cuid())
+  tutorId   String     @map("tutor_id")
+  tutor     Tutor      @relation(fields: [tutorId], references: [id])
+  tanggal   DateTime
+  mapel     String?
+  tipe      String     @default("privat") // "privat" | "kelompok"
+  status    String     @default("terjadwal") // "terjadwal" | "selesai" | "batal"
+  presensi  Presensi[]
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  @@map("pertemuan")
+}
+
+model Presensi {
+  id           String    @id @default(cuid())
+  pertemuanId  String    @map("pertemuan_id")
+  pertemuan    Pertemuan @relation(fields: [pertemuanId], references: [id], onDelete: Cascade)
+  siswaId      String    @map("siswa_id")
+  siswa        Siswa     @relation(fields: [siswaId], references: [id])
+  hadir        Boolean   @default(true)
+  harga        Int       // nominal hasil nego buat siswa ini, disimpen per pertemuan
+  statusBayar  String    @default("belum") @map("status_bayar") // "lunas" | "belum"
+  tanggalBayar DateTime? @map("tanggal_bayar")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@unique([pertemuanId, siswaId])
+  @@map("presensi")
+}
