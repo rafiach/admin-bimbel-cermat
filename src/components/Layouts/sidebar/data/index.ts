@@ -14,9 +14,21 @@ export const NAV_DATA = [
           },
         ],
       },
-       {
+      {
         title: "Data Siswa",
         url: "/siswa",
+        icon: Icons.User,
+        items: [],
+      },
+      {
+        title: "Data Tutor",
+        url: "/tutor",
+        icon: Icons.User,
+        items: [],
+      },
+      {
+        title: "Jadwal & Pertemuan",
+        url: "/pertemuan",
         icon: Icons.User,
         items: [],
       },

@@ -79,8 +79,9 @@ model Siswa {
   kelas         String?
   noHpOrtu      String?      @map("no_hp_ortu")
   tanggalDaftar DateTime     @default(now()) @map("tanggal_daftar")
+  notes         String?
   status        String       @default("aktif")
-  presensi      Presensi[]
+  kelasList     Kelas[]
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -90,43 +91,43 @@ model Siswa {
 model Tutor {
   id        String   @id @default(cuid())
   nama      String
-  mapel     String?
   noHp      String?  @map("no_hp")
+  alamat    String?
+  jenjang   String?
   status    String   @default("aktif")
   userId    String?  @unique @map("user_id")   // buat nyambung ke akun login nanti
-  pertemuan Pertemuan[]
+  kelasList Kelas[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("tutor")
 }
 
-model Pertemuan {
-  id        String     @id @default(cuid())
-  tutorId   String     @map("tutor_id")
-  tutor     Tutor      @relation(fields: [tutorId], references: [id])
-  tanggal   DateTime
-  mapel     String?
-  tipe      String     @default("privat") // "privat" | "kelompok"
-  status    String     @default("terjadwal") // "terjadwal" | "selesai" | "batal"
-  presensi  Presensi[]
-  createdAt DateTime   @default(now()) @map("created_at")
+model Kelas {
+  id         String     @id @default(cuid())
+  siswaId    String     @map("siswa_id")
+  siswa      Siswa      @relation(fields: [siswaId], references: [id])
+  tutorId    String     @map("tutor_id")
+  tutor      Tutor      @relation(fields: [tutorId], references: [id])
+  tipe       String     @default("privat") // "privat" | "kelompok"
+  jadwal     String     // teks bebas, misal: "Senin & Kamis, 15:00"
+  biayaOrtu  Int        @map("biaya_ortu")  // per pertemuan, ditagih ke ortu
+  feeTutor   Int        @map("fee_tutor")   // per pertemuan, dibayar ke tutor
+  status     String     @default("aktif")
+  presensi   Presensi[]
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 
-  @@map("pertemuan")
+  @@map("kelas")
 }
 
 model Presensi {
-  id           String    @id @default(cuid())
-  pertemuanId  String    @map("pertemuan_id")
-  pertemuan    Pertemuan @relation(fields: [pertemuanId], references: [id], onDelete: Cascade)
-  siswaId      String    @map("siswa_id")
-  siswa        Siswa     @relation(fields: [siswaId], references: [id])
-  hadir        Boolean   @default(true)
-  harga        Int       // nominal hasil nego buat siswa ini, disimpen per pertemuan
-  statusBayar  String    @default("belum") @map("status_bayar") // "lunas" | "belum"
-  tanggalBayar DateTime? @map("tanggal_bayar")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id        String   @id @default(cuid())
+  kelasId   String   @map("kelas_id")
+  kelas     Kelas    @relation(fields: [kelasId], references: [id], onDelete: Cascade)
+  tanggal   DateTime
+  hadir     Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
 
-  @@unique([pertemuanId, siswaId])
   @@map("presensi")
 }
