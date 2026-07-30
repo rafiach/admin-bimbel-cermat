@@ -1,27 +1,13 @@
-import darkLogo from "@/assets/logos/dark.svg";
-import logo from "@/assets/logos/main.svg";
-import Image from "next/image";
-
 export function Logo() {
   return (
-    <div className="relative h-8 max-w-[10.847rem]">
-      <Image
-        src={logo}
-        fill
-        className="dark:hidden"
-        alt="NextAdmin logo"
-        role="presentation"
-        quality={100}
+    <div className="flex h-16 items-center gap-2">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/images/logo/logo-bimbel.svg"
+        alt="Bimbel Cermat"
+        className="h-16 w-auto object-contain"
       />
 
-      <Image
-        src={darkLogo}
-        fill
-        className="hidden dark:block"
-        alt="NextAdmin logo"
-        role="presentation"
-        quality={100}
-      />
     </div>
   );
 }

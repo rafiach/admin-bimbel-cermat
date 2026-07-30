@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { createLaporan, type LaporState } from "../actions";
 
 type Kelas = { id: string; jadwal: string; tutorId: string; siswa: { nama: string } };
@@ -19,11 +20,20 @@ const RATING_FIELDS = [
 ];
 
 const inputClass =
-  "w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-primary dark:border-dark-3";
+  "w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-[#F35C2B] dark:border-dark-3";
 
-export function LaporForm({ tutorList, kelasList }: { tutorList: Tutor[]; kelasList: Kelas[] }) {
+export function ReportForm({ tutorList, kelasList }: { tutorList: Tutor[]; kelasList: Kelas[] }) {
   const [tutorId, setTutorId] = useState("");
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporan, null);
+
+  useEffect(() => {
+    if (!state) return;
+    if (state.success) {
+      toast.success(state.message);
+    } else {
+      toast.error(state.message);
+    }
+  }, [state]);
 
   const kelasTutorIni = kelasList.filter((k) => k.tutorId === tutorId);
   const now = new Date();
@@ -99,11 +109,13 @@ export function LaporForm({ tutorList, kelasList }: { tutorList: Tutor[]; kelasL
         <textarea name="saranBimbel" rows={2} className={inputClass} />
       </div>
 
-      <button type="submit" disabled={pending} className="w-full rounded-lg bg-primary px-6 py-3 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
+      <button
+        type="submit"
+        disabled={pending}
+        className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
+      >
         {pending ? "Mengirim..." : "Kirim Laporan"}
       </button>
-
-      {state && <p className={state.success ? "text-[#219653]" : "text-red"}>{state.message}</p>}
     </form>
   );
 }

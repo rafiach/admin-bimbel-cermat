@@ -25,7 +25,7 @@ export function Header() {
       {isMobile && (
         <Link href={"/"} className="2xsm:ml-4 ml-2 max-[430px]:hidden">
           <Image
-            src={"/images/logo/logo-icon.svg"}
+            src={"/images/logo/logo-bimbel.svg"}
             width={32}
             height={32}
             alt=""
@@ -38,7 +38,7 @@ export function Header() {
         <h1 className="text-heading-5 text-dark mb-0.5 font-bold dark:text-white">
           Dashboard
         </h1>
-        <p className="font-medium">Next.js Admin Dashboard Solution</p>
+        <p className="font-medium">Bimbel Cermat - Admin Panel</p>
       </div>
 
       <div className="2xsm:gap-4 flex flex-1 items-center justify-end gap-2">
@@ -54,7 +54,7 @@ export function Header() {
 
         <ThemeToggleSwitch />
 
-        <Notification />
+        {/* <Notification /> */}
 
         <div className="shrink-0">
           <UserInfo />
