@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isAuthRoute = pathname.startsWith("/auth");
-  const isPublicRoute = pathname.startsWith("/lapor");
+  const isPublicRoute = pathname.startsWith("/report");
 
   if (!sessionCookie && !isAuthRoute && !isPublicRoute) {
     return NextResponse.redirect(new URL("/auth/sign-in", request.url));

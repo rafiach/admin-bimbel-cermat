@@ -5,6 +5,8 @@ import {
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { toggleBayarOrtu, toggleBayarTutor } from "./actions";
+import Link from "next/link";
+
 
 export const metadata = { title: "Rekap & Pembayaran" };
 
@@ -13,6 +15,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
+// fee kompensasi
 const FEE_IZIN = 10000;
 
 export default async function RekapPage({
@@ -32,7 +35,7 @@ export default async function RekapPage({
   });
 
   const rows = laporan.map((l) => {
-    const tagihanOrtu = l.jumlahHadir * l.kelas.biayaOrtu;
+    const tagihanOrtu = l.jumlahHadir * l.kelas.biayaOrtu + l.jumlahIzin * FEE_IZIN;
     const feeTutor = l.jumlahHadir * l.kelas.feeTutor + l.jumlahIzin * FEE_IZIN;
     return { ...l, tagihanOrtu, feeTutor };
   });
@@ -87,7 +90,8 @@ export default async function RekapPage({
               <TableHead>Tagihan Ortu</TableHead>
               <TableHead>Fee Tutor</TableHead>
               <TableHead>Bayar Ortu</TableHead>
-              <TableHead className="text-right xl:pr-7.5">Bayar Tutor</TableHead>
+              <TableHead>Bayar Tutor</TableHead>
+              <TableHead className="text-right xl:pr-7.5">Detail</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -109,7 +113,7 @@ export default async function RekapPage({
                     </button>
                   </form>
                 </TableCell>
-                <TableCell className="text-right xl:pr-7.5">
+                <TableCell>
                   <form action={toggleBayarTutor}>
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="current" value={r.statusBayarTutor} />
@@ -117,6 +121,9 @@ export default async function RekapPage({
                       {r.statusBayarTutor === "sudah" ? "Sudah ✓" : "Belum"}
                     </button>
                   </form>
+                </TableCell>
+                <TableCell className="text-right xl:pr-7.5">
+                  <Link href={`/rekap/${r.id}`} className="hover:text-primary">Lihat</Link>
                 </TableCell>
               </TableRow>
             ))}
