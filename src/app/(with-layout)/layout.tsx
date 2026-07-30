@@ -1,8 +1,21 @@
 import { Header } from "@/components/Layouts/header";
 import { Sidebar } from "@/components/Layouts/sidebar";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { type PropsWithChildren } from "react";
 
-export default function WithLayout({ children }: PropsWithChildren) {
+export default async function WithLayout({
+  children,
+}: PropsWithChildren) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    redirect("/auth/sign-in");
+  }
+
   return (
     <div className="flex min-h-screen">
       <Sidebar />
