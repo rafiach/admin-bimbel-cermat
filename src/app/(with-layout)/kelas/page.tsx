@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelas } from "./actions";
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Kelas" };
 

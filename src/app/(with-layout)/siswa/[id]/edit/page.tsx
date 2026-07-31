@@ -4,6 +4,7 @@ import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateSiswa } from "../../actions";
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Siswa" };
 

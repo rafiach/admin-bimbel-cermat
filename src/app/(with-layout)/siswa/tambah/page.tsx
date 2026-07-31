@@ -2,7 +2,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { createSiswa } from "../actions";
-
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Tambah Siswa" };
 
 export default function TambahSiswaPage() {

@@ -2,6 +2,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { PrintButton } from "../_component/print-button";
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Detail Laporan" };
 

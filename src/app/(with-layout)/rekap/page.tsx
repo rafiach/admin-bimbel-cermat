@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
-
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Rekap & Pembayaran" };
 

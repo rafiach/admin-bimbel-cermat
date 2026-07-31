@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { ReportForm } from "./_component/form-report";
-
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Lapor Kehadiran - Bimbel Cermat" };
 
 export default async function ReportPage() {

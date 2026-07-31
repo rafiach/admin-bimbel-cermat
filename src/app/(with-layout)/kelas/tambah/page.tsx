@@ -3,6 +3,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { createKelas } from "../actions";
+export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Tambah Kelas" };
 
