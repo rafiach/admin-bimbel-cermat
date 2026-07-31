@@ -19,16 +19,6 @@ export default function TambahSiswaPage() {
           <InputGroup label="No Rekening Orang Tua" name="noRekOrtu" type="text" placeholder="Misal: BRI 12345" />
           <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="text" placeholder="Langsung tulis angka: 20000" />
           <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" />
-          <Select
-            label="Status"
-            name="status"
-            defaultValue="aktif"
-            items={[
-              { value: "aktif", label: "Aktif" },
-              { value: "nonaktif", label: "Nonaktif" },
-              { value: "keluar", label: "Keluar" },
-            ]}
-          />
           <button
             type="submit"
             className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"

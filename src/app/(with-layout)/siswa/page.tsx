@@ -30,6 +30,11 @@ export default async function SiswaPage({
         </div>
       )}
 
+      <div className="mb-4 rounded-lg border border-[#FFA70B]/30 bg-[#FFA70B]/5 px-4 py-3 text-sm text-dark dark:text-white">
+        <span className="font-medium">Nonaktif</span> = siswa belum dapat kelas/tutor. Status otomatis
+        jadi <span className="font-medium">Aktif</span> begitu siswa ini dibuatkan Kelas di menu Data Kelas.
+      </div>
+
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">

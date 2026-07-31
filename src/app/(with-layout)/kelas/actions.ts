@@ -12,11 +12,12 @@ export async function createKelas(formData: FormData) {
   const biayaOrtu = Number(formData.get("biayaOrtu"));
   const feeTutor = Number(formData.get("feeTutor"));
 
-  await db.kelas.create({
-    data: { siswaId, tutorId, tipe, jadwal, biayaOrtu, feeTutor },
-  });
-
+  await db.$transaction([
+    db.kelas.create({ data: { siswaId, tutorId, tipe, jadwal, biayaOrtu, feeTutor } }),
+    db.siswa.update({ where: { id: siswaId }, data: { status: "aktif" } }),
+  ])
   revalidatePath("/kelas");
+  revalidatePath("/siswa");
   redirect("/kelas");
 }
 

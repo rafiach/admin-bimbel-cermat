@@ -13,7 +13,7 @@ export async function createSiswa(formData: FormData) {
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
   const notes = formData.get("notes") as string;
-  const status = (formData.get("status") as string) || "aktif";
+  const status = "nonaktif";
 
   if (!nama?.trim()) {
     throw new Error("Nama wajib diisi");
