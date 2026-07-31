@@ -1,17 +1,19 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { combinePhone } from "@/lib/phone";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { normalizePhoneID } from "@/lib/phone";
 
 export async function createSiswa(formData: FormData) {
   const nama = formData.get("nama") as string;
   const namaOrtu = formData.get("namaOrtu") as string;
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
-  const noHpOrtuRaw = formData.get("noHpOrtu") as string;
-  const noHpOrtu = noHpOrtuRaw ? normalizePhoneID(noHpOrtuRaw) : null;
+  const noHpOrtu = combinePhone(
+    formData.get("noHpOrtu_kode") as string,
+    formData.get("noHpOrtu_nomor") as string,
+  );
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
   const status = "nonaktif";
@@ -33,8 +35,10 @@ export async function updateSiswa(id: string, formData: FormData) {
   const namaOrtu = formData.get("namaOrtu") as string;
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
-  const noHpOrtuRaw = formData.get("noHpOrtu") as string;
-  const noHpOrtu = noHpOrtuRaw ? normalizePhoneID(noHpOrtuRaw) : null;
+  const noHpOrtu = combinePhone(
+    formData.get("noHpOrtu_kode") as string,
+    formData.get("noHpOrtu_nomor") as string,
+  );
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
   const status = formData.get("status") as string;

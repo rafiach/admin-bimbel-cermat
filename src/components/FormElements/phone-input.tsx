@@ -1,3 +1,5 @@
+import { COUNTRY_CODES, splitPhone } from "@/lib/phone";
+
 export function PhoneInputGroup({
   label,
   name,
@@ -9,7 +11,7 @@ export function PhoneInputGroup({
   defaultValue?: string | null;
   required?: boolean;
 }) {
-  const localPart = defaultValue?.startsWith("62") ? defaultValue.slice(2) : defaultValue ?? "";
+  const { kodeNegara, nomor } = splitPhone(defaultValue);
 
   return (
     <div>
@@ -18,11 +20,19 @@ export function PhoneInputGroup({
         {required && <span className="ml-1 text-red">*</span>}
       </label>
       <div className="flex overflow-hidden rounded-lg border border-stroke focus-within:border-primary dark:border-dark-3">
-        <span className="flex items-center bg-[#F7F9FC] px-3 text-sm text-dark-6 dark:bg-dark-2">+62</span>
+        <select
+          name={`${name}_kode`}
+          defaultValue={kodeNegara}
+          className="border-r border-stroke bg-[#F7F9FC] px-2 text-sm text-dark outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white"
+        >
+          {COUNTRY_CODES.map((c) => (
+            <option key={c.code} value={c.code}>{c.label}</option>
+          ))}
+        </select>
         <input
           type="tel"
-          name={name}
-          defaultValue={localPart}
+          name={`${name}_nomor`}
+          defaultValue={nomor}
           required={required}
           placeholder="81234567890"
           className="w-full bg-transparent px-4 py-3 text-dark outline-none dark:text-white"

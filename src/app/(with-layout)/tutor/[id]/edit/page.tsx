@@ -4,6 +4,7 @@ import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateTutor } from "../../actions";
+import { PhoneInputGroup } from "@/components/FormElements/phone-input";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Tutor" };
@@ -27,7 +28,7 @@ export default async function EditTutorPage({
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
         <form action={updateTutorWithId} className="space-y-5.5">
           <InputGroup label="Nama Tutor" name="nama" type="text" placeholder="Nama lengkap tutor" defaultValue={tutor.nama} required />
-          <InputGroup label="No HP" name="noHp" type="text" placeholder="08xxxxxxxxxx" defaultValue={tutor.noHp ?? ""} />
+          <PhoneInputGroup label="No HP" name="noHp" defaultValue={tutor.noHp} />
           <InputGroup label="Alamat" name="alamat" type="text" placeholder="Alamat tutor" defaultValue={tutor.alamat ?? ""} />
           <InputGroup label="Jenjang" name="jenjang" type="text" placeholder="Isi jenjang atau mapel" defaultValue={tutor.jenjang ?? ""} />
           <Select

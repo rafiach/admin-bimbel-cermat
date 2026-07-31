@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteTutor } from "./actions";
+import { formatPhoneDisplay, waLink } from "@/lib/phone";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Tutor" };
@@ -63,8 +64,14 @@ export default async function TutorPage({
                 <TableCell className="xl:pl-7.5 text-dark dark:text-white">
                   {t.nama}
                 </TableCell>
-                <TableCell className="text-dark dark:text-white">
-                  {t.noHp || "-"}
+                <TableCell>
+                  {waLink(t.noHp) ? (
+                    <a href={waLink(t.noHp)!} target="_blank" className="text-primary hover:underline">
+                      {formatPhoneDisplay(t.noHp)}
+                    </a>
+                  ) : (
+                    <span className="text-dark dark:text-white">-</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {t.alamat || "-"}

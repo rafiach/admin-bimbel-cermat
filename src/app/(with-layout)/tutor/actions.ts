@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
+import { combinePhone } from "@/lib/phone";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -8,7 +9,10 @@ export async function createTutor(formData: FormData) {
   const nama = formData.get("nama") as string;
   const alamat = formData.get("alamat") as string;
   const jenjang = formData.get("jenjang") as string;
-  const noHp = formData.get("noHp") as string;
+  const noHp = combinePhone(
+    formData.get("noHp_kode") as string,
+    formData.get("noHp_nomor") as string,
+  );
   const status = (formData.get("status") as string) || "aktif";
 
   if (!nama?.trim()) {
@@ -27,7 +31,10 @@ export async function updateTutor(id: string, formData: FormData) {
   const nama = formData.get("nama") as string;
   const alamat = formData.get("alamat") as string;
   const jenjang = formData.get("jenjang") as string;
-  const noHp = formData.get("noHp") as string;
+  const noHp = combinePhone(
+    formData.get("noHp_kode") as string,
+    formData.get("noHp_nomor") as string,
+  );
   const status = (formData.get("status") as string) || "aktif";
 
   await db.tutor.update({

@@ -2,6 +2,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { createTutor } from "../actions";
+import { PhoneInputGroup } from "@/components/FormElements/phone-input";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Tambah Tutor" };
@@ -14,7 +15,7 @@ export default function TambahTutorPage() {
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
         <form action={createTutor} className="space-y-5.5">
           <InputGroup label="Nama Tutor" name="nama" type="text" placeholder="Nama lengkap tutor" required />
-          <InputGroup label="No HP" name="noHp" type="text" placeholder="08xxxxxxxxxx" />
+          <PhoneInputGroup label="No HP" name="noHp" />
           <InputGroup label="Jenjang" name="jenjang" type="text" placeholder="Isi jenjang atau mapel" />
           <InputGroup label="Alamat" name="alamat" type="text" placeholder="Alamat tutor" />
           <Select

@@ -4,6 +4,7 @@ import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateSiswa } from "../../actions";
+import { PhoneInputGroup } from "@/components/FormElements/phone-input";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Siswa" };
@@ -30,7 +31,7 @@ export default async function EditSiswaPage({
           <InputGroup label="Sekolah" name="sekolah" type="text" placeholder="Nama sekolah" defaultValue={siswa.sekolah ?? ""} />
           <InputGroup label="Kelas" name="kelas" type="text" placeholder="Misal: 5 SD / 8 SMP" defaultValue={siswa.kelas ?? ""} />
           <InputGroup label="Nama Orang Tua" name="namaOrtu" type="text" placeholder="Nama lengkap orang tua" defaultValue={siswa.namaOrtu ?? ""} />
-          <InputGroup label="No HP Orang Tua" name="noHpOrtu" type="text" placeholder="Nama lengkap orang tua" defaultValue={siswa.noHpOrtu ?? ""} />
+          <PhoneInputGroup label="No HP Orang Tua" name="noHpOrtu" defaultValue={siswa.noHpOrtu ?? ""}/>
           <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="number" placeholder="Langsung tulis angka: 20000" defaultValue={String(siswa.biayaBimbel) ?? ""}/>
           <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" defaultValue={siswa.notes ?? ""}/>
           <Select

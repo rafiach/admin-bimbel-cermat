@@ -11,6 +11,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteSiswa } from "./actions";
+import { formatPhoneDisplay, waLink } from "@/lib/phone";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Siswa" };
@@ -67,7 +68,7 @@ export default async function SiswaPage({
           <TableBody>
             {siswa.map((s) => (
               <TableRow key={s.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="sticky left-0 z-10 bg-[#F7F9FC] xl:pl-7.5 text-dark dark:text-white dark:bg-dark-2">
+                <TableCell className="sticky left-0 z-10 bg-white xl:pl-7.5 text-dark dark:text-white dark:bg-dark-2">
                   {s.nama}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
@@ -79,8 +80,14 @@ export default async function SiswaPage({
                 <TableCell className="text-dark dark:text-white">
                   {s.namaOrtu || "-"}
                 </TableCell>
-                <TableCell className="text-dark dark:text-white">
-                  {s.noHpOrtu || "-"}
+                <TableCell>
+                  {waLink(s.noHpOrtu) ? (
+                    <a href={waLink(s.noHpOrtu)!} target="_blank" className="text-primary hover:underline">
+                      {formatPhoneDisplay(s.noHpOrtu)}
+                    </a>
+                  ) : (
+                    <span className="text-dark dark:text-white">-</span>
+                  )}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {s.biayaBimbel || "-"}

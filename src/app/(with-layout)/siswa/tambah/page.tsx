@@ -2,6 +2,7 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { createSiswa } from "../actions";
+import { PhoneInputGroup } from "@/components/FormElements/phone-input";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Tambah Siswa" };
 
@@ -16,7 +17,7 @@ export default function TambahSiswaPage() {
           <InputGroup label="Sekolah" name="sekolah" type="text" placeholder="Nama sekolah" />
           <InputGroup label="Kelas" name="kelas" type="text" placeholder="Misal: 5 SD / 8 SMP" />
           <InputGroup label="Nama Orang Tua" name="namaOrtu" type="text" placeholder="Nama lengkap orang tua" />
-          <InputGroup label="No HP Orang Tua" name="noHpOrtu" type="text" placeholder="08xxxxxxxxxx" />
+          <PhoneInputGroup label="No HP Orang Tua" name="noHpOrtu" />
           <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="text" placeholder="Langsung tulis angka: 20000" />
           <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" />
           <button
