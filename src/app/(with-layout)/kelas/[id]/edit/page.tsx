@@ -4,6 +4,7 @@ import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateKelas } from "../../actions";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Kelas" };
@@ -50,9 +51,9 @@ export default async function EditKelasPage({
             ]}
           />
 
-          <button type="submit" className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90">
-            Simpan Perubahan
-          </button>
+          <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
+            Simpan Kelas
+          </SubmitButton>
         </form>
       </div>
     </>

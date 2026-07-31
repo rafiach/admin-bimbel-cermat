@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelas } from "./actions";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Kelas" };
@@ -60,7 +61,7 @@ export default async function KelasPage({
           <TableBody>
             {kelas.map((k) => (
               <TableRow key={k.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="xl:pl-7.5 text-dark dark:text-white">{k.siswa.nama}</TableCell>
+                <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">{k.siswa.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.tutor.nama}</TableCell>
                 <TableCell className="capitalize text-dark dark:text-white">{k.tipe}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.jadwal}</TableCell>
@@ -81,7 +82,9 @@ export default async function KelasPage({
                     <Link href={`/kelas/${k.id}/edit`} className="hover:text-primary">Edit</Link>
                     <form action={deleteKelas}>
                       <input type="hidden" name="id" value={k.id} />
-                      <button type="submit" className="text-red hover:underline">Hapus</button>
+                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
+                        Hapus
+                      </SubmitButton>
                     </form>
                   </div>
                 </TableCell>

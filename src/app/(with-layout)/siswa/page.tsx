@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteSiswa } from "./actions";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Siswa" };
@@ -68,7 +69,7 @@ export default async function SiswaPage({
           <TableBody>
             {siswa.map((s) => (
               <TableRow key={s.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="sticky left-0 z-10 bg-white xl:pl-7.5 text-dark dark:text-white dark:bg-dark-2">
+                <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">
                   {s.nama}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
@@ -114,9 +115,9 @@ export default async function SiswaPage({
                     </Link>
                     <form action={deleteSiswa}>
                       <input type="hidden" name="id" value={s.id} />
-                      <button type="submit" className="text-red hover:underline">
+                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
                         Hapus
-                      </button>
+                      </SubmitButton>
                     </form>
                   </div>
                 </TableCell>

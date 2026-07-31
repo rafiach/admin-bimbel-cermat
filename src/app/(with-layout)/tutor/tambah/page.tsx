@@ -3,6 +3,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { createTutor } from "../actions";
 import { PhoneInputGroup } from "@/components/FormElements/phone-input";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Tambah Tutor" };
@@ -27,12 +28,9 @@ export default function TambahTutorPage() {
               { value: "nonaktif", label: "Nonaktif" },
             ]}
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
-          >
+          <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
             Simpan Tutor
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </>

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteTutor } from "./actions";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Tutor" };
@@ -61,7 +62,7 @@ export default async function TutorPage({
           <TableBody>
             {tutor.map((t) => (
               <TableRow key={t.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="xl:pl-7.5 text-dark dark:text-white">
+                <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">
                   {t.nama}
                 </TableCell>
                 <TableCell>
@@ -98,9 +99,9 @@ export default async function TutorPage({
                     </Link>
                     <form action={deleteTutor}>
                       <input type="hidden" name="id" value={t.id} />
-                      <button type="submit" className="text-red hover:underline">
+                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
                         Hapus
-                      </button>
+                      </SubmitButton>
                     </form>
                   </div>
                 </TableCell>

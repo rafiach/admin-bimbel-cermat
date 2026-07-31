@@ -3,6 +3,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { createKelas } from "../actions";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Tambah Kelas" };
@@ -34,9 +35,9 @@ export default async function TambahKelasPage() {
           <InputGroup label="Biaya ke Ortu (per pertemuan)" name="biayaOrtu" type="number" placeholder="Misal: 75000" required />
           <InputGroup label="Fee Tutor (per pertemuan)" name="feeTutor" type="number" placeholder="Misal: 50000" required />
 
-          <button type="submit" className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90">
+          <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
             Simpan Kelas
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </>

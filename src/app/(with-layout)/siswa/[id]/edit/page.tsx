@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateSiswa } from "../../actions";
 import { PhoneInputGroup } from "@/components/FormElements/phone-input";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Siswa" };
@@ -44,12 +45,9 @@ export default async function EditSiswaPage({
               { value: "keluar", label: "Keluar" },
             ]}
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
-          >
-            Simpan Perubahan
-          </button>
+          <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
+            Simpan Siswa
+          </SubmitButton>
         </form>
       </div>
     </>

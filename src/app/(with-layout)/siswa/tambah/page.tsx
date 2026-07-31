@@ -3,6 +3,7 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { Select } from "@/components/FormElements/select";
 import { createSiswa } from "../actions";
 import { PhoneInputGroup } from "@/components/FormElements/phone-input";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Tambah Siswa" };
 
@@ -20,12 +21,9 @@ export default function TambahSiswaPage() {
           <PhoneInputGroup label="No HP Orang Tua" name="noHpOrtu" />
           <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="text" placeholder="Langsung tulis angka: 20000" />
           <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" />
-          <button
-            type="submit"
-            className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90"
-          >
+          <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
             Simpan Siswa
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </>
