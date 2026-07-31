@@ -4,7 +4,7 @@ import {
 } from "@/components/ui/table";
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
-import { toggleBayarOrtu, toggleBayarTutor } from "./actions";
+import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
 export const dynamic = "force-dynamic";
 
@@ -91,7 +91,7 @@ export default async function RekapPage({
               <TableHead>Fee Tutor</TableHead>
               <TableHead>Bayar Ortu</TableHead>
               <TableHead>Bayar Tutor</TableHead>
-              <TableHead className="text-right xl:pr-7.5">Detail</TableHead>
+              <TableHead className="text-right xl:pr-7.5">Aksi</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -123,7 +123,14 @@ export default async function RekapPage({
                   </form>
                 </TableCell>
                 <TableCell className="text-right xl:pr-7.5">
-                  <Link href={`/rekap/${r.id}`} className="hover:text-primary">Lihat</Link>
+                  <div className="flex items-center justify-end gap-3">
+                    <Link href={`/rekap/${r.id}`} className="hover:text-primary">Lihat</Link>
+                    <Link href={`/rekap/${r.id}/edit`} className="hover:text-primary">Edit</Link>
+                    <form action={deleteLaporan}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <button type="submit" className="text-red hover:underline">Hapus</button>
+                    </form>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
