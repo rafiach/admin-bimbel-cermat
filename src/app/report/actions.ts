@@ -14,6 +14,7 @@ export async function createLaporan(
   const tahun = Number(formData.get("tahun"));
   const jumlahHadir = Number(formData.get("jumlahHadir"));
   const jumlahIzin = Number(formData.get("jumlahIzin") || 0);
+  const norekTutor = formData.get("norekTutor") as string;
   const materiDipelajari = formData.get("materiDipelajari") as string;
   const pemahamanMateri = Number(formData.get("pemahamanMateri"));
   const keaktifanBelajar = Number(formData.get("keaktifanBelajar"));
@@ -22,7 +23,7 @@ export async function createLaporan(
   const catatanSiswa = formData.get("catatanSiswa") as string;
   const saranBimbel = formData.get("saranBimbel") as string;
 
-  if (!kelasId || !bulan || !tahun || !jumlahHadir) {
+  if (!kelasId || !bulan || !tahun || !jumlahHadir || !norekTutor) {
     return { success: false, message: "Lengkapi semua data wajib dulu ya." };
   }
 
@@ -34,6 +35,7 @@ export async function createLaporan(
         tahun,
         jumlahHadir,
         jumlahIzin,
+        norekTutor,
         materiDipelajari,
         pemahamanMateri,
         keaktifanBelajar,

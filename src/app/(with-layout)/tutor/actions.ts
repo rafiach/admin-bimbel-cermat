@@ -9,7 +9,6 @@ export async function createTutor(formData: FormData) {
   const alamat = formData.get("alamat") as string;
   const jenjang = formData.get("jenjang") as string;
   const noHp = formData.get("noHp") as string;
-  const norekTutor = formData.get("norekTutor") as string;
   const status = (formData.get("status") as string) || "aktif";
 
   if (!nama?.trim()) {
@@ -17,7 +16,7 @@ export async function createTutor(formData: FormData) {
   }
 
   await db.tutor.create({
-    data: { nama, alamat, jenjang, noHp, norekTutor, status },
+    data: { nama, alamat, jenjang, noHp, status },
   });
 
   revalidatePath("/tutor");
@@ -29,12 +28,11 @@ export async function updateTutor(id: string, formData: FormData) {
   const alamat = formData.get("alamat") as string;
   const jenjang = formData.get("jenjang") as string;
   const noHp = formData.get("noHp") as string;
-  const norekTutor = formData.get("norekTutor") as string;
   const status = (formData.get("status") as string) || "aktif";
 
   await db.tutor.update({
     where: { id },
-    data: { nama, alamat, jenjang, noHp, norekTutor, status },
+    data: { nama, alamat, jenjang, noHp, status },
   });
 
   revalidatePath("/tutor");

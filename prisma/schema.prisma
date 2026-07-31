@@ -96,7 +96,6 @@ model Tutor {
   alamat     String?
   jenjang    String?
   noHp       String?  @map("no_hp")
-  norekTutor String?  @map("norek_tutor")
   status     String   @default("aktif")
   userId     String?  @unique @map("user_id")
   kelasList      Kelas[]
@@ -132,6 +131,7 @@ model LaporanBulanan {
   tahun            Int
   jumlahHadir      Int      @map("jumlah_hadir")
   jumlahIzin       Int      @default(0) @map("jumlah_izin")
+  norekTutor       String?  @map("norek_tutor")
   materiDipelajari String?  @map("materi_dipelajari")
   pemahamanMateri  Int      @map("pemahaman_materi")   // 1-5
   keaktifanBelajar Int      @map("keaktifan_belajar")  // 1-5

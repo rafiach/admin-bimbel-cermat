@@ -85,6 +85,19 @@ export function ReportForm({ tutorList, kelasList }: { tutorList: Tutor[]; kelas
       </div>
 
       <div>
+        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+          No Rekening / E-Wallet (buat pencairan fee)
+        </label>
+        <input
+          type="text"
+          name="norekTutor"
+          required
+          placeholder="Misal: BCA 1234567890 a.n. Nama Tutor"
+          className={inputClass}
+        />
+      </div>
+
+      <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Materi yang Dipelajari Bulan Ini</label>
         <textarea name="materiDipelajari" rows={3} className={inputClass} />
       </div>

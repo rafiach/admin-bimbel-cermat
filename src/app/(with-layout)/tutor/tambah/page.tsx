@@ -16,7 +16,6 @@ export default function TambahTutorPage() {
           <InputGroup label="No HP" name="noHp" type="text" placeholder="08xxxxxxxxxx" />
           <InputGroup label="Jenjang" name="jenjang" type="text" placeholder="Isi jenjang atau mapel" />
           <InputGroup label="Alamat" name="alamat" type="text" placeholder="Alamat tutor" />
-          <InputGroup label="No Rekening / E-Wallet" name="norekTutor" type="text" placeholder="Misal: BCA 1234567890 a.n. ..." />
           <Select
             label="Status"
             name="status"
