@@ -77,10 +77,10 @@ model Siswa {
   nama          String
   sekolah       String?
   kelas         String?
+  namaOrtu      String?      @map("nama_ortu")
   noHpOrtu      String?      @map("no_hp_ortu")
   tanggalDaftar DateTime     @default(now()) @map("tanggal_daftar")
   notes         String?
-  noRekOrtu     String?      @map("no_rek_ortu")
   biayaBimbel   Int?         @map("biaya_bimbel")
   status        String       @default("aktif")
   kelasList     Kelas[]

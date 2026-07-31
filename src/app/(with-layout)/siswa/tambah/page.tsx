@@ -15,8 +15,8 @@ export default function TambahSiswaPage() {
           <InputGroup label="Nama Siswa" name="nama" type="text" placeholder="Nama lengkap siswa" required />
           <InputGroup label="Sekolah" name="sekolah" type="text" placeholder="Nama sekolah" />
           <InputGroup label="Kelas" name="kelas" type="text" placeholder="Misal: 5 SD / 8 SMP" />
+          <InputGroup label="Nama Orang Tua" name="namaOrtu" type="text" placeholder="Nama lengkap orang tua" />
           <InputGroup label="No HP Orang Tua" name="noHpOrtu" type="text" placeholder="08xxxxxxxxxx" />
-          <InputGroup label="No Rekening Orang Tua" name="noRekOrtu" type="text" placeholder="Misal: BRI 12345" />
           <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="text" placeholder="Langsung tulis angka: 20000" />
           <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" />
           <button

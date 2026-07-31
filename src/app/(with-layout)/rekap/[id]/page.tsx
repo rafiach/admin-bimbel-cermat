@@ -159,7 +159,7 @@ export default async function DetailLaporanPage({
           </div>
         </div>
         <div className="print:hidden mx-auto max-w-2xl space-y-2 rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">
-          <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Internal — gak ikut ke-print</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Notes Buat Bimbel</p>
           <p className="text-sm text-dark dark:text-white">
             <span className="text-dark-6">No Rekening Tutor: </span>{laporan.norekTutor}
           </p>

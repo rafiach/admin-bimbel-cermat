@@ -29,7 +29,10 @@ export default async function EditSiswaPage({
           <InputGroup label="Nama Siswa" name="nama" type="text" placeholder="Nama lengkap siswa" defaultValue={siswa.nama} required />
           <InputGroup label="Sekolah" name="sekolah" type="text" placeholder="Nama sekolah" defaultValue={siswa.sekolah ?? ""} />
           <InputGroup label="Kelas" name="kelas" type="text" placeholder="Misal: 5 SD / 8 SMP" defaultValue={siswa.kelas ?? ""} />
-          <InputGroup label="No HP Orang Tua" name="noHpOrtu" type="text" placeholder="08xxxxxxxxxx" defaultValue={siswa.noHpOrtu ?? ""} />
+          <InputGroup label="Nama Orang Tua" name="namaOrtu" type="text" placeholder="Nama lengkap orang tua" defaultValue={siswa.namaOrtu ?? ""} />
+          <InputGroup label="No HP Orang Tua" name="noHpOrtu" type="text" placeholder="Nama lengkap orang tua" defaultValue={siswa.noHpOrtu ?? ""} />
+          <InputGroup label="Biaya Bimbel" name="biayaBimbel" type="number" placeholder="Langsung tulis angka: 20000" defaultValue={String(siswa.biayaBimbel) ?? ""}/>
+          <InputGroup label="Kendala Belajar Siswa" name="notes" type="text" placeholder="Kendala belajar siswa" defaultValue={siswa.notes ?? ""}/>
           <Select
             label="Status"
             name="status"

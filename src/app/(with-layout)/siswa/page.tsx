@@ -55,8 +55,8 @@ export default async function SiswaPage({
               <TableHead className="sticky left-0 z-10 bg-[#F7F9FC] xl:pl-7.5 dark:bg-dark-2">Nama</TableHead>
               <TableHead>Sekolah</TableHead>
               <TableHead>Kelas</TableHead>
+              <TableHead>Nama Ortu</TableHead>
               <TableHead>No HP Ortu</TableHead>
-              <TableHead>No Rekening Ortu</TableHead>
               <TableHead>Biaya Bimbel</TableHead>
               <TableHead>Kendala Belajar Siswa</TableHead>
               <TableHead>Status</TableHead>
@@ -77,10 +77,10 @@ export default async function SiswaPage({
                   {s.kelas || "-"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
-                  {s.noHpOrtu || "-"}
+                  {s.namaOrtu || "-"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
-                  {s.noRekOrtu || "-"}
+                  {s.noHpOrtu || "-"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {s.biayaBimbel || "-"}

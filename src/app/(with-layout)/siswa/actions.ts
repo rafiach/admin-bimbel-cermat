@@ -3,16 +3,17 @@
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { normalizePhoneID } from "@/lib/phone";
 
 export async function createSiswa(formData: FormData) {
   const nama = formData.get("nama") as string;
+  const namaOrtu = formData.get("namaOrtu") as string;
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
-  const noHpOrtu = formData.get("noHpOrtu") as string;
-  const noRekOrtu = formData.get("noRekOrtu") as string;
+  const noHpOrtuRaw = formData.get("noHpOrtu") as string;
+  const noHpOrtu = noHpOrtuRaw ? normalizePhoneID(noHpOrtuRaw) : null;
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
-  const notes = formData.get("notes") as string;
   const status = "nonaktif";
 
   if (!nama?.trim()) {
@@ -20,7 +21,7 @@ export async function createSiswa(formData: FormData) {
   }
 
   await db.siswa.create({
-    data: { nama, sekolah, kelas, noHpOrtu, noRekOrtu, biayaBimbel, notes,status },
+    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status },
   });
 
   revalidatePath("/siswa");
@@ -29,18 +30,18 @@ export async function createSiswa(formData: FormData) {
 
 export async function updateSiswa(id: string, formData: FormData) {
   const nama = formData.get("nama") as string;
+  const namaOrtu = formData.get("namaOrtu") as string;
   const sekolah = formData.get("sekolah") as string;
   const kelas = formData.get("kelas") as string;
-  const noHpOrtu = formData.get("noHpOrtu") as string;
-  const noRekOrtu = formData.get("noRekOrtu") as string;
+  const noHpOrtuRaw = formData.get("noHpOrtu") as string;
+  const noHpOrtu = noHpOrtuRaw ? normalizePhoneID(noHpOrtuRaw) : null;
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
-  const notes = formData.get("notes") as string;
   const status = formData.get("status") as string;
 
   await db.siswa.update({
     where: { id },
-    data: { nama, sekolah, kelas, noHpOrtu, noRekOrtu, biayaBimbel, notes, status },
+    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status },
   });
 
   revalidatePath("/siswa");
