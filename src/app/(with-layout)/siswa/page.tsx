@@ -67,7 +67,7 @@ export default async function SiswaPage({
           <TableBody>
             {siswa.map((s) => (
               <TableRow key={s.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="xl:pl-7.5 text-dark dark:text-white">
+                <TableCell className="sticky left-0 z-10 bg-[#F7F9FC] xl:pl-7.5 text-dark dark:text-white dark:bg-dark-2">
                   {s.nama}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">

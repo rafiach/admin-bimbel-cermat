@@ -16,7 +16,7 @@ const BULAN = [
 ];
 
 // fee kompensasi
-const FEE_IZIN = 10000;
+const FEE_IZIN = 5000;
 
 export default async function RekapPage({
   searchParams,

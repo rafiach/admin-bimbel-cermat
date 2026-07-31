@@ -1,7 +1,7 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { PrintButton } from "../_component/print-button";
+import { DownloadButton } from "../_component/download-button";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Detail Laporan" };
@@ -12,7 +12,7 @@ const BULAN = [
 ];
 
 // fee kompensasi
-const FEE_IZIN = 10000;
+const FEE_IZIN = 5000;
 
 export default async function DetailLaporanPage({
   params,
@@ -35,7 +35,7 @@ export default async function DetailLaporanPage({
 
       <div className="space-y-5.5">
         <div className="print:hidden flex items-center justify-end">
-          <PrintButton />
+          <DownloadButton filename={`kwitansi-${laporan.kelas.siswa.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`}/>
         </div>
 
         <div
