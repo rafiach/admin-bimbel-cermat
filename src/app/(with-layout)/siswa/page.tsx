@@ -14,12 +14,21 @@ import { deleteSiswa } from "./actions";
 
 export const metadata = { title: "Data Siswa" };
 
-export default async function SiswaPage() {
+export default async function SiswaPage({
+  searchParams,
+}: {
+    searchParams: Promise<{ error?: string }>;
+  }) {
+  const { error } = await searchParams;
   const siswa = await db.siswa.findMany({ orderBy: { createdAt: "desc" } });
-
   return (
     <>
       <Breadcrumb pageName="Data Siswa" />
+      {error && (
+        <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
+          {error}
+        </div>
+      )}
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">

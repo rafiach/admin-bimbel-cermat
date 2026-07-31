@@ -14,12 +14,22 @@ import { deleteTutor } from "./actions";
 
 export const metadata = { title: "Data Tutor" };
 
-export default async function TutorPage() {
+export default async function TutorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const tutor = await db.tutor.findMany({ orderBy: { createdAt: "desc" } });
 
   return (
     <>
       <Breadcrumb pageName="Data Tutor" />
+      {error && (
+        <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
+          {error}
+        </div>
+      )}
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">

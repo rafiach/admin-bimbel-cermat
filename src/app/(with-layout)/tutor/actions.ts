@@ -41,6 +41,14 @@ export async function updateTutor(id: string, formData: FormData) {
 
 export async function deleteTutor(formData: FormData) {
   const id = formData.get("id") as string;
+
+  const kelasCount = await db.kelas.count({ where: { tutorId: id } });
+  if (kelasCount > 0) {
+    redirect(
+      `/tutor?error=${encodeURIComponent("Tutor ini masih punya kelas aktif, gak bisa dihapus. Nonaktifkan aja lewat tombol Edit.")}`,
+    );
+  }
+
   await db.tutor.delete({ where: { id } });
   revalidatePath("/tutor");
 }

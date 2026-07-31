@@ -9,7 +9,12 @@ import { deleteKelas } from "./actions";
 
 export const metadata = { title: "Data Kelas" };
 
-export default async function KelasPage() {
+export default async function KelasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const kelas = await db.kelas.findMany({
     include: { siswa: true, tutor: true },
     orderBy: { createdAt: "desc" },
@@ -18,6 +23,11 @@ export default async function KelasPage() {
   return (
     <>
       <Breadcrumb pageName="Data Kelas" />
+      {error && (
+        <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
+          {error}
+        </div>
+      )}
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">

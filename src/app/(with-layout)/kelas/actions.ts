@@ -38,6 +38,14 @@ export async function updateKelas(id: string, formData: FormData) {
 
 export async function deleteKelas(formData: FormData) {
   const id = formData.get("id") as string;
+
+  const laporanCount = await db.laporanBulanan.count({ where: { kelasId: id } });
+  if (laporanCount > 0) {
+    redirect(
+      `/kelas?error=${encodeURIComponent("Kelas ini udah punya riwayat laporan, gak bisa dihapus (biar histori pembayaran gak ikut hilang). Nonaktifkan aja lewat tombol Edit.")}`,
+    );
+  }
+
   await db.kelas.delete({ where: { id } });
   revalidatePath("/kelas");
 }

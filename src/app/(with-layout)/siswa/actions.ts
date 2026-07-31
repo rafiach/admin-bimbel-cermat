@@ -49,6 +49,14 @@ export async function updateSiswa(id: string, formData: FormData) {
 
 export async function deleteSiswa(formData: FormData) {
   const id = formData.get("id") as string;
+
+  const kelasCount = await db.kelas.count({ where: { siswaId: id } });
+  if (kelasCount > 0) {
+    redirect(
+      `/siswa?error=${encodeURIComponent("Siswa ini masih punya kelas aktif, gak bisa dihapus. Nonaktifkan aja lewat tombol Edit.")}`,
+    );
+  }
+
   await db.siswa.delete({ where: { id } });
   revalidatePath("/siswa");
 }
