@@ -24,6 +24,7 @@ export async function createTutor(formData: FormData) {
   });
 
   revalidatePath("/tutor");
+  revalidatePath("/report");
   redirect("/tutor");
 }
 
@@ -43,6 +44,7 @@ export async function updateTutor(id: string, formData: FormData) {
   });
 
   revalidatePath("/tutor");
+  revalidatePath("/report");
   redirect("/tutor");
 }
 
@@ -58,4 +60,5 @@ export async function deleteTutor(formData: FormData) {
 
   await db.tutor.delete({ where: { id } });
   revalidatePath("/tutor");
+  revalidatePath("/report");
 }

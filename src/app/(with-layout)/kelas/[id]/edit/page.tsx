@@ -5,7 +5,6 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { updateKelas } from "../../actions";
 import { SubmitButton } from "@/components/FormElements/submit-button";
-export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Edit Kelas" };
 

@@ -6,7 +6,8 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
-export const dynamic = "force-dynamic";
+import { formatPhoneDisplay, waLink } from "@/lib/phone";
+
 
 export const metadata = { title: "Rekap & Pembayaran" };
 
@@ -84,6 +85,7 @@ export default async function RekapPage({
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="xl:pl-7.5">Siswa</TableHead>
+              <TableHead>No HP Ortu</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Hadir</TableHead>
               <TableHead>Izin</TableHead>
@@ -99,6 +101,15 @@ export default async function RekapPage({
             {rows.map((r) => (
               <TableRow key={r.id} className="border-[#eee] dark:border-dark-3">
                 <TableCell className="xl:pl-7.5 text-dark dark:text-white">{r.kelas.siswa.nama}</TableCell>
+                <TableCell>
+                  {waLink(r.kelas.siswa.noHpOrtu) ? (
+                    <a href={waLink(r.kelas.siswa.noHpOrtu)!} target="_blank" className="text-primary hover:underline">
+                      {formatPhoneDisplay(r.kelas.siswa.noHpOrtu)}
+                    </a>
+                  ) : (
+                    <span className="text-dark dark:text-white">-</span>
+                  )}
+                </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.kelas.tutor.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahHadir}</TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahIzin}</TableCell>
@@ -137,7 +148,7 @@ export default async function RekapPage({
 
             {rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="py-6 text-center text-dark-6">Belum ada laporan buat periode ini.</TableCell>
+                <TableCell colSpan={10} className="py-6 text-center text-dark-6">Belum ada laporan buat periode ini.</TableCell>
               </TableRow>
             )}
           </TableBody>

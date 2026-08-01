@@ -27,6 +27,7 @@ export async function createSiswa(formData: FormData) {
   });
 
   revalidatePath("/siswa");
+  revalidatePath("/report");
   redirect("/siswa");
 }
 
@@ -49,6 +50,7 @@ export async function updateSiswa(id: string, formData: FormData) {
   });
 
   revalidatePath("/siswa");
+  revalidatePath("/report");
   redirect("/siswa");
 }
 
@@ -64,4 +66,5 @@ export async function deleteSiswa(formData: FormData) {
 
   await db.siswa.delete({ where: { id } });
   revalidatePath("/siswa");
+  revalidatePath("/report");
 }

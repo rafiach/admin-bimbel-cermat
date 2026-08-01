@@ -18,6 +18,7 @@ export async function createKelas(formData: FormData) {
   ])
   revalidatePath("/kelas");
   revalidatePath("/siswa");
+  revalidatePath("/report");
   redirect("/kelas");
 }
 
@@ -34,6 +35,8 @@ export async function updateKelas(id: string, formData: FormData) {
   });
 
   revalidatePath("/kelas");
+  revalidatePath("/siswa");
+  revalidatePath("/report");
   redirect("/kelas");
 }
 
@@ -49,4 +52,7 @@ export async function deleteKelas(formData: FormData) {
 
   await db.kelas.delete({ where: { id } });
   revalidatePath("/kelas");
+  revalidatePath("/siswa");
+  revalidatePath("/report");
+
 }

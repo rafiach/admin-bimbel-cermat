@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelas } from "./actions";
 import { SubmitButton } from "@/components/FormElements/submit-button";
-export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Kelas" };
 
