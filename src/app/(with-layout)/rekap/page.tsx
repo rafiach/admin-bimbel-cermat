@@ -80,7 +80,11 @@ export default async function RekapPage({
             Tampilkan
           </button>
         </form>
-
+        <div className="mb-5">
+          <Link href="/rekap/gabungan" className="text-sm text-primary hover:underline">
+            + Buat Kwitansi Gabungan
+          </Link>
+        </div>
         <Table>
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">

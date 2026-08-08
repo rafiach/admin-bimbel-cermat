@@ -9,7 +9,7 @@ export const metadata = { title: "Tambah Kelas" };
 
 export default async function TambahKelasPage() {
   const [siswaList, tutorList] = await Promise.all([
-    db.siswa.findMany({ where: { status: "aktif" }, orderBy: { nama: "asc" } }),
+    db.siswa.findMany({ orderBy: { nama: "asc" } }),
     db.tutor.findMany({ where: { status: "aktif" }, orderBy: { nama: "asc" } }),
   ]);
 
