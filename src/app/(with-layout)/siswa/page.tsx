@@ -55,6 +55,7 @@ export default async function SiswaPage({
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="sticky left-0 z-10 bg-[#F7F9FC] xl:pl-7.5 dark:bg-dark-2">Nama</TableHead>
+              <TableHead>Alamat</TableHead>
               <TableHead>Sekolah</TableHead>
               <TableHead>Kelas</TableHead>
               <TableHead>Nama Ortu</TableHead>
@@ -71,6 +72,9 @@ export default async function SiswaPage({
               <TableRow key={s.id} className="border-[#eee] dark:border-dark-3">
                 <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">
                   {s.nama}
+                </TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {s.alamat || "-"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {s.sekolah || "-"}
@@ -112,6 +116,9 @@ export default async function SiswaPage({
                   <div className="flex items-center justify-end gap-3.5">
                     <Link href={`/siswa/${s.id}/edit`} className="hover:text-primary">
                       Edit
+                    </Link>
+                    <Link href={`/siswa/${s.id}/poster`} className="hover:text-primary">
+                      Poster
                     </Link>
                     <form action={deleteSiswa}>
                       <input type="hidden" name="id" value={s.id} />

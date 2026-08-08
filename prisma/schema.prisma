@@ -75,6 +75,7 @@ model Verification {
 model Siswa {
   id            String       @id @default(cuid())
   nama          String
+  alamat        String?      @map("alamat")
   sekolah       String?
   kelas         String?
   namaOrtu      String?      @map("nama_ortu")

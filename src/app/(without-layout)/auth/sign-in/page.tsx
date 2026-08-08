@@ -20,17 +20,9 @@ export default function SignIn() {
         <div className="custom-gradient-1 overflow-hidden rounded-2xl px-15 pt-12.5 dark:bg-dark-2! dark:bg-none">
           <Link className="mb-10 inline-block" href="/">
             <Image
-              className="hidden dark:block"
-              src={"/images/logo/logo.svg"}
+              src={"/images/logo/logo-bimbel.svg"}
               alt="Logo"
-              width={176}
-              height={32}
-            />
-            <Image
-              className="dark:hidden"
-              src={"/images/logo/logo-dark.svg"}
-              alt="Logo"
-              width={176}
+              width={250}
               height={32}
             />
           </Link>
@@ -47,6 +39,7 @@ export default function SignIn() {
             below
           </p>
 
+          
           <div className="mt-31">
             <Image
               src={"/images/grids/grid-02.svg"}

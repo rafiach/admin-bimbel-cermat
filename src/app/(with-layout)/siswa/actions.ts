@@ -17,13 +17,15 @@ export async function createSiswa(formData: FormData) {
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
   const status = "nonaktif";
+  const alamat = formData.get("alamat") as string;
+
 
   if (!nama?.trim()) {
     throw new Error("Nama wajib diisi");
   }
 
   await db.siswa.create({
-    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status },
+    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status, alamat },
   });
 
   revalidatePath("/siswa");
@@ -43,10 +45,12 @@ export async function updateSiswa(id: string, formData: FormData) {
   const biayaBimbelRaw = formData.get("biayaBimbel") as string;
   const biayaBimbel = biayaBimbelRaw ? Number(biayaBimbelRaw) : null;
   const status = formData.get("status") as string;
+  const alamat = formData.get("alamat") as string;
+
 
   await db.siswa.update({
     where: { id },
-    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status },
+    data: { nama, namaOrtu, sekolah, kelas, noHpOrtu, biayaBimbel, status, alamat },
   });
 
   revalidatePath("/siswa");
