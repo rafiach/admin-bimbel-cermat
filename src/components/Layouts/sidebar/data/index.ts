@@ -29,6 +29,12 @@ export const NAV_DATA = [
         // items: [],
       },
       {
+        title: "Data Kelompok",
+        url: "/kelompok",
+        icon: Icons.User,
+        // items: [],
+      },
+      {
         title: "Rekap & Pembayaran",
         url: "/rekap",
         icon: Icons.Table,

@@ -85,6 +85,8 @@ model Siswa {
   biayaBimbel   Int?         @map("biaya_bimbel")
   status        String       @default("aktif")
   kelasList     Kelas[]
+  anggotaKelompok        AnggotaKelompok[]
+  anggotalaporanKelompok AnggotaLaporanKelompok[]
   createdAt     DateTime     @default(now()) @map("created_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
 
@@ -100,6 +102,7 @@ model Tutor {
   status     String   @default("aktif")
   userId     String?  @unique @map("user_id")
   kelasList      Kelas[]
+  kalompok   Kelompok[]
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -146,4 +149,73 @@ model LaporanBulanan {
 
   @@unique([kelasId, bulan, tahun])
   @@map("laporan_bulanan")
+}
+
+model Kelompok {
+  id                String            @id @default(cuid())
+  nama              String
+  tutorId           String            @map("tutor_id")
+  tutor             Tutor             @relation(fields: [tutorId], references: [id])
+  jadwal            String
+  hargaKelompok     Int               @map("harga_kelompok")
+  feeTutorKelompok  Int               @map("fee_tutor_kelompok")
+  namaWali          String?           @map("nama_wali")
+  noHpWali          String?           @map("no_hp_wali")
+  status            String            @default("aktif")
+  anggota           AnggotaKelompok[]
+  laporan           LaporanKelompok[]
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  @@map("kelompok")
+}
+
+model AnggotaKelompok {
+  id          String   @id @default(cuid())
+  kelompokId  String   @map("kelompok_id")
+  kelompok    Kelompok @relation(fields: [kelompokId], references: [id], onDelete: Cascade)
+  siswaId     String   @map("siswa_id")
+  siswa       Siswa    @relation(fields: [siswaId], references: [id])
+  hargaPrivat Int      @map("harga_privat")
+  feeTutor    Int      @map("fee_tutor")
+
+  @@unique([kelompokId, siswaId])
+  @@map("anggota_kelompok")
+}
+
+model LaporanKelompok {
+  id                 String                   @id @default(cuid())
+  kelompokId         String                   @map("kelompok_id")
+  kelompok           Kelompok                 @relation(fields: [kelompokId], references: [id], onDelete: Cascade)
+  bulan              Int
+  tahun              Int
+  jumlahKelompok     Int                      @map("jumlah_kelompok")
+  hargaKelompokFinal Int?                     @map("harga_kelompok_final")
+  materiDipelajari   String?                  @map("materi_dipelajari")
+  pemahamanMateri    Int                      @map("pemahaman_materi")
+  keaktifanBelajar   Int                      @map("keaktifan_belajar")
+  kemandirian        Int
+  kedisiplinan       Int
+  catatanSiswa       String?                  @map("catatan_siswa")
+  saranBimbel        String?                  @map("saran_bimbel")
+  norekTutor         String?                  @map("norek_tutor")
+  statusBayarOrtu    String                   @default("belum") @map("status_bayar_ortu")
+  statusBayarTutor   String                   @default("belum") @map("status_bayar_tutor")
+  anggotaLaporan     AnggotaLaporanKelompok[]
+  createdAt          DateTime                 @default(now()) @map("created_at")
+
+  @@unique([kelompokId, bulan, tahun])
+  @@map("laporan_kelompok")
+}
+
+model AnggotaLaporanKelompok {
+  id                String          @id @default(cuid())
+  laporanKelompokId String          @map("laporan_kelompok_id")
+  laporanKelompok   LaporanKelompok @relation(fields: [laporanKelompokId], references: [id], onDelete: Cascade)
+  siswaId           String          @map("siswa_id")
+  siswa             Siswa           @relation(fields: [siswaId], references: [id])
+  jumlahIndividu    Int             @default(0) @map("jumlah_individu")
+
+  @@unique([laporanKelompokId, siswaId])
+  @@map("anggota_laporan_kelompok")
 }

@@ -53,3 +53,62 @@ export async function createLaporan(
 
   return { success: true, message: "Laporan berhasil dikirim, makasih!" };
 }
+
+export async function createLaporanKelompok(
+  _prevState: LaporState,
+  formData: FormData,
+): Promise<LaporState> {
+  const kelompokId = formData.get("kelompokId") as string;
+  const bulan = Number(formData.get("bulan"));
+  const tahun = Number(formData.get("tahun"));
+  const jumlahKelompok = Number(formData.get("jumlahKelompok"));
+  const materiDipelajari = formData.get("materiDipelajari") as string;
+  const pemahamanMateri = Number(formData.get("pemahamanMateri"));
+  const keaktifanBelajar = Number(formData.get("keaktifanBelajar"));
+  const kemandirian = Number(formData.get("kemandirian"));
+  const kedisiplinan = Number(formData.get("kedisiplinan"));
+  const catatanSiswa = formData.get("catatanSiswa") as string;
+  const saranBimbel = formData.get("saranBimbel") as string;
+  const norekTutor = formData.get("norekTutor") as string;
+  const anggotaRaw = formData.get("anggotaIndividuData") as string;
+
+  if (!kelompokId || !bulan || !tahun || !norekTutor) {
+    return { success: false, message: "Lengkapi semua data wajib dulu ya." };
+  }
+
+  const anggotaIndividu: { siswaId: string; jumlahIndividu: number }[] = anggotaRaw
+    ? JSON.parse(anggotaRaw)
+    : [];
+
+  try {
+    await db.laporanKelompok.create({
+      data: {
+        kelompokId,
+        bulan,
+        tahun,
+        jumlahKelompok,
+        materiDipelajari,
+        pemahamanMateri,
+        keaktifanBelajar,
+        kemandirian,
+        kedisiplinan,
+        catatanSiswa,
+        saranBimbel,
+        norekTutor,
+        anggotaLaporan: {
+          create: anggotaIndividu
+            .filter((a) => a.jumlahIndividu > 0)
+            .map((a) => ({ siswaId: a.siswaId, jumlahIndividu: a.jumlahIndividu })),
+        },
+      },
+    });
+  } catch {
+    return { success: false, message: "Laporan kelompok ini buat periode ini udah pernah diisi sebelumnya." };
+  }
+
+  revalidatePath("/kelompok");
+  revalidatePath("/rekap");
+  revalidatePath("/");
+
+  return { success: true, message: "Laporan kelompok berhasil dikirim, makasih!" };
+}
