@@ -62,7 +62,7 @@ export async function createLaporanKelompok(
   const bulan = Number(formData.get("bulan"));
   const tahun = Number(formData.get("tahun"));
   const jumlahKelompok = Number(formData.get("jumlahKelompok"));
-  const jumlahIjin = Number(formData.get("jumlahIjin") || 0);
+  const jumlahIzin = Number(formData.get("jumlahIzin") || 0);
   const materiDipelajari = formData.get("materiDipelajari") as string;
   const pemahamanMateri = Number(formData.get("pemahamanMateri"));
   const keaktifanBelajar = Number(formData.get("keaktifanBelajar"));
@@ -88,7 +88,7 @@ export async function createLaporanKelompok(
         bulan,
         tahun,
         jumlahKelompok,
-        jumlahIjin,
+        jumlahIzin,
         materiDipelajari,
         pemahamanMateri,
         keaktifanBelajar,
