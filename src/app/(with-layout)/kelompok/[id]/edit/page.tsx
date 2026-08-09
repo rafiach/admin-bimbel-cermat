@@ -26,7 +26,7 @@ export default async function EditKelompokPage({
     <>
       <Breadcrumb pageName="Edit Kelompok" />
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
-        <p className="mb-5.5 text-dark-6">Tutor: {kelompok.tutor.nama} (gak bisa diganti, hapus & bikin baru kalau perlu)</p>
+        <p className="mb-5.5 text-dark-6">Tutor: {kelompok.tutor.nama}</p>
         <KelompokEditForm kelompok={kelompok} action={updateWithId} />
       </div>
     </>

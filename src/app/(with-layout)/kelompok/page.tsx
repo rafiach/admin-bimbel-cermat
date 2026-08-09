@@ -63,6 +63,7 @@ export default async function KelompokPage({
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
                   <div className="flex items-center justify-end gap-3">
+                    <Link href={`/kelompok/${k.id}/edit`} className="hover:text-primary">Edit</Link>
                     <form action={deleteKelompok}>
                       <input type="hidden" name="id" value={k.id} />
                       <button type="submit" className="text-red hover:underline">Hapus</button>

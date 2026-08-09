@@ -58,6 +58,11 @@ export function KelompokEditForm({
       <div>
         <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">Harga Privat per Anggota</label>
         <div className="space-y-3 rounded-lg border border-stroke p-4 dark:border-dark-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="min-w-[120px] flex-1"></span>
+            <span className="w-32 text-left text-sm text-dark-6">Harga ke Ortu</span>
+            <span className="w-32 text-left text-sm text-dark-6">Fee Tutor</span>
+          </div>
           {kelompok.anggota.map((a) => (
             <div key={a.id} className="flex flex-wrap items-center gap-3">
               <span className="min-w-[120px] flex-1 text-dark dark:text-white">{a.siswa.nama}</span>

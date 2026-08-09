@@ -190,6 +190,7 @@ model LaporanKelompok {
   bulan              Int
   tahun              Int
   jumlahKelompok     Int                      @map("jumlah_kelompok")
+  jumlahIzin         Int                      @default(0) @map("jumlah_izin")
   hargaKelompokFinal Int?                     @map("harga_kelompok_final")
   materiDipelajari   String?                  @map("materi_dipelajari")
   pemahamanMateri    Int                      @map("pemahaman_materi")

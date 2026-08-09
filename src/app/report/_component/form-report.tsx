@@ -103,14 +103,14 @@ export function ReportForm({
           onClick={() => { setMode("individual"); setTutorId(""); }}
           className={`rounded-md py-2 text-sm font-medium transition-colors ${mode === "individual" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
         >
-          Lapor Individual
+          Private
         </button>
         <button
           type="button"
           onClick={() => { setMode("kelompok"); setTutorId(""); }}
           className={`rounded-md py-2 text-sm font-medium transition-colors ${mode === "kelompok" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
         >
-          Lapor Kelompok
+          Kelompok
         </button>
       </div>
 
@@ -287,7 +287,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
           </div>
 
           <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
-            <p className="mb-3 text-sm font-medium text-dark dark:text-white">Ada yang masuk sendiri-sendiri? (isi kalau ada, biarin 0 kalau enggak)</p>
+            <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siawa, kalau tidak biarkan kosong)</p>
             <div className="space-y-3">
               {selectedKelompok.anggota.map((a) => (
                 <div key={a.siswaId} className="flex items-center justify-between gap-3">
