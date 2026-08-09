@@ -21,7 +21,7 @@ export default async function KelompokPage({
 
   return (
     <>
-      <Breadcrumb pageName="Data Kelompok" />
+      <Breadcrumb pageName="Data Kelas" />
 
       {error && (
         <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
@@ -32,10 +32,10 @@ export default async function KelompokPage({
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Daftar Kelompok ({kelompok.length})
+            Daftar Kelas Kelompok ({kelompok.length})
           </h4>
           <Link href="/kelompok/tambah" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90">
-            + Tambah Kelompok
+            + Tambah Kelas
           </Link>
         </div>
 
@@ -45,7 +45,8 @@ export default async function KelompokPage({
               <TableHead className="xl:pl-7.5">Nama Kelompok</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Anggota</TableHead>
-              <TableHead>Harga Kelompok</TableHead>
+              <TableHead>Jadwal</TableHead>
+              <TableHead>Fee Kelompok</TableHead>
               <TableHead className="text-right xl:pr-7.5">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -57,6 +58,9 @@ export default async function KelompokPage({
                 <TableCell className="text-dark dark:text-white">{k.tutor.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {k.anggota.map((a) => a.siswa.nama).join(", ")}
+                </TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {k.jadwal}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   Rp {k.hargaKelompok.toLocaleString("id-ID")}

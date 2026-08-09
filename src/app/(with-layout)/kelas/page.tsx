@@ -33,7 +33,7 @@ export default async function KelasPage({
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <div className="mb-5 flex items-center justify-between">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Daftar Kelas ({kelas.length})
+            Daftar Kelas Privat ({kelas.length})
           </h4>
           <Link
             href="/kelas/tambah"
