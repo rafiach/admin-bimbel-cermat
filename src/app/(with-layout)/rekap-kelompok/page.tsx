@@ -5,7 +5,7 @@ import {
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { toggleBayarOrtuKelompok, toggleBayarTutorKelompok } from "./actions";
+import { deleteLaporanKelompok, toggleBayarOrtuKelompok, toggleBayarTutorKelompok } from "./actions";
 
 export const metadata = { title: "Rekap Kelompok" };
 
@@ -37,20 +37,46 @@ export default async function RekapKelompokPage({
       const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
       return sum + a.jumlahIndividu * (anggota?.hargaPrivat ?? 0);
     }, 0);
-    return { ...l, totalTagihan: totalKelompok + totalIndividu };
+
+    const feeTutorKelompok = l.jumlahKelompok * l.kelompok.feeTutorKelompok;
+    const feeTutorIndividu = l.anggotaLaporan.reduce((sum, a) => {
+      const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
+      return sum + a.jumlahIndividu * (anggota?.feeTutor ?? 0);
+    }, 0);
+
+    const totalTagihan = totalKelompok + totalIndividu;
+    const totalFeeTutor = feeTutorKelompok + feeTutorIndividu;
+
+    return { ...l, totalTagihan, totalFeeTutor };
   });
 
-  const totalSemua = rows.reduce((sum, r) => sum + r.totalTagihan, 0);
+  const totalKelompok = rows.reduce((sum, r) => sum + r.totalTagihan, 0);
+  const totalFeeTutorKelompok = rows.reduce((sum, r) => sum + r.totalFeeTutor, 0);
+  const totalMargin = totalKelompok - totalFeeTutorKelompok;
 
   return (
     <>
       <Breadcrumb pageName="Rekap Kelompok" />
 
-      <div className="mb-5 rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
-        <dt className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
-          Rp {totalSemua.toLocaleString("id-ID")}
-        </dt>
-        <dd className="text-sm font-medium text-dark-6">Total Tagihan Kelompok Bulan Ini</dd>
+      <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
+          <dt className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
+            Rp {totalKelompok.toLocaleString("id-ID")}
+          </dt>
+          <dd className="text-sm font-medium text-dark-6">Total Tagihan Ortu</dd>
+        </div>
+        <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
+          <dt className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
+            Rp {totalFeeTutorKelompok.toLocaleString("id-ID")}
+          </dt>
+          <dd className="text-sm font-medium text-dark-6">Total Fee Tutor</dd>
+        </div>
+        <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
+          <dt className="mb-1.5 text-heading-6 font-bold text-dark dark:text-white">
+            Rp {totalMargin.toLocaleString("id-ID")}
+          </dt>
+          <dd className="text-sm font-medium text-dark-6">Margin Bimbel</dd>
+        </div>
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
@@ -107,7 +133,14 @@ export default async function RekapKelompokPage({
                   </form>
                 </TableCell>
                 <TableCell className="text-right xl:pr-7.5">
-                  <Link href={`/rekap-kelompok/${r.id}`} className="hover:text-primary">Lihat</Link>
+                  <div className="flex items-center justify-end gap-3">
+                    <Link href={`/rekap-kelompok/${r.id}`} className="hover:text-primary">Lihat</Link>
+                    <Link href={`/rekap-kelompok/${r.id}/edit`} className="hover:text-primary">Edit</Link>
+                    <form action={deleteLaporanKelompok}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <button type="submit" className="text-red hover:underline">Hapus</button>
+                    </form>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

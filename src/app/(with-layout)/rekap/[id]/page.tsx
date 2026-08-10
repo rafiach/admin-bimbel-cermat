@@ -47,7 +47,7 @@ export default async function DetailLaporanPage({
           {/* Watermark */}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo/logo-icon-bimbel.svg" alt="" className="w-2/3 opacity-[0.2] grayscale" />
+            <img src="/images/logo/logo-icon-bimbel.svg" alt="" className="w-2/3 opacity-[0.15] grayscale" />
           </div>
 
           <div className="relative z-10 p-8">
