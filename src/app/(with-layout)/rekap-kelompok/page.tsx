@@ -69,7 +69,8 @@ export default async function RekapKelompokPage({
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="xl:pl-7.5">Kelompok</TableHead>
               <TableHead>Tutor</TableHead>
-              <TableHead>Kelompok x</TableHead>
+              <TableHead>Periode</TableHead>
+              <TableHead>Kehadiaran Kelompok</TableHead>
               <TableHead>Total Tagihan</TableHead>
               <TableHead>Bayar Ortu</TableHead>
               <TableHead>Bayar Tutor</TableHead>
@@ -82,6 +83,9 @@ export default async function RekapKelompokPage({
               <TableRow key={r.id} className="border-[#eee] dark:border-dark-3">
                 <TableCell className="xl:pl-7.5 text-dark dark:text-white">{r.kelompok.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{r.kelompok.tutor.nama}</TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {r.mingguKe > 0 ? `Minggu ke-${r.mingguKe}` : "Bulanan"}
+                </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahKelompok}x</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {r.totalTagihan.toLocaleString("id-ID")}</TableCell>
                 <TableCell>

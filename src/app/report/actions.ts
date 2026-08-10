@@ -22,6 +22,8 @@ export async function createLaporan(
   const kedisiplinan = Number(formData.get("kedisiplinan"));
   const catatanSiswa = formData.get("catatanSiswa") as string;
   const saranBimbel = formData.get("saranBimbel") as string;
+  const tipePeriode = (formData.get("tipePeriode") as string) || "bulanan";
+  const mingguKe = Number(formData.get("mingguKe") || 0);
 
   if (!kelasId || !bulan || !tahun || !jumlahHadir || !norekTutor) {
     return { success: false, message: "Lengkapi semua data wajib dulu ya." };
@@ -33,6 +35,8 @@ export async function createLaporan(
         kelasId,
         bulan,
         tahun,
+        tipePeriode,
+        mingguKe,
         jumlahHadir,
         jumlahIzin,
         norekTutor,
@@ -46,7 +50,13 @@ export async function createLaporan(
       },
     });
   } catch {
-    return { success: false, message: "Laporan buat siswa & bulan ini udah pernah diisi sebelumnya." };
+    return {
+      success: false,
+      message:
+        mingguKe > 0
+          ? `Laporan minggu ke-${mingguKe} buat siswa & bulan ini udah pernah diisi.`
+          : "Laporan bulanan buat siswa & periode ini udah pernah diisi.",
+    };
   }
 
   revalidatePath("/kelas");
@@ -61,6 +71,8 @@ export async function createLaporanKelompok(
   const kelompokId = formData.get("kelompokId") as string;
   const bulan = Number(formData.get("bulan"));
   const tahun = Number(formData.get("tahun"));
+  const tipePeriode = (formData.get("tipePeriode") as string) || "bulanan";
+  const mingguKe = Number(formData.get("mingguKe") || 0);
   const jumlahKelompok = Number(formData.get("jumlahKelompok"));
   const jumlahIzin = Number(formData.get("jumlahIzin") || 0);
   const materiDipelajari = formData.get("materiDipelajari") as string;
@@ -87,6 +99,8 @@ export async function createLaporanKelompok(
         kelompokId,
         bulan,
         tahun,
+        tipePeriode,
+        mingguKe,
         jumlahKelompok,
         jumlahIzin,
         materiDipelajari,
@@ -105,7 +119,13 @@ export async function createLaporanKelompok(
       },
     });
   } catch {
-    return { success: false, message: "Laporan kelompok ini buat periode ini udah pernah diisi sebelumnya." };
+    return {
+      success: false,
+      message:
+        mingguKe > 0
+          ? `Laporan minggu ke-${mingguKe} buat siswa & bulan ini udah pernah diisi.`
+          : "Laporan bulanan buat siswa & periode ini udah pernah diisi.",
+    };
   }
 
   revalidatePath("/kelompok");

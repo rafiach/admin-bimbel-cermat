@@ -91,6 +91,7 @@ export default async function RekapPage({
               <TableHead className="xl:pl-7.5">Siswa</TableHead>
               <TableHead>No HP Ortu</TableHead>
               <TableHead>Tutor</TableHead>
+              <TableHead>Periode</TableHead>
               <TableHead>Hadir</TableHead>
               <TableHead>Izin</TableHead>
               <TableHead>Tagihan Ortu</TableHead>
@@ -115,6 +116,9 @@ export default async function RekapPage({
                   )}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.kelas.tutor.nama}</TableCell>
+                <TableCell className="text-dark dark:text-white">
+                  {r.mingguKe > 0 ? `Minggu ke-${r.mingguKe} ` : "Bulanan"}
+                </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahHadir}</TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahIzin}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {r.tagihanOrtu.toLocaleString("id-ID")}</TableCell>

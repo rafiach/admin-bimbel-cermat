@@ -67,19 +67,56 @@ function RatingAndNotesFields() {
 
 function PeriodeFields() {
   const now = new Date();
+  const [tipePeriode, setTipePeriode] = useState("bulanan");
+
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <>
       <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Periode Bulan</label>
-        <select name="bulan" required defaultValue={now.getMonth() + 1} className={inputClass}>
-          {BULAN.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
-        </select>
+        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tipe Laporan</label>
+        <div className="grid grid-cols-2 gap-2 rounded-lg bg-[#F7F9FC] p-1 dark:bg-dark-2">
+          <button
+            type="button"
+            onClick={() => setTipePeriode("bulanan")}
+            className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "bulanan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
+          >
+            Bulanan
+          </button>
+          <button
+            type="button"
+            onClick={() => setTipePeriode("mingguan")}
+            className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "mingguan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
+          >
+            Mingguan
+          </button>
+        </div>
+        <input type="hidden" name="tipePeriode" value={tipePeriode} />
       </div>
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tahun</label>
-        <input type="number" name="tahun" required defaultValue={now.getFullYear()} className={inputClass} />
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Periode Bulan</label>
+          <select name="bulan" required defaultValue={now.getMonth() + 1} className={inputClass}>
+            {BULAN.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tahun</label>
+          <input type="number" name="tahun" required defaultValue={now.getFullYear()} className={inputClass} />
+        </div>
       </div>
-    </div>
+
+      {tipePeriode === "mingguan" ? (
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Minggu Ke</label>
+          <select name="mingguKe" required defaultValue="" className={inputClass}>
+            <option value="" disabled>Pilih minggu</option>
+            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>Minggu ke-{n}</option>)}
+          </select>
+        </div>
+      ) : (
+        <input type="hidden" name="mingguKe" value={0} />
+      )}
+    </>
   );
 }
 

@@ -71,7 +71,10 @@ export default async function DetailLaporanPage({
               </div>
               <div>
                 <p className="text-dark-6">Periode</p>
-                <p className="font-medium text-dark">{BULAN[laporan.bulan - 1]} {laporan.tahun}</p>
+                <p className="font-medium text-dark">
+                  {BULAN[laporan.bulan - 1]} {laporan.tahun}
+                  {laporan.mingguKe > 0 && ` — Minggu ke-${laporan.mingguKe}`}
+                </p>
               </div>
               <div>
                 <p className="text-dark-6">Jadwal</p>

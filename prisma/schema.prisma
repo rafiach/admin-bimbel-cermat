@@ -133,6 +133,8 @@ model LaporanBulanan {
   kelas            Kelas    @relation(fields: [kelasId], references: [id], onDelete: Cascade)
   bulan            Int
   tahun            Int
+  tipePeriode      String   @default("bulanan") @map("tipe_periode") // "bulanan" | "mingguan"
+  mingguKe         Int      @default(0) @map("minggu_ke") // 0 = laporan bulanan penuh, 1-5 = minggu ke berapa
   jumlahHadir      Int      @map("jumlah_hadir")
   jumlahIzin       Int      @default(0) @map("jumlah_izin")
   norekTutor       String?  @map("norek_tutor")
@@ -147,7 +149,7 @@ model LaporanBulanan {
   statusBayarTutor String   @default("belum") @map("status_bayar_tutor")
   createdAt        DateTime @default(now()) @map("created_at")
 
-  @@unique([kelasId, bulan, tahun])
+  @@unique([kelasId, bulan, tahun, mingguKe])
   @@map("laporan_bulanan")
 }
 
@@ -189,6 +191,8 @@ model LaporanKelompok {
   kelompok           Kelompok                 @relation(fields: [kelompokId], references: [id], onDelete: Cascade)
   bulan              Int
   tahun              Int
+  tipePeriode        String                   @default("bulanan") @map("tipe_periode") // "bulanan" | "mingguan"
+  mingguKe           Int                      @default(0) @map("minggu_ke") // 0 = laporan bulanan penuh, 1-5 = minggu ke berapa
   jumlahKelompok     Int                      @map("jumlah_kelompok")
   jumlahIzin         Int                      @default(0) @map("jumlah_izin")
   hargaKelompokFinal Int?                     @map("harga_kelompok_final")
@@ -205,7 +209,7 @@ model LaporanKelompok {
   anggotaLaporan     AnggotaLaporanKelompok[]
   createdAt          DateTime                 @default(now()) @map("created_at")
 
-  @@unique([kelompokId, bulan, tahun])
+  @@unique([kelompokId, bulan, tahun, mingguKe])
   @@map("laporan_kelompok")
 }
 

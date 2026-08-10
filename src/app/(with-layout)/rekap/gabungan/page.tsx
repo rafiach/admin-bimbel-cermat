@@ -98,6 +98,7 @@ export default async function KwitansiGabunganPage({
                 <thead>
                   <tr className="border-b border-stroke text-left dark:border-dark-3">
                     <th className="py-2 font-medium text-dark-6">Tutor</th>
+                    <th className="py-2 font-medium text-dark-6">Periode</th>
                     <th className="py-2 text-center font-medium text-dark-6">Hadir</th>
                     <th className="py-2 text-right font-medium text-dark-6">Subtotal</th>
                   </tr>
@@ -106,6 +107,9 @@ export default async function KwitansiGabunganPage({
                   {laporan.map((l) => (
                     <tr key={l.id} className="border-b border-stroke dark:border-dark-3">
                       <td className="py-2 text-dark dark:text-white">{l.kelas.tutor.nama}</td>
+                      <td className="py-2 text-dark dark:text-white">
+                        {l.mingguKe > 0 ? `Minggu ke-${l.mingguKe}` : "Bulanan"}
+                      </td>
                       <td className="py-2 text-center text-dark dark:text-white">{l.jumlahHadir}x</td>
                       <td className="py-2 text-right text-dark dark:text-white">
                         Rp {(l.jumlahHadir * l.kelas.biayaOrtu).toLocaleString("id-ID")}
