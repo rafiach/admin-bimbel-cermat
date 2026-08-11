@@ -38,12 +38,13 @@ export async function DashboardStats() {
 
   const belumLunas = belumLunasKelas + belumLunasKelompok;
 
+  const semuaKelas = totalKelas + totalKelompok;
+
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <StatCard label="Siswa Aktif" value={String(totalSiswa)} icon={<SiswaIcon className="h-6 w-6" />} />
       <StatCard label="Tutor Aktif" value={String(totalTutor)} icon={<TutorIcon className="h-6 w-6" />} />
-      <StatCard label="Kelas Aktif" value={String(totalKelas)} icon={<KelasIcon className="h-6 w-6" />} />
-      <StatCard label="Kelompok Aktif" value={String(totalKelompok)} icon={<KelompokIcon className="h-6 w-6" />} />
+      <StatCard label="Kelas Aktif" value={String(semuaKelas)} icon={<KelasIcon className="h-6 w-6" />} />
       <StatCard
         label="Tagihan Belum Lunas (Bulan Ini)"
         value={`Rp ${belumLunas.toLocaleString("id-ID")}`}
