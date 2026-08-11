@@ -3,22 +3,33 @@ import { StatusPembayaranChart } from "./status-pembayaran-chart";
 
 export async function StatusPembayaranCard() {
   const now = new Date();
-  const laporan = await db.laporanBulanan.findMany({
-    where: { bulan: now.getMonth() + 1, tahun: now.getFullYear() },
-    select: { statusBayarOrtu: true, statusBayarTutor: true },
-  });
+  const bulan = now.getMonth() + 1;
+  const tahun = now.getFullYear();
 
-  const lunasOrtu = laporan.filter((l) => l.statusBayarOrtu === "lunas").length;
-  const belumOrtu = laporan.length - lunasOrtu;
+  const [laporan, laporanKelompok] = await Promise.all([
+    db.laporanBulanan.findMany({
+      where: { bulan, tahun },
+      select: { statusBayarOrtu: true, statusBayarTutor: true },
+    }),
+    db.laporanKelompok.findMany({
+      where: { bulan, tahun },
+      select: { statusBayarOrtu: true, statusBayarTutor: true },
+    }),
+  ]);
 
-  const sudahTutor = laporan.filter((l) => l.statusBayarTutor === "sudah").length;
-  const belumTutor = laporan.length - sudahTutor;
+  const semua = [...laporan, ...laporanKelompok];
+
+  const lunasOrtu = semua.filter((l) => l.statusBayarOrtu === "lunas").length;
+  const belumOrtu = semua.length - lunasOrtu;
+
+  const sudahTutor = semua.filter((l) => l.statusBayarTutor === "sudah").length;
+  const belumTutor = semua.length - sudahTutor;
 
   return (
     <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
       <h4 className="mb-4 font-medium text-dark dark:text-white">Status Pembayaran Bulan Ini</h4>
 
-      <div className="flex flex-nowrap justify-center gap-6 overflow-x-auto">
+      <div className="flex flex-nowrap justify-center gap-6">
         <div>
           <p className="mb-2 text-center text-sm text-dark-6">Ortu</p>
           <StatusPembayaranChart id="chart-ortu" labelLunas="Lunas" labelBelum="Belum" jumlahLunas={lunasOrtu} jumlahBelum={belumOrtu} />

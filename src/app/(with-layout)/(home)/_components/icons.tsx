@@ -38,3 +38,13 @@ export function TagihanIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function KelompokIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M20.618 5.984A11 11 0 0 0 3.382 5.984" />
+      <circle cx="12" cy="8" r="3" />
+      <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+    </svg>
+  );
+}
