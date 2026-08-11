@@ -1,6 +1,5 @@
 import Signup from "@/components/Auth/Signup";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -9,44 +8,38 @@ export const metadata: Metadata = {
 
 export default function SignUp() {
   return (
-    <div className="flex min-h-screen flex-wrap items-center">
-      <div className="w-full xl:w-1/2">
+    <div className="flex min-h-screen flex-wrap items-stretch">
+      <div className="flex w-full items-center xl:w-1/2">
         <div className="mx-auto w-[570px] p-4 sm:p-12.5 xl:p-15">
           <Signup />
         </div>
       </div>
 
       <div className="hidden w-full p-6 xl:block xl:w-1/2">
-        <div className="custom-gradient-1 overflow-hidden rounded-2xl px-15 pt-12.5 dark:bg-dark-2! dark:bg-none">
-          <Link className="mb-10 inline-block" href="/">
-            <Image
-              src={"/images/logo/logo-bimbel.svg"}
-              alt="Logo"
-              width={250}
-              height={32}
+        <div className="custom-gradient-1 flex h-full flex-col justify-center overflow-hidden rounded-2xl px-15">
+          <Link className="mb-10 inline-flex items-center gap-3" href="/">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/logo/logo-bimbel.svg"
+              alt="Bimbel Cermat"
+              className="h-16 w-auto object-contain"
             />
+            <span className="text-heading-6 font-bold text-dark dark:text-white">
+              Bimbel Cermat
+            </span>
           </Link>
-          <p className="mb-3 text-xl font-medium text-dark dark:text-white">
-            Create your account
+
+          <p className="mb-3 inline-block w-fit rounded-full bg-[#F35C2B]/10 px-3 py-1 text-sm font-medium text-[#F35C2B]">
+            Admin Panel
           </p>
 
           <h1 className="mb-4 text-2xl font-bold text-dark dark:text-white sm:text-heading-3">
-            Start your journey
+            Bikin <span className="text-[#F35C2B]">Akun Baru</span>
           </h1>
 
           <p className="w-full max-w-[375px] font-medium text-dark-4 dark:text-dark-6">
-            Create an account with email and password to begin.
+            Daftar pakai email dan password buat mulai kelola Bimbel Cermat.
           </p>
-
-          <div className="mt-31">
-            <Image
-              src={"/images/grids/grid-02.svg"}
-              alt="Logo"
-              width={405}
-              height={325}
-              className="mx-auto dark:opacity-30"
-            />
-          </div>
         </div>
       </div>
     </div>

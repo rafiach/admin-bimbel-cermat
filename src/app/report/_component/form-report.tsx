@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { createLaporan, createLaporanKelompok, type LaporState } from "../actions";
+import { SearchableSelect } from "@/components/FormElements/combobox";
 
 type Kelas = {
   id: string;
@@ -153,10 +154,12 @@ export function ReportForm({
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Nama Tutor</label>
-        <select value={tutorId} onChange={(e) => setTutorId(e.target.value)} className={inputClass}>
-          <option value="">Pilih nama kamu</option>
-          {tutorList.map((t) => <option key={t.id} value={t.id}>{t.nama}</option>)}
-        </select>
+        <SearchableSelect
+          value={tutorId}
+          onChange={setTutorId}
+          options={tutorList.map((t) => ({ value: t.id, label: t.nama }))}
+          placeholder="Ketik nama kamu..."
+        />
       </div>
 
       {mode === "individual" ? (

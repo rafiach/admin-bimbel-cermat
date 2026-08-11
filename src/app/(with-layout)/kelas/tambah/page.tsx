@@ -4,6 +4,7 @@ import { Select } from "@/components/FormElements/select";
 import { db } from "@/lib/db";
 import { createKelas } from "../actions";
 import { SubmitButton } from "@/components/FormElements/submit-button";
+import { Combobox } from "@/components/FormElements/combobox";
 
 export const metadata = { title: "Tambah Kelas" };
 
@@ -19,8 +20,24 @@ export default async function TambahKelasPage() {
 
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
         <form action={createKelas} className="space-y-5.5">
-          <Select label="Siswa" name="siswaId" placeholder="Pilih siswa" items={siswaList.map((s) => ({ value: s.id, label: s.nama }))} />
-          <Select label="Tutor" name="tutorId" placeholder="Pilih tutor" items={tutorList.map((t) => ({ value: t.id, label: t.nama }))} />
+          <div>
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">Siswa</label>
+            <Combobox
+              name="siswaId"
+              placeholder="Cari nama siswa..."
+              options={siswaList.map((s) => ({ value: s.id, label: s.nama }))}
+              required
+            />
+          </div>
+          <div>
+            <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">Tutor</label>
+            <Combobox
+              name="tutorId"
+              placeholder="Ketik nama tutor..."
+              options={tutorList.map((t) => ({ value: t.id, label: t.nama }))}
+              required
+            />
+          </div>
           <Select
             label="Tipe"
             name="tipe"

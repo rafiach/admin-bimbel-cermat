@@ -25,26 +25,32 @@ export async function createKelompok(formData: FormData) {
     throw new Error("Lengkapi data kelompok, minimal 2 anggota");
   }
 
-  await db.kelompok.create({
-    data: {
-      nama,
-      tutorId,
-      jadwal,
-      hargaKelompok,
-      feeTutorKelompok,
-      namaWali,
-      noHpWali,
-      anggota: {
-        create: anggotaData.map((a) => ({
-          siswaId: a.siswaId,
-          hargaPrivat: a.hargaPrivat,
-          feeTutor: a.feeTutorPrivat,
-        })),
+  const siswaIds = anggotaData.map((a) => a.siswaId);
+
+  await db.$transaction([
+    db.kelompok.create({
+      data: {
+        nama,
+        tutorId,
+        jadwal,
+        hargaKelompok,
+        feeTutorKelompok,
+        namaWali,
+        noHpWali,
+        anggota: {
+          create: anggotaData.map((a) => ({
+            siswaId: a.siswaId,
+            hargaPrivat: a.hargaPrivat,
+            feeTutor: a.feeTutorPrivat,
+          })),
+        },
       },
-    },
-  });
+    }),
+    db.siswa.updateMany({ where: { id: { in: siswaIds } }, data: { status: "aktif" } }),
+  ]);
 
   revalidatePath("/kelompok");
+  revalidatePath("/siswa");
   revalidatePath("/report");
   redirect("/kelompok");
 }

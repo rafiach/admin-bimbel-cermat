@@ -1,5 +1,6 @@
 "use client";
 
+import { Combobox } from "@/components/FormElements/combobox";
 import InputGroup from "@/components/FormElements/InputGroup";
 import { PhoneInputGroup } from "@/components/FormElements/phone-input";
 import { Select } from "@/components/FormElements/select";
@@ -50,12 +51,15 @@ export function KelompokForm({
     <form action={handleSubmit} className="space-y-5.5">
       <InputGroup label="Nama Kelompok" name="nama" type="text" placeholder="Misal: A & B - Senin Kamis" required />
 
-      <Select
-        label="Tutor"
-        name="tutorId"
-        placeholder="Pilih tutor"
-        items={tutorList.map((t) => ({ value: t.id, label: t.nama }))}
-      />
+      <div>
+        <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">Tutor</label>
+        <Combobox
+          name="tutorId"
+          placeholder="Ketik nama tutor..."
+          options={tutorList.map((t) => ({ value: t.id, label: t.nama }))}
+          required
+        />
+      </div>
 
       <InputGroup label="Jadwal" name="jadwal" type="text" placeholder="Misal: Senin & Kamis, 15:00" required />
 
