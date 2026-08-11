@@ -13,17 +13,35 @@ import Link from "next/link";
 import { deleteSiswa } from "./actions";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { SubmitButton } from "@/components/FormElements/submit-button";
+import { SearchInput } from "@/components/search-input";
+import { Pagination } from "@/components/pagination";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Siswa" };
 
+const PAGE_SIZE = 10;
+
 export default async function SiswaPage({
   searchParams,
 }: {
-    searchParams: Promise<{ error?: string }>;
-  }) {
-  const { error } = await searchParams;
-  const siswa = await db.siswa.findMany({ orderBy: { createdAt: "desc" } });
+  searchParams: Promise<{ q?: string; page?: string; error?: string }>;
+}) {
+  const { q, page: pageParam, error } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const where = q ? { nama: { contains: q, mode: "insensitive" as const } } : {};
+
+  const [siswa, total] = await Promise.all([
+    db.siswa.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+    db.siswa.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
   return (
     <>
       <Breadcrumb pageName="Data Siswa" />
@@ -39,16 +57,19 @@ export default async function SiswaPage({
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex flex-nowrap items-center justify-between gap-3">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Daftar Siswa ({siswa.length})
+            Daftar Siswa ({total})
           </h4>
-          <Link
-            href="/siswa/tambah"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            + Tambah Siswa
-          </Link>
+          <div className="flex items-center gap-3">
+            <SearchInput placeholder="Cari nama siswa..." />
+            <Link
+              href="/siswa/tambah"
+              className="whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              + Tambah
+            </Link>
+          </div>
         </div>
 
         <Table className="min-w-[960px]">
@@ -140,6 +161,7 @@ export default async function SiswaPage({
             )}
           </TableBody>
         </Table>
+        <Pagination currentPage={page} totalPages={totalPages} extraParams={{ q }} />
       </div>
     </>
   );

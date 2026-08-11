@@ -1,23 +1,47 @@
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
+import { Pagination } from "@/components/pagination";
+import { SearchInput } from "@/components/search-input";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { db } from "@/lib/db";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelompok } from "./actions";
 
 export const metadata = { title: "Data Kelompok" };
+const PAGE_SIZE = 10;
 
 export default async function KelompokPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; error?: string }>;
 }) {
-  const { error } = await searchParams;
-  const kelompok = await db.kelompok.findMany({
-    include: { tutor: true, anggota: { include: { siswa: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const { q, page: pageParam, error } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
+
+  const where = q ? { nama: { contains: q, mode: "insensitive" as const } } : {};
+
+  const [kelompok, total] = await Promise.all([
+    db.kelompok.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      include: {
+        tutor: true,
+        anggota: {
+          include: {
+            siswa: true,
+          },
+        },
+      },
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+    db.kelompok.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <>
@@ -30,13 +54,16 @@ export default async function KelompokPage({
       )}
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex flex-nowrap items-center justify-between gap-3">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Daftar Kelas Kelompok ({kelompok.length})
+            Daftar Kelas Kelompok ({total})
           </h4>
-          <Link href="/kelompok/tambah" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90">
-            + Tambah Kelas
-          </Link>
+          <div className="flex items-center gap-3">
+            <SearchInput placeholder="Cari nama kelompok..." />
+            <Link href="/kelompok/tambah" className="whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90">
+              + Tambah
+            </Link>
+          </div>
         </div>
 
         <Table className="min-w-[900px]">
@@ -46,7 +73,8 @@ export default async function KelompokPage({
               <TableHead>Tutor</TableHead>
               <TableHead>Anggota</TableHead>
               <TableHead>Jadwal</TableHead>
-              <TableHead>Fee Kelompok</TableHead>
+              <TableHead>Biaya Kelompok</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="text-right xl:pr-7.5">Aksi</TableHead>
             </TableRow>
           </TableHeader>
@@ -54,23 +82,37 @@ export default async function KelompokPage({
           <TableBody>
             {kelompok.map((k) => (
               <TableRow key={k.id} className="border-[#eee] dark:border-dark-3">
-                <TableCell className="xl:pl-7.5 text-dark dark:text-white">{k.nama}</TableCell>
+                <TableCell className="sticky left-0 z-10 bg-white xl:pl-7.5 dark:bg-[#122031] text-dark dark:text-white">{k.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.tutor.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {k.anggota.map((a) => a.siswa.nama).join(", ")}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
-                  {k.jadwal}
+                  {k.jadwal || "-"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">
                   Rp {k.hargaKelompok.toLocaleString("id-ID")}
                 </TableCell>
+                <TableCell>
+                  <span
+                    className={cn(
+                      "max-w-fit rounded-full px-3.5 py-1 text-sm font-medium",
+                      k.status === "aktif"
+                        ? "bg-[#219653]/8 text-[#219653]"
+                        : "bg-[#D34053]/8 text-[#D34053]",
+                    )}
+                  >
+                    {k.status}
+                  </span>
+                </TableCell>
                 <TableCell className="xl:pr-7.5">
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="flex items-center justify-end gap-3.5">
                     <Link href={`/kelompok/${k.id}/edit`} className="hover:text-primary">Edit</Link>
                     <form action={deleteKelompok}>
                       <input type="hidden" name="id" value={k.id} />
-                      <button type="submit" className="text-red hover:underline">Hapus</button>
+                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
+                        Hapus
+                      </SubmitButton>
                     </form>
                   </div>
                 </TableCell>
@@ -79,11 +121,12 @@ export default async function KelompokPage({
 
             {kelompok.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="py-6 text-center text-dark-6">Belum ada kelompok.</TableCell>
+                <TableCell colSpan={7} className="py-6 text-center text-dark-6">Belum ada kelompok.</TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+        <Pagination currentPage={page} totalPages={totalPages} extraParams={{ q }} />
       </div>
     </>
   );

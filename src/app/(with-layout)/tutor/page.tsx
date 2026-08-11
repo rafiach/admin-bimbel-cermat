@@ -13,18 +13,34 @@ import Link from "next/link";
 import { deleteTutor } from "./actions";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { SubmitButton } from "@/components/FormElements/submit-button";
+import { SearchInput } from "@/components/search-input";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Tutor" };
 
+const PAGE_SIZE = 10;
+
 export default async function TutorPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ q?: string; page?: string; error?: string}>;
 }) {
-  const { error } = await searchParams;
-  const tutor = await db.tutor.findMany({ orderBy: { createdAt: "desc" } });
+  const { q, page: pageParam, error } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
+  const where = q ? { nama: { contains: q, mode: "insensitive" as const } } : {};
+
+  const [tutor, total] = await Promise.all([
+    db.tutor.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: PAGE_SIZE,
+      skip: (page - 1) * PAGE_SIZE,
+    }),
+    db.tutor.count({ where }),
+  ]);
+
+  const totalPages = Math.ceil(total / PAGE_SIZE);
   return (
     <>
       <Breadcrumb pageName="Data Tutor" />
@@ -35,16 +51,19 @@ export default async function TutorPage({
       )}
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex flex-nowrap items-center justify-between gap-3">
           <h4 className="text-body-2xlg font-bold text-dark dark:text-white">
-            Daftar Tutor ({tutor.length})
+            Daftar Tutor ({total})
           </h4>
-          <Link
-            href="/tutor/tambah"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
-          >
-            + Tambah Tutor
-          </Link>
+          <div className="flex items-center gap-3">
+            <SearchInput placeholder="Cari nama Tutor..." />
+            <Link
+              href="/tutor/tambah"
+              className="whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90"
+            >
+              + Tambah
+            </Link>
+          </div>
         </div>
 
         <Table>
