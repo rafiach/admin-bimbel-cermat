@@ -20,12 +20,17 @@ export function KelompokForm({
   action: (formData: FormData) => void;
 }) {
   const [selected, setSelected] = useState<Record<string, AnggotaState>>({});
+  const [query, setQuery] = useState("");
 
-  const toggleSiswa = (id: string) => {
+  const addSiswa = (id: string) => {
+    setSelected((prev) => ({ ...prev, [id]: { hargaPrivat: "", feeTutorPrivat: "" } }));
+    setQuery("");
+  };
+
+  const removeSiswa = (id: string) => {
     setSelected((prev) => {
       const next = { ...prev };
-      if (id in next) delete next[id];
-      else next[id] = { hargaPrivat: "", feeTutorPrivat: "" };
+      delete next[id];
       return next;
     });
   };
@@ -46,6 +51,11 @@ export function KelompokForm({
     formData.set("anggotaData", JSON.stringify(anggotaData));
     action(formData);
   };
+
+  const belumDipilih = siswaList.filter((s) => !(s.id in selected));
+  const hasilCari = query
+    ? belumDipilih.filter((s) => s.nama.toLowerCase().includes(query.toLowerCase()))
+    : belumDipilih;
 
   return (
     <form action={handleSubmit} className="space-y-5.5">
@@ -77,39 +87,74 @@ export function KelompokForm({
           Anggota Kelompok (minimal 2) — isi harga kalau anak ini sesekali masuk sendiri
         </label>
 
-        <div className="space-y-3 rounded-lg border border-stroke p-4 dark:border-dark-3">
-          {siswaList.map((s) => {
-            const isChecked = s.id in selected;
-            return (
-              <div key={s.id} className="flex flex-wrap items-center gap-3">
-                <label className="flex min-w-[140px] flex-1 items-center gap-2">
-                  <input type="checkbox" checked={isChecked} onChange={() => toggleSiswa(s.id)} />
-                  <span className="text-dark dark:text-white">{s.nama}</span>
-                </label>
+        {/* Anggota yang udah dipilih */}
+        {Object.keys(selected).length > 0 && (
+          <div className="mb-3 space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-4">
+            {Object.entries(selected).map(([id, v]) => {
+              const siswa = siswaList.find((s) => s.id === id);
+              return (
+                <div key={id} className="flex flex-wrap items-center gap-3">
+                  <div className="flex min-w-[140px] flex-1 items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => removeSiswa(id)}
+                      className="flex size-5 shrink-0 items-center justify-center rounded-full bg-red text-white hover:bg-opacity-80"
+                      aria-label={`Hapus ${siswa?.nama}`}
+                    >
+                      ×
+                    </button>
+                    <span className="text-dark dark:text-white">{siswa?.nama}</span>
+                  </div>
 
-                {isChecked && (
-                  <>
-                    <input
-                      type="number"
-                      placeholder="Harga privat"
-                      value={selected[s.id].hargaPrivat}
-                      onChange={(e) => updateField(s.id, "hargaPrivat", e.target.value)}
-                      className="w-32 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Fee tutor privat"
-                      value={selected[s.id].feeTutorPrivat}
-                      onChange={(e) => updateField(s.id, "feeTutorPrivat", e.target.value)}
-                      className="w-32 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
-                    />
-                  </>
-                )}
-              </div>
-            );
-          })}
+                  <input
+                    type="number"
+                    placeholder="Harga privat"
+                    value={v.hargaPrivat}
+                    onChange={(e) => updateField(id, "hargaPrivat", e.target.value)}
+                    className="w-32 rounded-lg border border-stroke bg-white px-3 py-2 text-sm outline-none dark:border-dark-3 dark:bg-dark-2"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Fee tutor privat"
+                    value={v.feeTutorPrivat}
+                    onChange={(e) => updateField(id, "feeTutorPrivat", e.target.value)}
+                    className="w-32 rounded-lg border border-stroke bg-white px-3 py-2 text-sm outline-none dark:border-dark-3 dark:bg-dark-2"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-          {siswaList.length === 0 && <p className="text-dark-6">Belum ada siswa aktif.</p>}
+        {/* Cari & tambah anggota baru */}
+        <div className="rounded-lg border border-stroke p-4 dark:border-dark-3">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cari nama siswa buat ditambahin..."
+            className="mb-3 w-full rounded-lg border border-stroke bg-transparent px-4 py-2 text-sm outline-none focus:border-primary dark:border-dark-3"
+          />
+
+          <div className="max-h-56 space-y-1 overflow-y-auto">
+            {hasilCari.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => addSiswa(s.id)}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-2 dark:hover:bg-dark-2"
+              >
+                <span className="text-dark dark:text-white">{s.nama}</span>
+                <span className="text-primary">+ Tambah</span>
+              </button>
+            ))}
+
+            {hasilCari.length === 0 && (
+              <p className="px-3 py-2 text-sm text-dark-6">
+                {siswaList.length === 0 ? "Belum ada siswa." : "Gak ketemu."}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 

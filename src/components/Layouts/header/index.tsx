@@ -22,19 +22,7 @@ export function Header() {
         <span className="sr-only">Toggle Sidebar</span>
       </button>
 
-      {isMobile && (
-        <Link href={"/"} className="2xsm:ml-4 ml-2 max-[430px]:hidden">
-          <Image
-            src={"/images/logo/logo-bimbel.svg"}
-            width={32}
-            height={32}
-            alt=""
-            role="presentation"
-          />
-        </Link>
-      )}
-
-      <div className="max-xl:hidden">
+      <div className="max-xl:hidden mr-8">
         <h1 className="text-heading-5 text-dark mb-0.5 font-bold dark:text-white">
           Dashboard
         </h1>

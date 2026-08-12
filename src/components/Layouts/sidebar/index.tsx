@@ -86,7 +86,7 @@ export function Sidebar() {
                 <nav role="navigation" aria-label={section.label}>
                   <ul className="space-y-2">
                     {section.items.map((item) => (
-                      <li key={item.title}>
+                      <li key={item.title} className="min-w-0">
                         {item.items.length ? (
                           <div>
                             <MenuItem
@@ -94,7 +94,7 @@ export function Sidebar() {
                               onClick={() => toggleExpanded(item.title)}
                             >
                               <item.icon className="size-6 shrink-0" aria-hidden="true" />
-                              <span>{item.title}</span>
+                              <span className="truncate">{item.title}</span>
                               <ChevronUp
                                 className={cn(
                                   "ml-auto rotate-180 transition-transform duration-200",
@@ -107,13 +107,13 @@ export function Sidebar() {
                             {expandedItems.includes(item.title) && (
                               <ul className="ml-9 mr-0 space-y-1.5 pb-[15px] pr-0 pt-2" role="menu">
                                 {item.items.map((subItem) => (
-                                  <li key={subItem.title} role="none">
+                                  <li key={subItem.title} role="none" className="min-w-0">
                                     <MenuItem
                                       as="link"
                                       href={subItem.url}
                                       isActive={pathname === subItem.url}
                                     >
-                                      <span>{subItem.title}</span>
+                                      <span className="truncate">{subItem.title}</span>
                                     </MenuItem>
                                   </li>
                                 ))}
@@ -128,7 +128,7 @@ export function Sidebar() {
                             isActive={pathname === item.url}
                           >
                             <item.icon className="size-6 shrink-0" aria-hidden="true" />
-                            <span>{item.title}</span>
+                            <span className="truncate">{item.title}</span>
                           </MenuItem>
                         )}
                       </li>
