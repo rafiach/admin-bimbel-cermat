@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
+import { Combobox } from "@/components/FormElements/combobox";
 
 
 export const metadata = { title: "Rekap & Pembayaran" };
@@ -72,11 +73,20 @@ export default async function RekapPage({
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
         <form method="get" className="mb-5 flex items-center gap-3">
-          <select name="bulan" defaultValue={bulan} className="rounded-lg border border-stroke bg-transparent px-4 py-2 outline-none dark:border-dark-3">
-            {BULAN.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
-          </select>
-          <input type="number" name="tahun" defaultValue={tahun} className="w-24 rounded-lg border border-stroke bg-transparent px-4 py-2 outline-none dark:border-dark-3" />
-          <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90">
+          <div className="w-48">
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
+            <Combobox
+              name="bulan"
+              placeholder="Pilih bulan..."
+              defaultValue={bulan ? String(bulan) : undefined}
+              options={BULAN.map((b, i) => ({ value: String(i + 1), label: b }))}
+            />
+          </div>
+          <div className="w-48">
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
+            <input type="number" name="tahun" defaultValue={tahun} className="w-24 rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none dark:border-dark-3" />
+          </div>
+          <button type="submit" className="rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white hover:bg-opacity-90">
             Tampilkan
           </button>
         </form>
