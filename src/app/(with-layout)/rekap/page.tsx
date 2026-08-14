@@ -72,7 +72,7 @@ export default async function RekapPage({
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <form method="get" className="mb-5 flex items-center gap-3">
+        <form method="get" className="mb-5 flex items-end gap-3">
           <div className="w-48">
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
             <Combobox

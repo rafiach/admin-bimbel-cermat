@@ -23,7 +23,7 @@ export default async function WithLayout({
       <div className="w-full min-w-0 bg-gray-2 dark:bg-[#020d1a]">
         <Header />
 
-        <main className="isolate mx-auto w-full max-w-(--breakpoint-2xl) overflow-hidden p-4 md:p-6 2xl:p-10">
+        <main className="isolate mx-auto w-full max-w-(--breakpoint-2xl) overflow-x-hidden p-4 md:p-6 2xl:p-10">
           {children}
         </main>
       </div>

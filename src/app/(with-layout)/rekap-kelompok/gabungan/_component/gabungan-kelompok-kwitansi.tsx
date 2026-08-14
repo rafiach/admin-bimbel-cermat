@@ -1,15 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { DownloadButton } from "../../_component/download-button";
+import { DownloadButton } from "../../../rekap/_component/download-button";
+
+type LineItem = {
+  key: string;
+  label: string;
+  jumlah: number;
+  hargaSatuan: number;
+};
 
 type LaporanItem = {
   id: string;
-  tutorNama: string;
-  jumlahHadir: number;
-  biayaOrtu: number;
   mingguKe: number;
   statusBayarOrtu: string;
+  lines: LineItem[];
   materiDipelajari: string | null;
   pemahamanMateri: number;
   keaktifanBelajar: number;
@@ -19,13 +24,15 @@ type LaporanItem = {
   createdAt: string;
 };
 
-export function GabunganKwitansi({
-  namaSiswa,
+export function GabunganKelompokKwitansi({
+  namaKelompok,
+  tutorNama,
   periodeLabel,
   items,
   filenamePrefix,
 }: {
-  namaSiswa: string;
+  namaKelompok: string;
+  tutorNama: string;
   periodeLabel: string;
   items: LaporanItem[];
   filenamePrefix: string;
@@ -39,7 +46,8 @@ export function GabunganKwitansi({
   };
 
   const selectedItems = items.filter((i) => selectedIds.includes(i.id));
-  const totalTagihan = selectedItems.reduce((sum, i) => sum + i.jumlahHadir * i.biayaOrtu, 0);
+  const allLines = selectedItems.flatMap((i) => i.lines);
+  const totalTagihan = allLines.reduce((sum, l) => sum + l.jumlah * l.hargaSatuan, 0);
 
   const laporanTerakhir = useMemo(() => {
     if (selectedItems.length === 0) return null;
@@ -61,7 +69,7 @@ export function GabunganKwitansi({
               <span className="flex items-center gap-3">
                 <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleItem(item.id)} />
                 <span className="text-sm text-dark dark:text-white">
-                  {item.tutorNama} — {item.mingguKe > 0 ? `Minggu ke-${item.mingguKe}` : "Bulanan"} ({item.jumlahHadir}x)
+                  {item.mingguKe > 0 ? `Minggu ke-${item.mingguKe}` : "Bulanan"}
                 </span>
               </span>
               <span
@@ -103,8 +111,12 @@ export function GabunganKwitansi({
 
               <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg bg-[#F7F9FC] p-4 text-sm">
                 <div>
-                  <p className="text-dark-6">Nama Siswa</p>
-                  <p className="font-medium text-dark">{namaSiswa}</p>
+                  <p className="text-dark-6">Nama Kelompok</p>
+                  <p className="font-medium text-dark">{namaKelompok}</p>
+                </div>
+                <div>
+                  <p className="text-dark-6">Tutor</p>
+                  <p className="font-medium text-dark">{tutorNama}</p>
                 </div>
                 <div>
                   <p className="text-dark-6">Periode</p>
@@ -115,25 +127,24 @@ export function GabunganKwitansi({
               <table className="mb-6 w-full border-collapse text-sm">
                 <thead>
                   <tr className="border-b border-stroke text-left">
-                    <th className="py-2 font-medium text-dark-6">Tutor</th>
-                    <th className="py-2 font-medium text-dark-6">Periode</th>
-                    <th className="py-2 text-center font-medium text-dark-6">Hadir</th>
+                    <th className="py-2 font-medium text-dark-6">Rincian</th>
+                    <th className="py-2 text-center font-medium text-dark-6">Jumlah</th>
                     <th className="py-2 text-right font-medium text-dark-6">Subtotal</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedItems.map((l) => (
-                    <tr key={l.id} className="border-b border-stroke">
-                      <td className="py-2 text-dark">{l.tutorNama}</td>
-                      <td className="py-2 text-dark">{l.mingguKe > 0 ? `Minggu ke-${l.mingguKe}` : "Bulanan"}</td>
-                      <td className="py-2 text-center text-dark">{l.jumlahHadir}x</td>
+                  {allLines.map((l) => (
+                    <tr key={l.key} className="border-b border-stroke">
+                      <td className="py-2 text-dark">{l.label}</td>
+                      <td className="py-2 text-center text-dark">{l.jumlah}x</td>
                       <td className="py-2 text-right text-dark">
-                        Rp {(l.jumlahHadir * l.biayaOrtu).toLocaleString("id-ID")}
+                        Rp {(l.jumlah * l.hargaSatuan).toLocaleString("id-ID")}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
               <div className="mb-6 flex items-center justify-between rounded-lg bg-[#F35C2B]/10 px-5 py-4">
                 <div>
                   <p className="text-sm text-dark-6">Total Tagihan</p>
@@ -187,7 +198,7 @@ export function GabunganKwitansi({
 
                   {laporanTerakhir.catatanSiswa && (
                     <p className="mt-3 text-sm text-dark">
-                      <span className="text-dark-6">Catatan & saran untuk siswa: </span>
+                      <span className="text-dark-6">Catatan & saran: </span>
                       {laporanTerakhir.catatanSiswa}
                     </p>
                   )}

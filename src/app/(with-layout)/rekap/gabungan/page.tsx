@@ -54,7 +54,7 @@ export default async function KwitansiGabunganPage({
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
         <h4 className="mb-2 font-bold text-dark dark:text-white">Kwitansi Gabungan</h4>
         <p className="mb-4 text-sm text-dark-6">
-          Buat 1 kwitansi kalau dalam 1 periode siswa sempat diajar lebih dari 1 tutor (misal ganti tutor di tengah bulan).
+          Buat 1 kwitansi kalau dalam 1 periode privat punya beberapa laporan.
         </p>
         <form method="get" className="flex flex-wrap items-end gap-3">
           <div>

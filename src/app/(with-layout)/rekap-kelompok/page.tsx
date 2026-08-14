@@ -81,7 +81,7 @@ export default async function RekapKelompokPage({
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <form method="get" className="mb-5 flex items-center gap-3">
+        <form method="get" className="mb-5 flex items-end gap-3">
           <div className="w-48">
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
             <Combobox
@@ -91,7 +91,7 @@ export default async function RekapKelompokPage({
               options={BULAN.map((b, i) => ({ value: String(i + 1), label: b }))}
             />
           </div>
-          <div className="w-48">
+          <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tahun</label>
             <input type="number" name="tahun" defaultValue={tahun} className="w-24 rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none dark:border-dark-3" />
           </div>
@@ -99,6 +99,12 @@ export default async function RekapKelompokPage({
             Tampilkan
           </button>
         </form>
+
+        <div className="mb-5">
+          <Link href="/rekap-kelompok/gabungan" className="text-sm text-primary hover:underline">
+            + Buat Kwitansi Gabungan
+          </Link>
+        </div>
 
         <Table className="min-w-[900px]">
           <TableHeader>
