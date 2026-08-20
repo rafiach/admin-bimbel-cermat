@@ -14,6 +14,7 @@ import { deleteTutor } from "./actions";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { SearchInput } from "@/components/search-input";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Tutor" };
@@ -113,14 +114,20 @@ export default async function TutorPage({
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
                   <div className="flex items-center justify-end gap-3.5">
-                    <Link href={`/tutor/${t.id}/edit`} className="hover:text-primary">
-                      Edit
+                    <Link
+                      href={`/tutor/${t.id}/edit`}
+                      title="Edit"
+                      className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
+                    >
+                      <Pencil size={17} />
                     </Link>
                     <form action={deleteTutor}>
                       <input type="hidden" name="id" value={t.id} />
-                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
-                        Hapus
-                      </SubmitButton>
+                      <SubmitButton
+                        icon={<Trash2 size={17} />}
+                        pendingIcon={<Loader2 size={17} className="animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
                     </form>
                   </div>
                 </TableCell>

@@ -7,6 +7,9 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteLaporanKelompok, toggleBayarOrtuKelompok, toggleBayarTutorKelompok } from "./actions";
 import { Combobox } from "@/components/FormElements/combobox";
+import { Button } from "@/components/ui-elements/button";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 
 export const metadata = { title: "Rekap Kelompok" };
 
@@ -110,10 +113,12 @@ export default async function RekapKelompokPage({
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="xl:pl-7.5">Kelompok</TableHead>
+              <TableHead>No Hp Ortu</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Periode</TableHead>
               <TableHead>Kehadiaran Kelompok</TableHead>
-              <TableHead>Total Tagihan</TableHead>
+              <TableHead>Tagihan Ortu</TableHead>
+              <TableHead>Fee Tutor</TableHead>
               <TableHead>Bayar Ortu</TableHead>
               <TableHead>Bayar Tutor</TableHead>
               <TableHead className="text-right xl:pr-7.5">Detail</TableHead>
@@ -124,12 +129,14 @@ export default async function RekapKelompokPage({
             {rows.map((r) => (
               <TableRow key={r.id} className="border-[#eee] dark:border-dark-3">
                 <TableCell className="xl:pl-7.5 text-dark dark:text-white">{r.kelompok.nama}</TableCell>
+                <TableCell className="xl:pl-7.5 text-dark dark:text-white">{r.kelompok.noHpWali}</TableCell>
                 <TableCell className="text-dark dark:text-white">{r.kelompok.tutor.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">
                   {r.mingguKe > 0 ? `Minggu ke-${r.mingguKe}` : "Bulanan"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahKelompok}x</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {r.totalTagihan.toLocaleString("id-ID")}</TableCell>
+                <TableCell className="text-dark dark:text-white">Rp {r.totalFeeTutor.toLocaleString("id-ID")}</TableCell>
                 <TableCell>
                   <form action={toggleBayarOrtuKelompok}>
                     <input type="hidden" name="id" value={r.id} />
@@ -149,12 +156,31 @@ export default async function RekapKelompokPage({
                   </form>
                 </TableCell>
                 <TableCell className="text-right xl:pr-7.5">
-                  <div className="flex items-center justify-end gap-3">
-                    <Link href={`/rekap-kelompok/${r.id}`} className="hover:text-primary">Lihat</Link>
-                    <Link href={`/rekap-kelompok/${r.id}/edit`} className="hover:text-primary">Edit</Link>
+                  <div className="flex items-center justify-end gap-1">
+                    <Link
+                      href={`/rekap-kelompok/${r.id}`}
+                      title="Lihat"
+                      className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Eye size={17} />
+                    </Link>
+
+                    <Link
+                      href={`/rekap-kelompok/${r.id}/edit`}
+                      title="Edit"
+                      className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
+                    >
+                      <Pencil size={17} />
+                    </Link>
+
                     <form action={deleteLaporanKelompok}>
                       <input type="hidden" name="id" value={r.id} />
-                      <button type="submit" className="text-red hover:underline">Hapus</button>
+
+                    <SubmitButton
+                      icon={<Trash2 size={17} />}
+                      pendingIcon={<Loader2 size={17} className="animate-spin" />}
+                      className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
                     </form>
                   </div>
                 </TableCell>

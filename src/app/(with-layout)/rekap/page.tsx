@@ -8,6 +8,8 @@ import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { Combobox } from "@/components/FormElements/combobox";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
+import { SubmitButton } from "@/components/FormElements/submit-button";
 
 
 export const metadata = { title: "Rekap & Pembayaran" };
@@ -153,11 +155,28 @@ export default async function RekapPage({
                 </TableCell>
                 <TableCell className="text-right xl:pr-7.5">
                   <div className="flex items-center justify-end gap-3">
-                    <Link href={`/rekap/${r.id}`} className="hover:text-primary">Lihat</Link>
-                    <Link href={`/rekap/${r.id}/edit`} className="hover:text-primary">Edit</Link>
+                    <Link 
+                      href={`/rekap/${r.id}`}                       
+                      title="Lihat"
+                      className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Eye size={17} />
+                    </Link>
+                    <Link 
+                      href={`/rekap/${r.id}/edit`} 
+                      title="Edit"
+                      className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
+                    >
+                      <Pencil size={17} />
+                    </Link>
                     <form action={deleteLaporan}>
                       <input type="hidden" name="id" value={r.id} />
-                      <button type="submit" className="text-red hover:underline">Hapus</button>
+                      
+                    <SubmitButton
+                      icon={<Trash2 size={17} />}
+                      pendingIcon={<Loader2 size={17} className="animate-spin" />}
+                      className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
                     </form>
                   </div>
                 </TableCell>

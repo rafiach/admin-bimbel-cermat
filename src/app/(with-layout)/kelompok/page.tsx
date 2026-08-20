@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelompok } from "./actions";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 
 export const metadata = { title: "Data Kelompok" };
 const PAGE_SIZE = 10;
@@ -20,9 +21,7 @@ export default async function KelompokPage({
 }) {
   const { q, page: pageParam, error } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-
   const where = q ? { nama: { contains: q, mode: "insensitive" as const } } : {};
-
   const [kelompok, total] = await Promise.all([
     db.kelompok.findMany({
       where,
@@ -40,8 +39,8 @@ export default async function KelompokPage({
     }),
     db.kelompok.count({ where }),
   ]);
-
   const totalPages = Math.ceil(total / PAGE_SIZE);
+
 
   return (
     <>
@@ -107,12 +106,20 @@ export default async function KelompokPage({
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
                   <div className="flex items-center justify-end gap-3.5">
-                    <Link href={`/kelompok/${k.id}/edit`} className="hover:text-primary">Edit</Link>
+                    <Link 
+                      href={`/kelompok/${k.id}/edit`}
+                      title="Edit"
+                      className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
+                    >
+                      <Pencil size={17} />
+                    </Link>
                     <form action={deleteKelompok}>
                       <input type="hidden" name="id" value={k.id} />
-                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
-                        Hapus
-                      </SubmitButton>
+                      <SubmitButton
+                        icon={<Trash2 size={17} />}
+                        pendingIcon={<Loader2 size={17} className="animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
                     </form>
                   </div>
                 </TableCell>

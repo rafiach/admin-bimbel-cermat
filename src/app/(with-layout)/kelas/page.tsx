@@ -9,6 +9,7 @@ import { deleteKelas } from "./actions";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { SearchInput } from "@/components/search-input";
 import { Pagination } from "@/components/pagination";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 
 export const metadata = { title: "Data Kelas" };
 
@@ -73,7 +74,6 @@ export default async function KelasPage({
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="xl:pl-7.5">Siswa</TableHead>
               <TableHead>Tutor</TableHead>
-              <TableHead>Tipe</TableHead>
               <TableHead>Jadwal</TableHead>
               <TableHead>Biaya Ortu</TableHead>
               <TableHead>Fee Tutor</TableHead>
@@ -87,7 +87,6 @@ export default async function KelasPage({
               <TableRow key={k.id} className="border-[#eee] dark:border-dark-3">
                 <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">{k.siswa.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.tutor.nama}</TableCell>
-                <TableCell className="capitalize text-dark dark:text-white">{k.tipe}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.jadwal}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {k.biayaOrtu.toLocaleString("id-ID")}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {k.feeTutor.toLocaleString("id-ID")}</TableCell>
@@ -103,12 +102,20 @@ export default async function KelasPage({
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
                   <div className="flex items-center justify-end gap-3.5">
-                    <Link href={`/kelas/${k.id}/edit`} className="hover:text-primary">Edit</Link>
+                    <Link 
+                      href={`/kelas/${k.id}/edit`} 
+                      title="Lihat"
+                      className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
+                    >
+                      <Pencil size={17} />
+                    </Link>
                     <form action={deleteKelas}>
                       <input type="hidden" name="id" value={k.id} />
-                      <SubmitButton className="text-red hover:underline disabled:opacity-60">
-                        Hapus
-                      </SubmitButton>
+                      <SubmitButton
+                        icon={<Trash2 size={17} />}
+                        pendingIcon={<Loader2 size={17} className="animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
                     </form>
                   </div>
                 </TableCell>
