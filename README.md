@@ -1,104 +1,114 @@
-# NextAdmin - Next.js Admin Dashboard Template and Components
+# 📚 Bimbel Cermat — Admin Panel
 
-**NextAdmin** is a Free, open-source Next.js admin dashboard toolkit featuring 200+ UI components and templates that come with pre-built elements, components, pages, high-quality design, integrations, and much more to help you create powerful admin dashboards with ease.
+Aplikasi web admin panel untuk mengelola operasional bimbingan belajar (bimbel) privat & kelompok — mulai dari data siswa, tutor, kelas, kelompok belajar, laporan bulanan tutor, hingga rekap pembayaran dan struk pembayaran otomatis. Dibangun dengan Next.js App Router di atas template [NextAdmin](https://nextadmin.co/), dikustomisasi penuh untuk kebutuhan operasional Bimbel Cermat.
 
-[![nextjs admin template](https://cdn.pimjo.com/nextadmin-2.png)](https://nextadmin.co/)
+## ✨ Fitur
 
----
-## Useful Links
-- [Website](https://nextadmin.co/)
-- [Live Demo](https://demo.nextadmin.co/)
-- [Docs](https://nextadmin.co/docs)
-- [Components](https://nextadmin.co/components)
+- **🔐 Autentikasi & RBAC** — Login via BetterAuth (email/password + Google OAuth), dengan 3 peran akses: `viewer`, `editor`, dan `admin`.
+- **👨‍🎓 Manajemen Siswa** — Data siswa lengkap (sekolah, kelas, kontak orang tua, biaya bimbel, status aktif) dengan pencarian & paginasi.
+- **👩‍🏫 Manajemen Tutor** — Data tutor beserta jenjang yang diampu dan status keaktifan.
+- **📖 Kelas Privat & Kelompok** — Dua model pembelajaran: kelas privat (1 siswa – 1 tutor) dan **Kelompok** (banyak siswa dalam satu kelompok dengan satu tutor, mendukung harga per-anggota individual maupun harga kelompok flat).
+- **📝 Laporan Bulanan/Mingguan** — Tutor mengisi laporan progres belajar (pemahaman materi, keaktifan, kemandirian, kedisiplinan, kehadiran) untuk kelas privat maupun kelompok, lewat form publik yang bisa diakses tanpa login.
+- **💳 Rekap Pembayaran** — Halaman rekap terpisah untuk kelas privat & kelompok, melacak status bayar orang tua dan fee tutor per periode, termasuk tampilan rekap gabungan lintas bulan.
+- **🧾 Struk Pembayaran (PNG)** — Generate struk pembayaran sebagai gambar PNG yang bisa diunduh langsung (menggunakan `html-to-image`).
+- **🖼️ Poster Generator** — Membuat poster promosi siswa secara otomatis menggunakan HTML Canvas.
+- **📊 Dashboard & Grafik** — Ringkasan data dan visualisasi menggunakan ApexCharts.
+- **📱 Normalisasi Nomor Telepon** — Utility khusus untuk menyimpan nomor HP orang tua/tutor dalam format standar dengan kode negara.
 
-## Quick start
+## 🛠️ Tech Stack
 
-You'll need Node.js installed. Then:
+| Kategori | Teknologi |
+|---|---|
+| Framework | Next.js 16 (App Router), TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database | PostgreSQL (Neon) |
+| ORM | Prisma 7 |
+| Autentikasi | BetterAuth (Prisma Adapter, RBAC, Google OAuth) |
+| Grafik | ApexCharts / react-apexcharts |
+| Export Gambar | html-to-image, HTML Canvas (poster) |
+| Validasi | Zod |
+| Deployment | Vercel |
+
+## 🏗️ Keputusan Arsitektur
+
+- **Server Actions** dipakai untuk mutasi data (create/update/delete), bukan REST API routes — lebih ringkas untuk kebutuhan admin panel internal.
+- **`revalidatePath()`** dipakai untuk invalidasi cache setelah mutasi, alih-alih memaksa `force-dynamic` di semua halaman.
+- **Model `Kelompok`** dipisah dari `Kelas` privat: satu kelompok menghubungkan banyak siswa ke satu tutor, dengan opsi harga per-anggota individual (`AnggotaKelompok.hargaPrivat`) maupun harga kelompok flat (`Kelompok.hargaKelompok`) — sementara data siswa tetap tercatat sebagai record individual di kedua model.
+- **Laporan periodik** (`LaporanBulanan` / `LaporanKelompok`) mendukung tipe bulanan maupun mingguan (`tipePeriode`, `mingguKe`) dalam satu skema yang sama.
+- Database development & production dipisah untuk mencegah data testing bocor ke production.
+
+## 📸 Screenshot
+
+| Dashboard |
+|---|
+| <img width="1920" height="1080" alt="Screenshot 2026-08-15 120741" src="https://github.com/user-attachments/assets/6d1b980e-f05e-49c9-aca6-a50468021ccd" /> |
+| Data Siswa | 
+|---|
+| <img width="1920" height="1080" alt="Screenshot 2026-08-15 120912" src="https://github.com/user-attachments/assets/4821c301-4d47-4314-8727-e20c560e606f" /> |
+| Rekap Pembayaran |
+|---|
+| <img width="1920" height="1080" alt="Screenshot 2026-08-15 120931" src="https://github.com/user-attachments/assets/7461883d-f611-4c5b-b9c0-27a1ca3e4568" /> |
+
+
+## 🚀 Cara Menjalankan
+
+### Prasyarat
+- Node.js 18+
+- Database PostgreSQL (rekomendasi: [Neon](https://neon.tech/))
+
+### Instalasi
 
 ```bash
-git clone https://github.com/NextAdminHQ/nextjs-admin-dashboard.git
-cd nextjs-admin-dashboard
-```
+# 1. Clone repository
+git clone https://github.com/rafiach/admin-bimbel-cermat.git
+cd admin-bimbel-cermat
 
-Install dependencies — pick your poison:
-
-```bash
+# 2. Install dependencies
 npm install
-# or: yarn / pnpm install / bun install
-```
 
-Copy the example env file and fill in your credentials:
-
-```bash
+# 3. Salin file environment
 cp .env.example .env.local
 ```
 
-Then start the dev server:
+Isi `.env.local`:
+
+```env
+BETTER_AUTH_SECRET=      # secret acak untuk BetterAuth
+BETTER_AUTH_URL=         # URL aplikasi, mis. http://localhost:3000
+NEXT_PUBLIC_APP_URL=     # sama dengan di atas
+GOOGLE_CLIENT_ID=        # (opsional) untuk login Google
+GOOGLE_CLIENT_SECRET=    # (opsional) untuk login Google
+DATABASE_URL=            # connection string PostgreSQL
+```
 
 ```bash
+# 4. Migrasi database & generate Prisma client
+npx prisma migrate dev
+
+# 5. Jalankan development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and you're good.
+Buka [http://localhost:3000](http://localhost:3000).
 
-## Deploying
+### Script Berguna
 
-Works out of the box on Vercel and Netlify.
+| Command | Fungsi |
+|---|---|
+| `npm run db:studio` | Membuka Prisma Studio untuk browsing data |
+| `npm run db:migrate` | Membuat & menjalankan migrasi baru |
+| `npm run auth:generate` | Generate ulang schema BetterAuth ke Prisma |
 
-## Docs & components
+## 🗺️ Roadmap
 
-Full docs at [nextadmin.co/docs](https://nextadmin.co/docs). Component-level docs (props, examples, code) live under [/docs/components](https://nextadmin.co/docs) — accordions, charts, tables, form layouts, maps, modals, and everything else.
+- [ ] Notifikasi otomatis (WhatsApp/email) untuk pengingat pembayaran
+- [ ] Export rekap ke Excel/PDF
+- [ ] Dashboard analitik pertumbuhan siswa per periode
 
-## Community
+## 👤 Author
 
-- [Discord](https://pimjo.com/community)
-- [X / Twitter](https://twitter.com/PimjoHQ)
-- [GitHub](https://github.com/NextAdminHQ/)
+- **Rafi Achmad** — [@rafiach](https://github.com/rafiach)
 
+---
 
-## Update Logs
-### Version 1.3.0 - [May 03, 2026]
-- Updated to Next.js Latest
-- Updated dependencies
-
-### Version 1.3.0 - [April 30, 2026]
-
-- Update Tailwind CSS to v4 and update dependencies.
-- Added new authentication pages.
-- Updated to latest Next.js
-- Implemented authentication with BetterAuth and Prisma.
-- Configured Role-Based Access Control (RBAC).
-- Added user profile data mutations and queries in profile and settings pages.
-
-### Version 1.2.3 - [Mar 16, 2026]
-
-- Update Next.js to ^16.1.6 and configure image qualities
-
-### Version 1.2.2 - [December 01, 2025]
-
-- Updated to Next.js 16
-- Updated dependencies.
-
-### Version 1.2.1 - [Mar 20, 2025]
-
-- Fix Peer dependency issues and NextConfig warning.
-- Updated apexcharts and react-apexhcarts to the latest version.
-
-### Version 1.2.0 - Major Upgrade and UI Improvements - [Jan 27, 2025]
-
-- Upgraded to Next.js v15 and updated dependencies
-- API integration with loading skeleton for tables and charts.
-- Improved code structure for better readability.
-- Rebuilt components like dropdown, sidebar, and all ui-elements using accessibility practices.
-- Using search-params to store dropdown selection and refetch data.
-- Semantic markups, better separation of concerns and more.
-
-### Version 1.1.0
-
-- Updated Dependencies
-- Removed Unused Integrations
-- Optimized App
-
-### Version 1.0
-
-- Initial Release - [May 13, 2024]
+> Dibangun di atas template [NextAdmin](https://nextadmin.co/) (Next.js Admin Dashboard), dikustomisasi penuh untuk kebutuhan operasional Bimbel Cermat.
