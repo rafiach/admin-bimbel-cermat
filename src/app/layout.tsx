@@ -9,6 +9,7 @@ import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Toaster } from "sonner";
 import { Providers } from "./providers";
+import { DisableNumberScroll } from "@/components/ui-elements/disable-number-scroll";
 
 export const metadata: Metadata = {
   title: {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <DisableNumberScroll/>
         <Providers>
           <NextTopLoader color="#5750F1" showSpinner={false} />
 
