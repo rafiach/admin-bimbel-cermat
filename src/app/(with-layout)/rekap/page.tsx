@@ -10,6 +10,7 @@ import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { Combobox } from "@/components/FormElements/combobox";
 import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
 import { SubmitButton } from "@/components/FormElements/submit-button";
+import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 
 export const metadata = { title: "Rekap & Pembayaran" };
@@ -172,11 +173,15 @@ export default async function RekapPage({
                     <form action={deleteLaporan}>
                       <input type="hidden" name="id" value={r.id} />
                       
-                    <SubmitButton
-                      icon={<Trash2 size={17} />}
-                      pendingIcon={<Loader2 size={17} className="animate-spin" />}
-                      className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
+                      <ConfirmButton
+                        variant="danger"
+                        title="Hapus Data Rekap Privat?"
+                        message={`Yakin mau hapus data rekap ${r.kelas.siswa.nama}?`}
+                        confirmLabel="Ya, Hapus"
+                        icon={<Trash2 className="size-4.5" />}
+                        pendingIcon={<Loader2 className="size-4.5 animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red/10 hover:text-red"
+                      />
                     </form>
                   </div>
                 </TableCell>

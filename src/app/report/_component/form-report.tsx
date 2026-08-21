@@ -4,6 +4,7 @@ import { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { createLaporan, createLaporanKelompok, type LaporState } from "../actions";
 import { SearchableSelect } from "@/components/FormElements/combobox";
+import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 type Kelas = {
   id: string;
@@ -262,9 +263,15 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 
       <RatingAndNotesFields />
 
-      <button type="submit" disabled={pending} className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60">
-        {pending ? "Mengirim..." : "Kirim Laporan"}
-      </button>
+      <ConfirmButton
+        variant="brand"
+        title="Kirim Laporan?"
+        message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
+        confirmLabel="Ya, Kirim"
+        className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
+      >
+        Kirim Laporan
+      </ConfirmButton>
     </form>
   );
 }
@@ -349,9 +356,15 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
         </>
       )}
 
-      <button type="submit" disabled={pending || !selectedKelompok} className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60">
-        {pending ? "Mengirim..." : "Kirim Laporan"}
-      </button>
+      <ConfirmButton
+        variant="brand"
+        title="Kirim Laporan?"
+        message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
+        confirmLabel="Ya, Kirim"
+        className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
+      >
+        Kirim Laporan
+      </ConfirmButton>
     </form>
   );
 }

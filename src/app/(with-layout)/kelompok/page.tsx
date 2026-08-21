@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelompok } from "./actions";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 export const metadata = { title: "Data Kelompok" };
 const PAGE_SIZE = 10;
@@ -115,10 +116,14 @@ export default async function KelompokPage({
                     </Link>
                     <form action={deleteKelompok}>
                       <input type="hidden" name="id" value={k.id} />
-                      <SubmitButton
-                        icon={<Trash2 size={17} />}
-                        pendingIcon={<Loader2 size={17} className="animate-spin" />}
-                        className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      <ConfirmButton
+                        variant="danger"
+                        title="Hapus Data Kelompok?"
+                        message={`Yakin mau hapus data kelompok ${k.nama}?`}
+                        confirmLabel="Ya, Hapus"
+                        icon={<Trash2 className="size-4.5" />}
+                        pendingIcon={<Loader2 className="size-4.5 animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red/10 hover:text-red"
                       />
                     </form>
                   </div>

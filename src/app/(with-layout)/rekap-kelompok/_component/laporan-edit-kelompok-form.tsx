@@ -1,6 +1,10 @@
 "use client";
 
+import InputGroup from "@/components/FormElements/InputGroup";
+import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
+import { Select } from "@/components/FormElements/select";
 import { SubmitButton } from "@/components/FormElements/submit-button";
+import { TextareaGroup } from "@/components/FormElements/text-area-group";
 import { useState } from "react";
 
 type Anggota = { siswaId: string; siswa: { nama: string } };
@@ -49,10 +53,14 @@ export function LaporanKelompokEditForm({
 
   return (
     <form action={handleSubmit} className="space-y-5.5">
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
-        <input type="number" name="jumlahKelompok" defaultValue={laporan.jumlahKelompok} required min={0} className={inputClass} />
-      </div>
+      <InputGroup
+        label = "Kelompok Masuk Berapa Kali"
+        name="jumlahKelompok"
+        type="number"
+        placeholder=""
+        defaultValue={String(laporan.jumlahKelompok)}
+        required
+      />
 
       <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
         <p className="mb-3 text-sm font-medium text-dark dark:text-white">Yang masuk sendiri-sendiri</p>
@@ -73,52 +81,61 @@ export function LaporanKelompokEditForm({
         </div>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Materi yang Dipelajari</label>
-        <textarea name="materiDipelajari" rows={3} defaultValue={laporan.materiDipelajari ?? ""} className={inputClass} />
-      </div>
-
+      <TextAreaGroup
+        label="Materi yang Dipelajari"
+        name="materiDipelajari"
+        defaultValue={laporan.materiDipelajari ?? ""}
+      />
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Pemahaman Materi (1-5)</label>
-          <select name="pemahamanMateri" defaultValue={laporan.pemahamanMateri} required className={inputClass}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Keaktifan Belajar (1-5)</label>
-          <select name="keaktifanBelajar" defaultValue={laporan.keaktifanBelajar} required className={inputClass}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kemandirian (1-5)</label>
-          <select name="kemandirian" defaultValue={laporan.kemandirian} required className={inputClass}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kedisiplinan (1-5)</label>
-          <select name="kedisiplinan" defaultValue={laporan.kedisiplinan} required className={inputClass}>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
-          </select>
-        </div>
-      </div>
+        <Select
+          label="Pemahaman Materi (1-5)"
+          name="pemahamanMateri"
+          defaultValue={String(laporan.pemahamanMateri)}
+          items={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }))}
+        />
+        <Select
+          label="Keaktifan Belajar (1-5)"
+          name="keaktifanBelajar"
+          defaultValue={String(laporan.keaktifanBelajar)}
+          items={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }))}
+        />
+        <Select
+          label="Kemandirian (1-5)"
+          name="kemandirian"
+          defaultValue={String(laporan.kemandirian)}
+          items={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }))}
+        />
+        <Select
+          label="Kedisiplinan (1-5)"
+          name="kedisiplinan"
+          defaultValue={String(laporan.kedisiplinan)}
+          items={[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) }))}
+        />
+      </div>      
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Catatan & Saran untuk Siswa</label>
-        <textarea name="catatanSiswa" rows={3} defaultValue={laporan.catatanSiswa ?? ""} className={inputClass} />
-      </div>
+      <TextareaGroup
+        label="Catatan & Saran untuk Siswa"
+        name="catatanSiswa"
+        placeholder="Catatan dan saran untuk siswa"
+        defaultValue={laporan.catatanSiswa ?? ""}
+      />
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Saran untuk Bimbel</label>
-        <textarea name="saranBimbel" rows={2} defaultValue={laporan.saranBimbel ?? ""} className={inputClass} />
-      </div>
+      <TextareaGroup
+        label="Saran untuk Bimbel"
+        name="saranBimbel"
+        placeholder="Saran untuk bimbel"
+        rows={2}
+        defaultValue={laporan.saranBimbel ?? ""}
+      />
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening Tutor</label>
-        <input type="text" name="norekTutor" defaultValue={laporan.norekTutor ?? ""} className={inputClass} />
-      </div>
+      <InputGroup
+        label="No Rekening Tutor"
+        name="norekTutor"
+        type="text"
+        placeholder="Misal: BCA 1234567890 a.n. ..."
+        defaultValue={laporan.norekTutor ?? ""}
+        required
+      />
 
       <SubmitButton className="rounded-lg bg-primary px-6 py-2.5 font-medium text-white hover:bg-opacity-90 disabled:opacity-60">
         Simpan Perubahan

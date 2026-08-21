@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/FormElements/submit-button";
 import { SearchInput } from "@/components/search-input";
 import { Pagination } from "@/components/pagination";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 export const metadata = { title: "Data Kelas" };
 
@@ -111,10 +112,14 @@ export default async function KelasPage({
                     </Link>
                     <form action={deleteKelas}>
                       <input type="hidden" name="id" value={k.id} />
-                      <SubmitButton
-                        icon={<Trash2 size={17} />}
-                        pendingIcon={<Loader2 size={17} className="animate-spin" />}
-                        className="rounded-md p-2 text-gray-500 hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      <ConfirmButton
+                        variant="danger"
+                        title="Hapus Data kelas?"
+                        message={`Yakin mau hapus data kelas ${k.siswa.nama}?`}
+                        confirmLabel="Ya, Hapus"
+                        icon={<Trash2 className="size-4.5" />}
+                        pendingIcon={<Loader2 className="size-4.5 animate-spin" />}
+                        className="rounded-md p-2 text-gray-500 hover:bg-red/10 hover:text-red"
                       />
                     </form>
                   </div>
