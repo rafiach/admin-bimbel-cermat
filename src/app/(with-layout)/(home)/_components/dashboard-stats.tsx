@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { StatCard } from "./stat-card";
-import { KelasIcon, KelompokIcon, SiswaIcon, TagihanIcon, TutorIcon } from "./icons";
+import { KelasIcon, KelompokIcon, MarginIcon, SiswaIcon, TagihanIcon, TutorIcon } from "./icons";
 
 export async function DashboardStats() {
   const now = new Date();
@@ -20,6 +20,7 @@ export async function DashboardStats() {
       }),
     ]);
 
+  // Tagihan belum lunas (gabungan)
   const belumLunasKelas = laporanBulanIni
     .filter((l) => l.statusBayarOrtu !== "lunas")
     .reduce((sum, l) => sum + l.jumlahHadir * l.kelas.biayaOrtu, 0);
@@ -38,17 +39,49 @@ export async function DashboardStats() {
 
   const belumLunas = belumLunasKelas + belumLunasKelompok;
 
-  const semuaKelas = totalKelas + totalKelompok;
+  // Margin (tagihan ortu - fee tutor), gabungan, gak peduli status bayar
+  const marginKelas = laporanBulanIni.reduce((sum, l) => {
+    const tagihan = l.jumlahHadir * l.kelas.biayaOrtu;
+    const feeTutor = l.jumlahHadir * l.kelas.feeTutor;
+    return sum + (tagihan - feeTutor);
+  }, 0);
+
+  const marginKelompok = laporanKelompokBulanIni.reduce((sum, l) => {
+    const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
+    const tagihanKelompok = l.jumlahKelompok * hargaKelompok;
+    const feeTutorKelompok = l.jumlahKelompok * l.kelompok.feeTutorKelompok;
+
+    const { tagihanIndividu, feeTutorIndividu } = l.anggotaLaporan.reduce(
+      (acc, a) => {
+        const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
+        return {
+          tagihanIndividu: acc.tagihanIndividu + a.jumlahIndividu * (anggota?.hargaPrivat ?? 0),
+          feeTutorIndividu: acc.feeTutorIndividu + a.jumlahIndividu * (anggota?.feeTutor ?? 0),
+        };
+      },
+      { tagihanIndividu: 0, feeTutorIndividu: 0 },
+    );
+
+    return sum + (tagihanKelompok - feeTutorKelompok) + (tagihanIndividu - feeTutorIndividu);
+  }, 0);
+
+  const totalMargin = marginKelas + marginKelompok;
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
       <StatCard label="Siswa Aktif" value={String(totalSiswa)} icon={<SiswaIcon className="h-6 w-6" />} />
       <StatCard label="Tutor Aktif" value={String(totalTutor)} icon={<TutorIcon className="h-6 w-6" />} />
-      <StatCard label="Kelas Aktif" value={String(semuaKelas)} icon={<KelasIcon className="h-6 w-6" />} />
+      <StatCard label="Kelas Aktif" value={String(totalKelas)} icon={<KelasIcon className="h-6 w-6" />} />
+      <StatCard label="Kelompok Aktif" value={String(totalKelompok)} icon={<KelompokIcon className="h-6 w-6" />} />
       <StatCard
         label="Tagihan Belum Lunas (Bulan Ini)"
         value={`Rp ${belumLunas.toLocaleString("id-ID")}`}
         icon={<TagihanIcon className="h-6 w-6" />}
+      />
+      <StatCard
+        label="Margin Bimbel (Bulan Ini)"
+        value={`Rp ${totalMargin.toLocaleString("id-ID")}`}
+        icon={<MarginIcon className="h-6 w-6" />}
       />
     </div>
   );
