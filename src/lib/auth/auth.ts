@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "../db";
+import { sendEmail } from "../email";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set.");
@@ -27,6 +28,17 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     minPasswordLength: 8,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your password - Bimbel Cermat",
+        html: `<p>Click <a href="${url}">here</a> to reset your password. Link expires in 1 hour.</p>`,
+        text: `Reset your password: ${url}`,
+      });
+    },
+    onPasswordReset: async ({ user }, request) => {
+      console.log(`Password reset completed for ${user.email}`);
+    },
   },
 
   socialProviders: {

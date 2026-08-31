@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-const AUTH_ONLY_PATHS = ["/auth/sign-in", "/auth/sign-up"];
+// src/proxy.ts:4
+const AUTH_ONLY_PATHS = ["/auth/sign-in", "/auth/sign-up", "/auth/forgot-password", "/auth/reset-password"];
 
 // Route yang boleh diakses tanpa login
 const PUBLIC_PATHS = ["/report"];

@@ -99,7 +99,7 @@ export default function SigninWithPassword() {
         />
 
         <Link
-          href="/"
+          href="/auth/forgot-password"
           className="ring-primary outline-0 hover:text-primary focus-visible:text-primary focus-visible:ring dark:text-white dark:hover:text-primary"
         >
           Forgot Password?
