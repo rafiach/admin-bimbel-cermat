@@ -8,7 +8,7 @@ import Link from "next/link";
 import { deleteLaporanKelompok, toggleBayarOrtuKelompok, toggleBayarTutorKelompok } from "./actions";
 import { Combobox } from "@/components/FormElements/combobox";
 import { Button } from "@/components/ui-elements/button";
-import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Eye, FileImage, Loader2, Pencil, Trash2 } from "lucide-react";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
@@ -18,6 +18,8 @@ const BULAN = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
+
+const FEE_IZIN = 5000;
 
 export default async function RekapKelompokPage({
   searchParams,
@@ -38,6 +40,7 @@ export default async function RekapKelompokPage({
   const rows = laporan.map((l) => {
     const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
     const totalKelompok = l.jumlahKelompok * hargaKelompok;
+    const feeIzinKelompok = l.jumlahIzin * FEE_IZIN;
     const totalIndividu = l.anggotaLaporan.reduce((sum, a) => {
       const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
       return sum + a.jumlahIndividu * (anggota?.hargaPrivat ?? 0);
@@ -48,9 +51,10 @@ export default async function RekapKelompokPage({
       const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
       return sum + a.jumlahIndividu * (anggota?.feeTutor ?? 0);
     }, 0);
+    const feeIzinTutor = l.jumlahIzin * FEE_IZIN;
 
-    const totalTagihan = totalKelompok + totalIndividu;
-    const totalFeeTutor = feeTutorKelompok + feeTutorIndividu;
+    const totalTagihan = totalKelompok + totalIndividu + feeIzinKelompok;
+    const totalFeeTutor = feeTutorKelompok + feeTutorIndividu + feeIzinTutor;
 
     return { ...l, totalTagihan, totalFeeTutor };
   });
@@ -110,7 +114,7 @@ export default async function RekapKelompokPage({
           </Link>
         </div>
 
-        <Table className="min-w-[900px]">
+        <Table className="min-w-[1000px]">
           <TableHeader>
             <TableRow className="border-none bg-[#F7F9FC] dark:bg-dark-2 [&>th]:py-4 [&>th]:text-base [&>th]:text-dark [&>th]:dark:text-white">
               <TableHead className="xl:pl-7.5">Kelompok</TableHead>
@@ -118,6 +122,7 @@ export default async function RekapKelompokPage({
               <TableHead>Tutor</TableHead>
               <TableHead>Periode</TableHead>
               <TableHead>Kehadiaran Kelompok</TableHead>
+              <TableHead>Izin Mendadak</TableHead>
               <TableHead>Tagihan Ortu</TableHead>
               <TableHead>Fee Tutor</TableHead>
               <TableHead>Bayar Ortu</TableHead>
@@ -136,6 +141,7 @@ export default async function RekapKelompokPage({
                   {r.mingguKe > 0 ? `Minggu ke-${r.mingguKe}` : "Bulanan"}
                 </TableCell>
                 <TableCell className="text-dark dark:text-white">{r.jumlahKelompok}x</TableCell>
+                <TableCell className="text-dark dark:text-white">{r.jumlahIzin > 0 ? `${r.jumlahIzin}x` : "-"}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {r.totalTagihan.toLocaleString("id-ID")}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {r.totalFeeTutor.toLocaleString("id-ID")}</TableCell>
                 <TableCell>
@@ -160,10 +166,10 @@ export default async function RekapKelompokPage({
                   <div className="flex items-center justify-end gap-1">
                     <Link
                       href={`/rekap-kelompok/${r.id}`}
-                      title="Lihat"
+                      title="Kwitansi"
                       className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
                     >
-                      <Eye size={17} />
+                      <FileImage size={17} />
                     </Link>
 
                     <Link
@@ -193,7 +199,7 @@ export default async function RekapKelompokPage({
 
             {rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-6 text-center text-dark-6">Belum ada laporan kelompok buat periode ini.</TableCell>
+                <TableCell colSpan={8} className="py-6 text-center text-dark-6">Belum ada laporan kelompok buat periode ini.</TableCell>
               </TableRow>
             )}
           </TableBody>

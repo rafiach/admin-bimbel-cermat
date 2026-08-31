@@ -328,9 +328,15 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
             <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
-            <input type="number" name="jumlahKelompok" required min={0} className={inputClass} />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
+              <input type="number" name="jumlahKelompok" required min={0} className={inputClass} />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+              <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
+            </div>
           </div>
 
           <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">

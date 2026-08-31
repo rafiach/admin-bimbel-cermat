@@ -45,6 +45,7 @@ export async function updateHargaFinal(formData: FormData) {
 
 export async function updateLaporanKelompok(id: string, formData: FormData) {
   const jumlahKelompok = Number(formData.get("jumlahKelompok"));
+  const jumlahIzin = Number(formData.get("jumlahIzin"));
   const materiDipelajari = formData.get("materiDipelajari") as string;
   const pemahamanMateri = Number(formData.get("pemahamanMateri"));
   const keaktifanBelajar = Number(formData.get("keaktifanBelajar"));
@@ -63,6 +64,7 @@ export async function updateLaporanKelompok(id: string, formData: FormData) {
       where: { id },
       data: {
         jumlahKelompok,
+        jumlahIzin,
         materiDipelajari,
         pemahamanMateri,
         keaktifanBelajar,

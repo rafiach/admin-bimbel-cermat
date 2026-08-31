@@ -10,6 +10,8 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
+const FEE_IZIN = 5000;
+
 export default async function KwitansiGabunganKelompokPage({
   searchParams,
 }: {
@@ -40,6 +42,9 @@ export default async function KwitansiGabunganKelompokPage({
 
     const lines = [
       { key: `${l.id}-kelompok`, label: `Kelompok — ${periode}`, jumlah: l.jumlahKelompok, hargaSatuan: hargaKelompok },
+      ...(l.jumlahIzin > 0
+        ? [{ key: `${l.id}-izin`, label: `Izin Mendadak — ${periode}`, jumlah: l.jumlahIzin, hargaSatuan: FEE_IZIN }]
+        : []),
       ...l.anggotaLaporan
         .filter((a) => a.jumlahIndividu > 0)
         .map((a) => {

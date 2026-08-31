@@ -12,6 +12,8 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
+const FEE_IZIN = 5000;
+
 export default async function DetailRekapKelompokPage({
   params,
 }: {
@@ -30,6 +32,7 @@ export default async function DetailRekapKelompokPage({
 
   const hargaKelompok = laporan.hargaKelompokFinal ?? laporan.kelompok.hargaKelompok;
   const subtotalKelompok = laporan.jumlahKelompok * hargaKelompok;
+  const feeIzinKelompok = laporan.jumlahIzin * FEE_IZIN;
 
   const barisIndividu = laporan.anggotaLaporan
     .filter((a) => a.jumlahIndividu > 0)
@@ -43,7 +46,7 @@ export default async function DetailRekapKelompokPage({
       };
     });
 
-  const totalTagihan = subtotalKelompok + barisIndividu.reduce((sum, b) => sum + b.subtotal, 0);
+  const totalTagihan = subtotalKelompok + feeIzinKelompok + barisIndividu.reduce((sum, b) => sum + b.subtotal, 0);
   const namaAnggota = laporan.kelompok.anggota.map((a) => a.siswa.nama).join(" & ");
 
   return (
@@ -134,6 +137,13 @@ export default async function DetailRekapKelompokPage({
                   <td className="py-2 text-center text-dark">{laporan.jumlahKelompok}x</td>
                   <td className="py-2 text-right text-dark">Rp {subtotalKelompok.toLocaleString("id-ID")}</td>
                 </tr>
+                {laporan.jumlahIzin > 0 && (
+                  <tr className="border-b border-stroke">
+                    <td className="py-2 text-dark">Izin Mendadak</td>
+                    <td className="py-2 text-center text-dark-6">{laporan.jumlahIzin}x @5000</td>
+                    <td className="py-2 text-right text-dark-6">Rp {feeIzinKelompok.toLocaleString("id-ID")}</td>
+                  </tr>
+                )}
                 {barisIndividu.map((b) => (
                   <tr key={b.nama} className="border-b border-stroke">
                     <td className="py-2 text-dark">{b.nama} (privat) @ Rp{b.harga.toLocaleString("id-ID")}</td>

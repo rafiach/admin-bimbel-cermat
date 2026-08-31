@@ -8,7 +8,7 @@ import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
 import { Combobox } from "@/components/FormElements/combobox";
-import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Eye, FileImage, Loader2, Pencil, Trash2 } from "lucide-react";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
@@ -158,10 +158,10 @@ export default async function RekapPage({
                   <div className="flex items-center justify-end gap-3">
                     <Link 
                       href={`/rekap/${r.id}`}                       
-                      title="Lihat"
+                      title="Kwitansi"
                       className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
                     >
-                      <Eye size={17} />
+                      <FileImage size={17} />
                     </Link>
                     <Link 
                       href={`/rekap/${r.id}/edit`} 

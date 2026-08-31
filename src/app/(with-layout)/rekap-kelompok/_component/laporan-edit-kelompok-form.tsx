@@ -11,6 +11,7 @@ type Anggota = { siswaId: string; siswa: { nama: string } };
 type AnggotaLaporan = { siswaId: string; jumlahIndividu: number };
 type LaporanData = {
   jumlahKelompok: number;
+  jumlahIzin: number;
   materiDipelajari: string | null;
   pemahamanMateri: number;
   keaktifanBelajar: number;
@@ -59,6 +60,15 @@ export function LaporanKelompokEditForm({
         type="number"
         placeholder=""
         defaultValue={String(laporan.jumlahKelompok)}
+        required
+      />
+
+      <InputGroup
+        label="Izin Mendadak"
+        name="jumlahIzin"
+        type="number"
+        placeholder="0"
+        defaultValue={String(laporan.jumlahIzin)}
         required
       />
 

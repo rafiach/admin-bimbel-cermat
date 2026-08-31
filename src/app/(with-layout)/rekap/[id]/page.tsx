@@ -97,7 +97,7 @@ export default async function DetailLaporanPage({
                 {laporan.jumlahIzin > 0 && (
                   <tr className="border-b border-stroke">
                     <td className="py-2 text-dark">Izin Mendadak</td>
-                    <td className="py-2 text-right text-dark-6">{laporan.jumlahIzin}x (tidak ditagih)</td>
+                    <td className="py-2 text-right text-dark-6">{laporan.jumlahIzin}x @5000</td>
                   </tr>
                 )}
               </tbody>
