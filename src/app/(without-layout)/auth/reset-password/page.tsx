@@ -1,6 +1,7 @@
 import ResetPassword from "@/components/Auth/ResetPassword";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Reset Password",
@@ -11,7 +12,9 @@ export default function ResetPasswordPage() {
     <div className="flex min-h-screen flex-wrap items-stretch">
       <div className="flex w-full items-center xl:w-1/2">
         <div className="mx-auto w-[570px] p-4 sm:p-12.5 xl:p-15">
-          <ResetPassword />
+          <Suspense fallback={<div>Loading...</div>}>
+            <ResetPassword />
+          </Suspense>
         </div>
       </div>
 
