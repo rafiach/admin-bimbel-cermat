@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 type SiswaItem = { id: string; nama: string };
@@ -164,10 +165,16 @@ export function NotifGroupClient({
               <p className="mb-1 text-xs font-medium text-dark-6">Kelas Privat</p>
               <ul className="space-y-1.5">
                 {kelasTelat.map((k) => (
-                  <li key={k.id} className="rounded-lg border border-stroke px-3 py-2 text-sm dark:border-dark-3">
-                    <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
-                    <span className="text-dark-6"> — {k.siswaNama}</span>
-                    <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                  <li key={k.id}>
+                    <Link
+                      href={`/kelas/${k.id}`}
+                      onClick={() => setOpen(null)}
+                      className="block rounded-lg border border-stroke px-3 py-2 text-sm transition-colors hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:hover:bg-dark-2"
+                    >
+                      <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
+                      <span className="text-dark-6"> — {k.siswaNama}</span>
+                      <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -178,10 +185,16 @@ export function NotifGroupClient({
               <p className="mb-1 text-xs font-medium text-dark-6">Kelompok</p>
               <ul className="space-y-1.5">
                 {kelompokTelat.map((k) => (
-                  <li key={k.id} className="rounded-lg border border-stroke px-3 py-2 text-sm dark:border-dark-3">
-                    <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
-                    <span className="text-dark-6"> — {k.nama}</span>
-                    <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                  <li key={k.id}>
+                    <Link
+                      href={`/kelompok/${k.id}`}
+                      onClick={() => setOpen(null)}
+                      className="block rounded-lg border border-stroke px-3 py-2 text-sm transition-colors hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:hover:bg-dark-2"
+                    >
+                      <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
+                      <span className="text-dark-6"> — {k.nama}</span>
+                      <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                    </Link>
                   </li>
                 ))}
               </ul>
