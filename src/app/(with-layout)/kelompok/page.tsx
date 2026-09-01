@@ -9,7 +9,7 @@ import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteKelompok } from "./actions";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 export const metadata = { title: "Data Kelompok" };
@@ -106,7 +106,14 @@ export default async function KelompokPage({
                   </span>
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
-                  <div className="flex items-center justify-end gap-3.5">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <Link
+                      href={`/kelompok/${k.id}`}
+                      title="Lihat detail"
+                      className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Eye size={17} />
+                    </Link>
                     <Link 
                       href={`/kelompok/${k.id}/edit`}
                       title="Edit"

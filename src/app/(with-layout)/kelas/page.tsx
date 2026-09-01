@@ -9,7 +9,7 @@ import { deleteKelas } from "./actions";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { SearchInput } from "@/components/search-input";
 import { Pagination } from "@/components/pagination";
-import { Loader2, Pencil, Trash2 } from "lucide-react";
+import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 
 export const metadata = { title: "Data Kelas" };
@@ -102,10 +102,17 @@ export default async function KelasPage({
                   </span>
                 </TableCell>
                 <TableCell className="xl:pr-7.5">
-                  <div className="flex items-center justify-end gap-3.5">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <Link
+                      href={`/kelas/${k.id}`}
+                      title="Lihat detail"
+                      className="rounded-md p-2 text-gray-500 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Eye size={17} />
+                    </Link>
                     <Link 
                       href={`/kelas/${k.id}/edit`} 
-                      title="Lihat"
+                      title="Edit"
                       className="rounded-md p-2 text-gray-500 hover:bg-green/10 hover:text-green"
                     >
                       <Pencil size={17} />

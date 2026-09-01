@@ -3,6 +3,7 @@ import { DashboardStats } from "./_components/dashboard-stats";
 import { LaporanTerbaru } from "./_components/laporan-terbaru";
 import { StatusPembayaranCard } from "./_components/status-pembayaran-card";
 import { SiswaBelumTutor } from "./_components/siswa-belum-tutor";
+import { TutorBelumLaporan } from "./_components/tutor-belum-laporan";
 
 export default function Home() {
   return (
@@ -12,6 +13,9 @@ export default function Home() {
       </Suspense>
       <Suspense fallback={null}>
         <SiswaBelumTutor />
+      </Suspense>
+      <Suspense fallback={null}>
+        <TutorBelumLaporan />
       </Suspense>
 
       <div className="col-span-12 xl:col-span-5">
