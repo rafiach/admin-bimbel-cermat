@@ -1,11 +1,15 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
 
+// Deprecated: sekarang dipakai di NotifGroup dengan split bulanan/mingguan.
+// File ini dipertahankan untuk kompatibilitas, tapi halaman utama sudah pakai NotifGroup.
+// Jika dipakai standalone, tetap support split tanpa ubah DB (infer dari riwayat).
+
 function getTargetPeriod(now: Date): { bulan: number; tahun: number } | null {
   const day = now.getDate();
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
-  // Notif hanya aktif: 3 hari terakhir bulan (lastDay-2 .. lastDay) ATAU 7 hari pertama bulan (1..7)
+  // Notif bulanan hanya aktif: 3 hari terakhir bulan (lastDay-2 .. lastDay) ATAU 7 hari pertama bulan (1..7)
   const inWindow = day <= 7 || day > lastDay - 3;
   if (!inWindow) return null;
 
@@ -17,6 +21,15 @@ function getTargetPeriod(now: Date): { bulan: number; tahun: number } | null {
 
   // Jika di akhir bulan (lastDay-2 .. lastDay), cek laporan bulan berjalan
   return { bulan: now.getMonth() + 1, tahun: now.getFullYear() };
+}
+
+function getWeeklyTarget(now: Date): { bulan: number; tahun: number; mingguKe: number } {
+  const bulan = now.getMonth() + 1;
+  const tahun = now.getFullYear();
+  let mingguKe = Math.ceil(now.getDate() / 7);
+  if (mingguKe < 1) mingguKe = 1;
+  if (mingguKe > 5) mingguKe = 5;
+  return { bulan, tahun, mingguKe };
 }
 
 export async function TutorBelumLaporan() {

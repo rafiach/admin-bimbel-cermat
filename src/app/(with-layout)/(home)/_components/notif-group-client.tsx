@@ -41,32 +41,35 @@ function Modal({
 
 export function NotifGroupClient({
   siswa,
-  kelasTelat,
-  kelompokTelat,
-  carryOver,
-  carryLabel,
-  isInWindow,
-  namaBulan,
+  kelasTelatBulanan,
+  kelompokTelatBulanan,
+  kelasTelatMingguan,
+  kelompokTelatMingguan,
+  isInMonthlyWindow,
+  namaBulanBulanan,
+  weeklyLabel,
+  mingguKe,
 }: {
   siswa: SiswaItem[];
-  kelasTelat: KelasTelat[];
-  kelompokTelat: KelompokTelat[];
-  carryOver: number;
-  carryLabel: string;
-  isInWindow: boolean;
-  namaBulan: string;
+  kelasTelatBulanan: KelasTelat[];
+  kelompokTelatBulanan: KelompokTelat[];
+  kelasTelatMingguan: KelasTelat[];
+  kelompokTelatMingguan: KelompokTelat[];
+  isInMonthlyWindow: boolean;
+  namaBulanBulanan: string;
+  weeklyLabel: string;
+  mingguKe: number;
 }) {
-  const [open, setOpen] = useState<"siswa" | "tutor" | "tagihan" | null>(null);
+  const [open, setOpen] = useState<"siswa" | "bulanan" | "mingguan" | null>(null);
 
-  const totalTutor = kelasTelat.length + kelompokTelat.length;
-  const hasTagihan = carryOver > 0;
+  const totalBulanan = kelasTelatBulanan.length + kelompokTelatBulanan.length;
+  const totalMingguan = kelasTelatMingguan.length + kelompokTelatMingguan.length;
   const hasSiswa = siswa.length > 0;
-  // tutor notif hanya relevan jika dalam window ATAU ada data
-  const hasTutor = isInWindow ? totalTutor > 0 : false;
-  // untuk tampilan summary, tetap hitung isInWindow
-  const tutorCount = isInWindow ? totalTutor : 0;
+  const hasBulanan = isInMonthlyWindow ? totalBulanan > 0 : false;
+  const hasMingguan = totalMingguan > 0;
+  const bulananCount = isInMonthlyWindow ? totalBulanan : 0;
 
-  const hasAny = hasSiswa || hasTutor || hasTagihan;
+  const hasAny = hasSiswa || hasBulanan || hasMingguan;
 
   return (
     <>
@@ -79,26 +82,6 @@ export function NotifGroupClient({
           </div>
         ) : (
           <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
-            {/* Tagihan nyangkut */}
-            <button
-              onClick={() => hasTagihan && setOpen("tagihan")}
-              disabled={!hasTagihan}
-              className={`flex flex-col items-start rounded-lg border p-3 text-left transition ${
-                hasTagihan
-                  ? "border-[#FFA70B]/30 bg-[#FFA70B]/10 hover:bg-[#FFA70B]/15 dark:bg-[#FFA70B]/10"
-                  : "border-stroke bg-gray-1 opacity-60 dark:border-dark-3 dark:bg-dark-2"
-              }`}
-            >
-              <span className="text-lg">💰</span>
-              <span className={`mt-1 text-sm font-bold ${hasTagihan ? "text-[#FFA70B]" : "text-dark-6"}`}>
-                {hasTagihan ? `Rp ${carryOver.toLocaleString("id-ID")}` : "Rp 0"}
-              </span>
-              <span className="text-xs font-medium text-dark dark:text-white">Tagihan Nyangkut</span>
-              <span className="text-[11px] text-dark-6">
-                {hasTagihan ? `Sebelum ${carryLabel}` : "Tidak ada tunggakan"}
-              </span>
-            </button>
-
             {/* Siswa belum dapat tutor */}
             <button
               onClick={() => hasSiswa && setOpen("siswa")}
@@ -115,36 +98,46 @@ export function NotifGroupClient({
               <span className="text-[11px] text-dark-6">{hasSiswa ? "Belum dapat kelas" : "Semua sudah ada tutor"}</span>
             </button>
 
-            {/* Tutor belum kirim laporan */}
+            {/* Tutor telat bulanan — window 3 hari sebelum akhir bulan & 7 hari setelah */}
             <button
-              onClick={() => hasTutor && setOpen("tutor")}
-              disabled={!hasTutor}
+              onClick={() => hasBulanan && setOpen("bulanan")}
+              disabled={!hasBulanan}
               className={`flex flex-col items-start rounded-lg border p-3 text-left transition ${
-                hasTutor
+                hasBulanan
                   ? "border-[#3B82F6]/20 bg-[#3B82F6]/5 hover:bg-[#3B82F6]/10 dark:bg-[#3B82F6]/10"
                   : "border-stroke bg-gray-1 opacity-60 dark:border-dark-3 dark:bg-dark-2"
               }`}
             >
-              <span className="text-lg">⏰</span>
-              <span className={`mt-1 text-sm font-bold ${hasTutor ? "text-[#3B82F6]" : "text-dark-6"}`}>{tutorCount}</span>
-              <span className="text-xs font-medium text-dark dark:text-white">Tutor Telat Laporan</span>
+              <span className="text-lg">📅</span>
+              <span className={`mt-1 text-sm font-bold ${hasBulanan ? "text-[#3B82F6]" : "text-dark-6"}`}>{bulananCount}</span>
+              <span className="text-xs font-medium text-dark dark:text-white">Tutor belum kirim Laporan Bulanan</span>
               <span className="text-[11px] text-dark-6">
-                {!isInWindow ? "Di luar jadwal notif" : hasTutor ? namaBulan : "Semua sudah lapor"}
+                {!isInMonthlyWindow ? "Di luar jadwal notif" : hasBulanan ? namaBulanBulanan : "Semua sudah lapor"}
+              </span>
+            </button>
+
+            {/* Tutor telat mingguan — reset tiap Senin */}
+            <button
+              onClick={() => hasMingguan && setOpen("mingguan")}
+              disabled={!hasMingguan}
+              className={`flex flex-col items-start rounded-lg border p-3 text-left transition ${
+                hasMingguan
+                  ? "border-[#8B5CF6]/20 bg-[#8B5CF6]/5 hover:bg-[#8B5CF6]/10 dark:bg-[#8B5CF6]/10"
+                  : "border-stroke bg-gray-1 opacity-60 dark:border-dark-3 dark:bg-dark-2"
+              }`}
+            >
+              <span className="text-lg">⏰</span>
+              <span className={`mt-1 text-sm font-bold ${hasMingguan ? "text-[#8B5CF6]" : "text-dark-6"}`}>{totalMingguan}</span>
+              <span className="text-xs font-medium text-dark dark:text-white">Tutor belum kirim Laporan Mingguan</span>
+              <span className="text-[11px] text-dark-6">
+                {hasMingguan ? weeklyLabel : `Minggu ke-${mingguKe} aman`}
               </span>
             </button>
           </div>
         )}
 
-        <p className="mt-3 text-[11px] text-dark-6">Tekan kartu untuk lihat detail</p>
+        <p className="mt-3 text-[11px] text-dark-6">Tekan kartu untuk lihat detail · Bulanan: 3 hari akhir bulan & 7 hari awal bulan · Mingguan: reset Senin</p>
       </div>
-
-      {/* Modal Tagihan */}
-      <Modal open={open === "tagihan"} onClose={() => setOpen(null)} title={`Tagihan Nyangkut — Sebelum ${carryLabel}`}>
-        <p className="mb-3 text-sm text-dark-6">
-          Total <b className="text-dark dark:text-white">Rp {carryOver.toLocaleString("id-ID")}</b> dari periode sebelum {carryLabel} yang belum lunas.
-        </p>
-        <p className="text-xs text-dark-6">Detail per laporan bisa dilihat di halaman Rekap dengan filter periode &lt; {carryLabel}.</p>
-      </Modal>
 
       {/* Modal Siswa */}
       <Modal open={open === "siswa"} onClose={() => setOpen(null)} title={`${siswa.length} Siswa Belum Dapat Tutor`}>
@@ -157,14 +150,15 @@ export function NotifGroupClient({
         </ul>
       </Modal>
 
-      {/* Modal Tutor */}
-      <Modal open={open === "tutor"} onClose={() => setOpen(null)} title={`${totalTutor} Kelas Belum Kirim Laporan — ${namaBulan}`}>
+      {/* Modal Bulanan */}
+      <Modal open={open === "bulanan"} onClose={() => setOpen(null)} title={`${totalBulanan} Kelas Belum Kirim Laporan Bulanan — ${namaBulanBulanan}`}>
+        <p className="mb-3 text-xs text-dark-6">Periode bulanan: notif aktif 3 hari sebelum akhir bulan & 7 hari setelah akhir bulan.</p>
         <div className="space-y-3">
-          {kelasTelat.length > 0 && (
+          {kelasTelatBulanan.length > 0 && (
             <div>
               <p className="mb-1 text-xs font-medium text-dark-6">Kelas Privat</p>
               <ul className="space-y-1.5">
-                {kelasTelat.map((k) => (
+                {kelasTelatBulanan.map((k) => (
                   <li key={k.id}>
                     <Link
                       href={`/kelas/${k.id}`}
@@ -180,11 +174,11 @@ export function NotifGroupClient({
               </ul>
             </div>
           )}
-          {kelompokTelat.length > 0 && (
+          {kelompokTelatBulanan.length > 0 && (
             <div>
               <p className="mb-1 text-xs font-medium text-dark-6">Kelompok</p>
               <ul className="space-y-1.5">
-                {kelompokTelat.map((k) => (
+                {kelompokTelatBulanan.map((k) => (
                   <li key={k.id}>
                     <Link
                       href={`/kelompok/${k.id}`}
@@ -200,6 +194,54 @@ export function NotifGroupClient({
               </ul>
             </div>
           )}
+        </div>
+      </Modal>
+
+      {/* Modal Mingguan */}
+      <Modal open={open === "mingguan"} onClose={() => setOpen(null)} title={`${totalMingguan} Kelas Belum Kirim Laporan Mingguan — ${weeklyLabel}`}>
+        <p className="mb-3 text-xs text-dark-6">Periode mingguan: reset tiap Senin..</p>
+        <div className="space-y-3">
+          {kelasTelatMingguan.length > 0 && (
+            <div>
+              <p className="mb-1 text-xs font-medium text-dark-6">Kelas Privat</p>
+              <ul className="space-y-1.5">
+                {kelasTelatMingguan.map((k) => (
+                  <li key={k.id}>
+                    <Link
+                      href={`/kelas/${k.id}`}
+                      onClick={() => setOpen(null)}
+                      className="block rounded-lg border border-stroke px-3 py-2 text-sm transition-colors hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:hover:bg-dark-2"
+                    >
+                      <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
+                      <span className="text-dark-6"> — {k.siswaNama}</span>
+                      <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {kelompokTelatMingguan.length > 0 && (
+            <div>
+              <p className="mb-1 text-xs font-medium text-dark-6">Kelompok</p>
+              <ul className="space-y-1.5">
+                {kelompokTelatMingguan.map((k) => (
+                  <li key={k.id}>
+                    <Link
+                      href={`/kelompok/${k.id}`}
+                      onClick={() => setOpen(null)}
+                      className="block rounded-lg border border-stroke px-3 py-2 text-sm transition-colors hover:border-primary hover:bg-primary/5 dark:border-dark-3 dark:hover:bg-dark-2"
+                    >
+                      <span className="font-medium text-dark dark:text-white">{k.tutorNama}</span>
+                      <span className="text-dark-6"> — {k.nama}</span>
+                      <span className="ml-1 text-xs text-dark-6">({k.jadwal})</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {totalMingguan === 0 && <p className="text-sm text-dark-6">Tidak ada kelas mingguan yang telat minggu ini. Kelas baru tanpa riwayat mingguan dihitung sebagai bulanan, jadi tidak muncul di sini sampai ada laporan mingguan pertamanya.</p>}
         </div>
       </Modal>
     </>

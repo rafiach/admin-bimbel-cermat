@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
-import { NotifGroupClient } from "./notif-group-client";
 
-function getTargetPeriod(now: Date): { bulan: number; tahun: number } | null {
+function getMonthlyTarget(now: Date): { bulan: number; tahun: number } | null {
   const day = now.getDate();
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const inWindow = day <= 7 || day > lastDay - 3;
@@ -13,89 +12,175 @@ function getTargetPeriod(now: Date): { bulan: number; tahun: number } | null {
   return { bulan: now.getMonth() + 1, tahun: now.getFullYear() };
 }
 
-export async function NotifGroup({ bulan, tahun }: { bulan: number; tahun: number }) {
-  const target = getTargetPeriod(new Date());
-  const isInWindow = !!target;
+function getWeeklyTarget(now: Date): { bulan: number; tahun: number; mingguKe: number; monday: Date } {
+  const bulan = now.getMonth() + 1;
+  const tahun = now.getFullYear();
+  let mingguKe = Math.ceil(now.getDate() / 7);
+  if (mingguKe < 1) mingguKe = 1;
+  if (mingguKe > 5) mingguKe = 5;
+  // Senin minggu ini untuk label/reset
+  const day = now.getDay(); // 0 Sun .. 6 Sat
+  const diffToMonday = (day + 6) % 7;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - diffToMonday);
+  return { bulan, tahun, mingguKe, monday };
+}
 
-  // query siswa tanpa tutor & tutor telat (window) + carryOver (filter periode)
+export async function NotifGroup({ bulan, tahun: _tahun }: { bulan: number; tahun: number }) {
+  const now = new Date();
+  const monthlyTarget = getMonthlyTarget(now);
+  const weeklyTarget = getWeeklyTarget(now);
+  const isInMonthlyWindow = !!monthlyTarget;
+
+  // Siswa tanpa tutor
   const siswaPromise = db.siswa.findMany({
     where: { status: "nonaktif", kelasList: { none: {} } },
     orderBy: { createdAt: "desc" },
     select: { id: true, nama: true },
   });
 
-  const tutorPromise = target
-    ? Promise.all([
-        db.kelas.findMany({
-          where: { status: "aktif", laporan: { none: { bulan: target.bulan, tahun: target.tahun } } },
+  // Infer tipe tanpa ubah DB: kelas/kelompok yang pernah punya laporan mingguan dianggap mingguan, sisanya bulanan
+  const mingguanKelasIdsPromise = db.laporanBulanan
+    .findMany({
+      where: { tipePeriode: "mingguan" },
+      select: { kelasId: true },
+      distinct: ["kelasId"],
+    })
+    .then((rows) => rows.map((r) => r.kelasId));
+
+  const mingguanKelompokIdsPromise = db.laporanKelompok
+    .findMany({
+      where: { tipePeriode: "mingguan" },
+      select: { kelompokId: true },
+      distinct: ["kelompokId"],
+    })
+    .then((rows) => rows.map((r) => r.kelompokId));
+
+  const [siswa, mingguanKelasIds, mingguanKelompokIds] = await Promise.all([
+    siswaPromise,
+    mingguanKelasIdsPromise,
+    mingguanKelompokIdsPromise,
+  ]);
+
+  // --- Bulanan: hanya untuk kelas/kelompok yang BUKAN mingguan (infer bulanan) ---
+  // Jika monthlyTarget null (di luar window), skip query
+  const monthlyKelasPromise = monthlyTarget
+    ? db.kelas.findMany({
+        where: {
+          status: "aktif",
+          ...(mingguanKelasIds.length > 0 ? { id: { notIn: mingguanKelasIds } } : {}),
+          laporan: { none: { bulan: monthlyTarget.bulan, tahun: monthlyTarget.tahun, tipePeriode: "bulanan" } },
+        },
+        include: { tutor: true, siswa: true },
+        orderBy: { tutor: { nama: "asc" } },
+      })
+    : Promise.resolve([] as any[]);
+
+  const monthlyKelompokPromise = monthlyTarget
+    ? db.kelompok.findMany({
+        where: {
+          status: "aktif",
+          ...(mingguanKelompokIds.length > 0 ? { id: { notIn: mingguanKelompokIds } } : {}),
+          laporan: { none: { bulan: monthlyTarget.bulan, tahun: monthlyTarget.tahun, tipePeriode: "bulanan" } },
+        },
+        include: { tutor: true },
+        orderBy: { tutor: { nama: "asc" } },
+      })
+    : Promise.resolve([] as any[]);
+
+  // --- Mingguan: hanya untuk kelas/kelompok yang pernah mingguan (infer mingguan), reset tiap Senin ---
+  const weeklyKelasPromise =
+    mingguanKelasIds.length > 0
+      ? db.kelas.findMany({
+          where: {
+            status: "aktif",
+            id: { in: mingguanKelasIds },
+            laporan: {
+              none: {
+                bulan: weeklyTarget.bulan,
+                tahun: weeklyTarget.tahun,
+                mingguKe: weeklyTarget.mingguKe,
+                tipePeriode: "mingguan",
+              },
+            },
+          },
           include: { tutor: true, siswa: true },
           orderBy: { tutor: { nama: "asc" } },
-        }),
-        db.kelompok.findMany({
-          where: { status: "aktif", laporan: { none: { bulan: target.bulan, tahun: target.tahun } } },
+        })
+      : Promise.resolve([] as any[]);
+
+  const weeklyKelompokPromise =
+    mingguanKelompokIds.length > 0
+      ? db.kelompok.findMany({
+          where: {
+            status: "aktif",
+            id: { in: mingguanKelompokIds },
+            laporan: {
+              none: {
+                bulan: weeklyTarget.bulan,
+                tahun: weeklyTarget.tahun,
+                mingguKe: weeklyTarget.mingguKe,
+                tipePeriode: "mingguan",
+              },
+            },
+          },
           include: { tutor: true },
           orderBy: { tutor: { nama: "asc" } },
-        }),
-      ])
-    : Promise.resolve([[], []] as const);
+        })
+      : Promise.resolve([] as any[]);
 
-  const carryKelasPromise = db.laporanBulanan.findMany({
-    where: { statusBayarOrtu: { not: "lunas" }, OR: [{ tahun: { lt: tahun } }, { tahun, bulan: { lt: bulan } }] },
-    include: { kelas: true },
-  });
-  const carryKelompokPromise = db.laporanKelompok.findMany({
-    where: { statusBayarOrtu: { not: "lunas" }, OR: [{ tahun: { lt: tahun } }, { tahun, bulan: { lt: bulan } }] },
-    include: { kelompok: { include: { anggota: true } }, anggotaLaporan: true },
-  });
-
-  const [siswa, tutorRes, carryKelas, carryKelompok] = await Promise.all([
-    siswaPromise,
-    tutorPromise,
-    carryKelasPromise,
-    carryKelompokPromise,
+  const [kelasBulananRaw, kelompokBulananRaw, kelasMingguanRaw, kelompokMingguanRaw] = await Promise.all([
+    monthlyKelasPromise,
+    monthlyKelompokPromise,
+    weeklyKelasPromise,
+    weeklyKelompokPromise,
   ]);
-  const [kelasTelatRaw, kelompokTelatRaw] = tutorRes as [any[], any[]];
 
-  // sederhanakan payload untuk client
-  const kelasTelat = (kelasTelatRaw as any[]).map((k: any) => ({
+  const kelasTelatBulanan = (kelasBulananRaw as any[]).map((k: any) => ({
     id: k.id as string,
     tutorNama: k.tutor.nama as string,
     siswaNama: k.siswa.nama as string,
     jadwal: k.jadwal as string,
   }));
-  const kelompokTelat = (kelompokTelatRaw as any[]).map((k: any) => ({
+  const kelompokTelatBulanan = (kelompokBulananRaw as any[]).map((k: any) => ({
+    id: k.id as string,
+    tutorNama: k.tutor.nama as string,
+    nama: k.nama as string,
+    jadwal: k.jadwal as string,
+  }));
+  const kelasTelatMingguan = (kelasMingguanRaw as any[]).map((k: any) => ({
+    id: k.id as string,
+    tutorNama: k.tutor.nama as string,
+    siswaNama: k.siswa.nama as string,
+    jadwal: k.jadwal as string,
+  }));
+  const kelompokTelatMingguan = (kelompokMingguanRaw as any[]).map((k: any) => ({
     id: k.id as string,
     tutorNama: k.tutor.nama as string,
     nama: k.nama as string,
     jadwal: k.jadwal as string,
   }));
 
-  const carryKelasAmt = carryKelas.reduce((sum, l) => sum + l.jumlahHadir * l.kelas.biayaOrtu, 0);
-  const carryKelompokAmt = carryKelompok.reduce((sum, l) => {
-    const hargaKelompok = (l as any).hargaKelompokFinal ?? (l as any).kelompok.hargaKelompok;
-    const totalKelompokBaris = (l as any).jumlahKelompok * hargaKelompok;
-    const totalIndividu = (l as any).anggotaLaporan.reduce((s: number, a: any) => {
-      const anggota = (l as any).kelompok.anggota.find((ag: any) => ag.siswaId === a.siswaId);
-      return s + a.jumlahIndividu * (anggota?.hargaPrivat ?? 0);
-    }, 0);
-    return sum + totalKelompokBaris + totalIndividu;
-  }, 0);
-  const carryOver = carryKelasAmt + carryKelompokAmt;
-
-  const carryLabel = new Date(tahun, bulan - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
-  const namaBulan = target
-    ? new Date(target.tahun, target.bulan - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+  const namaBulanBulanan = monthlyTarget
+    ? new Date(monthlyTarget.tahun, monthlyTarget.bulan - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
     : "";
+
+  const weeklyLabel = `Minggu ke-${weeklyTarget.mingguKe} — ${new Date(weeklyTarget.tahun, weeklyTarget.bulan - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" })}`;
+
+  // Import client dynamically to avoid circular? use direct
+  const { NotifGroupClient } = await import("./notif-group-client");
 
   return (
     <NotifGroupClient
       siswa={siswa}
-      kelasTelat={kelasTelat}
-      kelompokTelat={kelompokTelat}
-      carryOver={carryOver}
-      carryLabel={carryLabel}
-      isInWindow={isInWindow}
-      namaBulan={namaBulan}
+      kelasTelatBulanan={kelasTelatBulanan}
+      kelompokTelatBulanan={kelompokTelatBulanan}
+      kelasTelatMingguan={kelasTelatMingguan}
+      kelompokTelatMingguan={kelompokTelatMingguan}
+      isInMonthlyWindow={isInMonthlyWindow}
+      namaBulanBulanan={namaBulanBulanan}
+      weeklyLabel={weeklyLabel}
+      mingguKe={weeklyTarget.mingguKe}
     />
   );
 }
