@@ -28,6 +28,7 @@ export default async function DetailLaporanPage({
   if (!laporan) notFound();
 
   const tagihanOrtu = laporan.jumlahHadir * laporan.kelas.biayaOrtu + laporan.jumlahIzin * FEE_IZIN;
+  const feeTutor = laporan.jumlahHadir * laporan.kelas.feeTutor + laporan.jumlahIzin * FEE_IZIN;
 
   return (
     <>
@@ -36,6 +37,31 @@ export default async function DetailLaporanPage({
       <div className="space-y-5.5">
         <div className="print:hidden flex items-center justify-end">
           <DownloadButton filename={`kwitansi-${laporan.kelas.siswa.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`}/>
+        </div>
+
+        {/* Card Info Tutor — di luar area print */}
+        <div className="print:hidden mx-auto max-w-2xl rounded-[10px] border border-stroke bg-white p-5 shadow-1 dark:border-dark-3 dark:bg-gray-dark">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-dark dark:text-white">Info Pembayaran Tutor</h4>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-stroke bg-[#F7F9FC] p-4 dark:border-dark-3 dark:bg-dark-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Fee Tutor</p>
+              <p className="mt-1 text-lg font-bold text-dark dark:text-white">Rp {feeTutor.toLocaleString("id-ID")}</p>
+              <p className="mt-1 text-xs text-dark-6">
+                {laporan.jumlahHadir}x @Rp {laporan.kelas.feeTutor.toLocaleString("id-ID")}
+                {laporan.jumlahIzin > 0 && ` + ${laporan.jumlahIzin}x @5000 (izin)`}
+              </p>
+              <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${laporan.statusBayarTutor === "sudah" ? "bg-[#219653]/10 text-[#219653]" : "bg-[#D34053]/10 text-[#D34053]"}`}>
+                {laporan.statusBayarTutor === "sudah" ? "Sudah dibayar" : "Belum dibayar"}
+              </span>
+            </div>
+            <div className="rounded-lg border border-stroke bg-[#F7F9FC] p-4 dark:border-dark-3 dark:bg-dark-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-dark-6">No Rekening / E-Wallet Tutor</p>
+              <p className="mt-1 break-all font-mono text-lg font-bold text-dark dark:text-white">{laporan.norekTutor || "-"}</p>
+              <p className="mt-1 text-xs text-dark-6">a.n. {laporan.kelas.tutor.nama}</p>
+            </div>
+          </div>
         </div>
 
         <div
@@ -163,9 +189,6 @@ export default async function DetailLaporanPage({
         </div>
         <div className="print:hidden mx-auto max-w-2xl space-y-2 rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">
           <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Notes Buat Bimbel</p>
-          <p className="text-sm text-dark dark:text-white">
-            <span className="text-dark-6">No Rekening Tutor: </span>{laporan.norekTutor}
-          </p>
           {laporan.saranBimbel && (
             <p className="text-sm text-dark dark:text-white">
               <span className="text-dark-6">Saran untuk Bimbel: </span>{laporan.saranBimbel}

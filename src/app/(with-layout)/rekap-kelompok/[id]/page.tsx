@@ -49,39 +49,54 @@ export default async function DetailRekapKelompokPage({
   const totalTagihan = subtotalKelompok + feeIzinKelompok + barisIndividu.reduce((sum, b) => sum + b.subtotal, 0);
   const namaAnggota = laporan.kelompok.anggota.map((a) => a.siswa.nama).join(" & ");
 
+  // Fee tutor kelompok (sama dengan logic di rekap-kelompok/page.tsx)
+  const feeTutorKelompok = laporan.jumlahKelompok * laporan.kelompok.feeTutorKelompok;
+  const feeTutorIndividu = laporan.anggotaLaporan.reduce((sum, a) => {
+    const anggota = laporan.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
+    return sum + a.jumlahIndividu * (anggota?.feeTutor ?? 0);
+  }, 0);
+  const feeIzinTutor = laporan.jumlahIzin * FEE_IZIN;
+  const totalFeeTutor = feeTutorKelompok + feeTutorIndividu + feeIzinTutor;
+
   return (
 
     <>
       <Breadcrumb pageName="Detail Laporan Kelompok" />
     
       <div className="space-y-5.5">
-        {/* <div className="print:hidden space-y-3">
-          <form action={updateHargaFinal} className="flex items-end gap-3 rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">
-            <input type="hidden" name="id" value={laporan.id} />
-            <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-                Harga Kelompok Final (buat kwitansi ini aja, default Rp{laporan.kelompok.hargaKelompok.toLocaleString("id-ID")})
-              </label>
-              <input
-                type="number"
-                name="hargaKelompokFinal"
-                defaultValue={hargaKelompok}
-                className="w-48 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
-              />
+          <div className="print:hidden flex justify-end">
+            <DownloadButton filename={`kwitansi-kelompok-${laporan.kelompok.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`} />
+          </div>
+
+        {/* Card Info Tutor — di luar area print */}
+        <div className="print:hidden mx-auto max-w-2xl rounded-[10px] border border-stroke bg-white p-5 shadow-1 dark:border-dark-3 dark:bg-gray-dark">
+          <div className="mb-3 flex items-center justify-between">
+            <h4 className="text-sm font-semibold text-dark dark:text-white">Info Pembayaran Tutor</h4>
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-stroke bg-[#F7F9FC] p-4 dark:border-dark-3 dark:bg-dark-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Fee Tutor</p>
+              <p className="mt-1 text-lg font-bold text-dark dark:text-white">Rp {totalFeeTutor.toLocaleString("id-ID")}</p>
+              <div className="mt-1 space-y-0.5 text-xs text-dark-6">
+                <p>{laporan.jumlahKelompok}x kelompok @Rp {laporan.kelompok.feeTutorKelompok.toLocaleString("id-ID")}</p>
+                {barisIndividu.length > 0 && (
+                  <p>
+                    + {barisIndividu.map((b) => `${b.jumlah}x ${b.nama} @${b.harga.toLocaleString("id-ID")}`).join(", ")}
+                  </p>
+                )}
+                {laporan.jumlahIzin > 0 && <p>+ {laporan.jumlahIzin}x @5000 (izin)</p>}
+              </div>
+              <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${laporan.statusBayarTutor === "sudah" ? "bg-[#219653]/10 text-[#219653]" : "bg-[#D34053]/10 text-[#D34053]"}`}>
+                {laporan.statusBayarTutor === "sudah" ? "Sudah dibayar" : "Belum dibayar"}
+              </span>
             </div>
-            <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-opacity-90">
-              Simpan
-            </button>
-          </form>
-
-          <div className="flex justify-end">
-            <DownloadButton filename={`kwitansi-kelompok-${laporan.kelompok.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`} />
+            <div className="rounded-lg border border-stroke bg-[#F7F9FC] p-4 dark:border-dark-3 dark:bg-dark-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-dark-6">No Rekening / E-Wallet Tutor</p>
+              <p className="mt-1 break-all font-mono text-lg font-bold text-dark dark:text-white">{laporan.norekTutor || "-"}</p>
+              <p className="mt-1 text-xs text-dark-6">a.n. {laporan.kelompok.tutor.nama}</p>
+            </div>
           </div>
-        </div> */}
-
-          <div className="flex justify-end">
-            <DownloadButton filename={`kwitansi-kelompok-${laporan.kelompok.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`} />
-          </div>
+        </div>
 
         <div id="area-cetak" className="relative mx-auto max-w-2xl overflow-hidden rounded-[10px] border border-stroke bg-white shadow-1">
           <div className="h-2 bg-[#F35C2B]" />
@@ -210,10 +225,7 @@ export default async function DetailRekapKelompokPage({
 
         {laporan.saranBimbel && (
           <div className="print:hidden mx-auto max-w-2xl rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">
-            <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Internal — gak ikut ke-download</p>
-            <p className="mt-1 text-sm text-dark dark:text-white">
-              <span className="text-dark-6">No Rekening Tutor: </span>{laporan.norekTutor}
-            </p>
+            <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Notes Buat Bimbel</p>
             <p className="mt-1 text-sm text-dark dark:text-white">
               <span className="text-dark-6">Saran untuk Bimbel: </span>{laporan.saranBimbel}
             </p>
