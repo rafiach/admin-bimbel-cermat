@@ -1,10 +1,13 @@
 import { db } from "@/lib/db";
 import { StatusPembayaranChart } from "./status-pembayaran-chart";
 
-export async function StatusPembayaranCard() {
-  const now = new Date();
-  const bulan = now.getMonth() + 1;
-  const tahun = now.getFullYear();
+export async function StatusPembayaranCard({
+  bulan,
+  tahun,
+}: {
+  bulan: number;
+  tahun: number;
+}) {
 
   const [laporan, laporanKelompok] = await Promise.all([
     db.laporanBulanan.findMany({
@@ -25,9 +28,11 @@ export async function StatusPembayaranCard() {
   const sudahTutor = semua.filter((l) => l.statusBayarTutor === "sudah").length;
   const belumTutor = semua.length - sudahTutor;
 
+  const bulanLabel = new Date(tahun, bulan - 1, 1).toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+
   return (
-    <div className="rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
-      <h4 className="mb-4 font-medium text-dark dark:text-white">Status Pembayaran Bulan Ini</h4>
+    <div className="flex h-full flex-col rounded-[10px] bg-white p-6 shadow-1 dark:bg-gray-dark">
+      <h4 className="mb-4 font-medium text-dark dark:text-white">Status Pembayaran — {bulanLabel}</h4>
 
       <div className="flex flex-nowrap justify-center gap-6">
         <div>

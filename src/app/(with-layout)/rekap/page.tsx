@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { deleteLaporan, toggleBayarOrtu, toggleBayarTutor } from "./actions";
 import Link from "next/link";
 import { formatPhoneDisplay, waLink } from "@/lib/phone";
-import { Combobox } from "@/components/FormElements/combobox";
+import { PeriodeFilterForm } from "@/components/periode-filter-form";
 import { Eye, FileImage, Loader2, Pencil, Trash2 } from "lucide-react";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
@@ -75,24 +75,7 @@ export default async function RekapPage({
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
-        <form method="get" className="mb-5 flex items-end gap-3">
-          <div className="w-48">
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
-            <Combobox
-              name="bulan"
-              placeholder="Pilih bulan..."
-              defaultValue={bulan ? String(bulan) : undefined}
-              options={BULAN.map((b, i) => ({ value: String(i + 1), label: b }))}
-            />
-          </div>
-          <div className="w-48">
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Bulan</label>
-            <input type="number" name="tahun" defaultValue={tahun} className="w-24 rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none dark:border-dark-3" />
-          </div>
-          <button type="submit" className="rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white hover:bg-opacity-90">
-            Tampilkan
-          </button>
-        </form>
+        <PeriodeFilterForm bulan={bulan} tahun={tahun} />
         <div className="mb-5">
           <Link href="/rekap/gabungan" className="text-sm text-primary hover:underline">
             + Buat Kwitansi Gabungan
