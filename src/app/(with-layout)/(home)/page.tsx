@@ -6,6 +6,7 @@ import { StatusPembayaranCard } from "./_components/status-pembayaran-card";
 import { SiswaBelumTutor } from "./_components/siswa-belum-tutor";
 import { TutorBelumLaporan } from "./_components/tutor-belum-laporan";
 import { PeriodeFilterForm } from "@/components/periode-filter-form";
+import { NotifGroup } from "./_components/notif-group";
 
 export default async function Home({
   searchParams,
@@ -19,16 +20,18 @@ export default async function Home({
 
   return (
     <div className="space-y-4 md:space-y-6 2xl:space-y-7.5">
-      <Suspense fallback={null}>
-        <DashboardStats />
-      </Suspense>
-
-      <Suspense fallback={null}>
-        <SiswaBelumTutor />
-      </Suspense>
-      <Suspense fallback={null}>
-        <TutorBelumLaporan />
-      </Suspense>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+        <div className="lg:col-span-3">
+          <Suspense key={`notif-${bulan}-${tahun}`} fallback={null}>
+            <NotifGroup bulan={bulan} tahun={tahun} />
+          </Suspense>
+        </div>
+        <div className="lg:col-span-2">
+          <Suspense fallback={null}>
+            <DashboardStats />
+          </Suspense>
+        </div>
+      </div>
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-6">
         <PeriodeFilterForm bulan={bulan} tahun={tahun} />
       </div>
