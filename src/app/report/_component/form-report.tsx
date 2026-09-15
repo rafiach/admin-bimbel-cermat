@@ -33,10 +33,38 @@ const RATING_FIELDS = [
   { name: "kedisiplinan", label: "Kedisiplinan" },
 ];
 
+const DEFAULT_RATING = 3;
+
+const ASSESSMENT_DEFAULTS = {
+  pemahamanMateri: DEFAULT_RATING,
+  keaktifanBelajar: DEFAULT_RATING,
+  kemandirian: DEFAULT_RATING,
+  kedisiplinan: DEFAULT_RATING,
+  materiDipelajari: "",
+  catatanSiswa: "",
+  saranBimbel: "",
+};
+
 const inputClass =
   "w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-[#F35C2B] dark:border-dark-3";
 
-function RatingAndNotesFields() {
+function RatingAndNotesFields({ 
+  isExpanded, 
+  defaults = ASSESSMENT_DEFAULTS 
+}: { 
+  isExpanded: boolean; 
+  defaults?: typeof ASSESSMENT_DEFAULTS 
+}) {
+  if (!isExpanded) {
+    return (
+      <>
+        {Object.entries(defaults).map(([name, value]) => (
+          <input key={name} type="hidden" name={name} value={value} />
+        ))}
+      </>
+    );
+  }
+
   return (
     <>
       <div>
@@ -47,8 +75,7 @@ function RatingAndNotesFields() {
       {RATING_FIELDS.map((f) => (
         <div key={f.name}>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{f.label} (1-5)</label>
-          <select name={f.name} required defaultValue="" className={inputClass}>
-            <option value="" disabled>Pilih nilai</option>
+          <select name={f.name} required defaultValue={defaults[f.name as keyof typeof defaults] as string} className={inputClass}>
             {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
           </select>
         </div>
@@ -175,6 +202,7 @@ export function ReportForm({
 function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Kelas[] }) {
   const [kelasId, setKelasId] = useState("");
   const [partnerIds, setPartnerIds] = useState<string[]>([]);
+  const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporan, null);
 
   useEffect(() => {
@@ -203,65 +231,91 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 
   return (
     <form action={handleSubmit} className="space-y-5">
-      {tutorId && (
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Nama Siswa & Kelas</label>
-          <select
-            name="kelasId"
-            required
-            value={kelasId}
-            onChange={(e) => { setKelasId(e.target.value); setPartnerIds([]); }}
-            className={inputClass}
-          >
-            <option value="">Pilih siswa</option>
-            {kelasTutorIni.map((k) => (
-              <option key={k.id} value={k.id}>{k.siswa.nama} — {k.jadwal}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div className="rounded-lg border border-stroke bg-white p-5 dark:border-dark-3 dark:bg-gray-dark space-y-5">
+        {tutorId && (
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Nama Siswa & Kelas</label>
+            <select
+              name="kelasId"
+              required
+              value={kelasId}
+              onChange={(e) => { setKelasId(e.target.value); setPartnerIds([]); }}
+              className={inputClass}
+            >
+              <option value="">Pilih siswa</option>
+              {kelasTutorIni.map((k) => (
+                <option key={k.id} value={k.id}>{k.siswa.nama} — {k.jadwal}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
-      {partners.length > 0 && (
-        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4">
-          <p className="mb-2 text-sm font-medium text-dark dark:text-white">
-            Sesi kelompok ini juga bareng siapa? (centang biar gak usah isi ulang buat mereka)
-          </p>
-          <div className="space-y-2">
-            {partners.map((p) => (
-              <label key={p.id} className="flex items-center gap-2 text-sm text-dark dark:text-white">
-                <input
-                  type="checkbox"
-                  checked={partnerIds.includes(p.id)}
-                  onChange={(e) =>
-                    setPartnerIds((prev) => (e.target.checked ? [...prev, p.id] : prev.filter((id) => id !== p.id)))
-                  }
-                />
-                {p.siswa.nama}
-              </label>
-            ))}
+        {partners.length > 0 && (
+          <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4">
+            <p className="mb-2 text-sm font-medium text-dark dark:text-white">
+              Sesi kelompok ini juga bareng siapa? (centang biar gak usah isi ulang buat mereka)
+            </p>
+            <div className="space-y-2">
+              {partners.map((p) => (
+                <label key={p.id} className="flex items-center gap-2 text-sm text-dark dark:text-white">
+                  <input
+                    type="checkbox"
+                    checked={partnerIds.includes(p.id)}
+                    onChange={(e) =>
+                      setPartnerIds((prev) => (e.target.checked ? [...prev, p.id] : prev.filter((id) => id !== p.id)))
+                    }
+                  />
+                  {p.siswa.nama}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <PeriodeFields />
+
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
+          <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Hadir</label>
+            <input type="number" name="jumlahHadir" required min={0} className={inputClass} />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+            <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
           </div>
         </div>
-      )}
-
-      <PeriodeFields />
-
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
-        <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Hadir</label>
-          <input type="number" name="jumlahHadir" required min={0} className={inputClass} />
-        </div>
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
-          <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
+      <button
+        type="button"
+        onClick={() => setShowAssessment(!showAssessment)}
+        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
+      >
+        <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          ▼
+        </span>
+        <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
+      </button>
+
+      <div 
+        className="overflow-hidden transition-all duration-300 ease-in-out"
+        style={{
+          maxHeight: showAssessment ? '800px' : '0',
+          opacity: showAssessment ? 1 : 0,
+          marginTop: showAssessment ? '1rem' : '0',
+          paddingTop: showAssessment ? '1rem' : '0',
+          borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
+        }}
+      >
+        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
+          <RatingAndNotesFields isExpanded={showAssessment} />
         </div>
       </div>
-
-      <RatingAndNotesFields />
 
       <ConfirmButton
         variant="brand"
@@ -279,6 +333,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelompokList: Kelompok[] }) {
   const [kelompokId, setKelompokId] = useState("");
   const [jumlahIndividu, setJumlahIndividu] = useState<Record<string, string>>({});
+  const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporanKelompok, null);
 
   useEffect(() => {
@@ -302,65 +357,91 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   return (
     <form action={handleSubmit} className="space-y-5">
       {tutorId && (
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok</label>
-          <select
-            name="kelompokId"
-            required
-            value={kelompokId}
-            onChange={(e) => setKelompokId(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Pilih kelompok</option>
-            {kelompokTutorIni.map((k) => (
-              <option key={k.id} value={k.id}>{k.nama}</option>
-            ))}
-          </select>
+        <div className="rounded-lg border border-stroke bg-white p-5 dark:border-dark-3 dark:bg-gray-dark space-y-5">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok</label>
+            <select
+              name="kelompokId"
+              required
+              value={kelompokId}
+              onChange={(e) => setKelompokId(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Pilih kelompok</option>
+              {kelompokTutorIni.map((k) => (
+                <option key={k.id} value={k.id}>{k.nama}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedKelompok && (
+            <>
+              <PeriodeFields />
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
+                <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
+                  <input type="number" name="jumlahKelompok" required min={0} className={inputClass} />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+                  <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
+                <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siawa, kalau tidak biarkan kosong)</p>
+                <div className="space-y-3">
+                  {selectedKelompok.anggota.map((a) => (
+                    <div key={a.siswaId} className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-dark dark:text-white">{a.siswa.nama}</span>
+                      <input
+                        type="number"
+                        min={0}
+                        placeholder="0"
+                        value={jumlahIndividu[a.siswaId] ?? ""}
+                        onChange={(e) => setJumlahIndividu((prev) => ({ ...prev, [a.siswaId]: e.target.value }))}
+                        className="w-24 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
 
-      {selectedKelompok && (
-        <>
-          <PeriodeFields />
+      <button
+        type="button"
+        onClick={() => setShowAssessment(!showAssessment)}
+        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
+      >
+        <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          ▼
+        </span>
+        <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
+      </button>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
-            <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
-              <input type="number" name="jumlahKelompok" required min={0} className={inputClass} />
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
-              <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
-            </div>
-          </div>
-
-          <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
-            <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siawa, kalau tidak biarkan kosong)</p>
-            <div className="space-y-3">
-              {selectedKelompok.anggota.map((a) => (
-                <div key={a.siswaId} className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-dark dark:text-white">{a.siswa.nama}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={jumlahIndividu[a.siswaId] ?? ""}
-                    onChange={(e) => setJumlahIndividu((prev) => ({ ...prev, [a.siswaId]: e.target.value }))}
-                    className="w-24 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <RatingAndNotesFields />
-        </>
-      )}
+      <div 
+        className="overflow-hidden transition-all duration-300 ease-in-out"
+        style={{
+          maxHeight: showAssessment ? '800px' : '0',
+          opacity: showAssessment ? 1 : 0,
+          marginTop: showAssessment ? '1rem' : '0',
+          paddingTop: showAssessment ? '1rem' : '0',
+          borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
+        }}
+      >
+        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
+          <RatingAndNotesFields isExpanded={showAssessment} />
+        </div>
+      </div>
 
       <ConfirmButton
         variant="brand"
