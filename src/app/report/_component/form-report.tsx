@@ -70,7 +70,7 @@ function RatingAndNotesFields({
     <>
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Materi yang Dipelajari Bulan Ini</label>
-        <textarea name="materiDipelajari" rows={3} className={inputClass} />
+        <textarea name="materiDipelajari" rows={3} required className={inputClass} />
       </div>
 
       {RATING_FIELDS.map((f) => (
@@ -84,12 +84,12 @@ function RatingAndNotesFields({
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Catatan & Saran untuk Siswa</label>
-        <textarea name="catatanSiswa" rows={3} className={inputClass} />
+        <textarea name="catatanSiswa" rows={3} required className={inputClass} />
       </div>
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Saran untuk Bimbel</label>
-        <textarea name="saranBimbel" rows={2} className={inputClass} />
+        <textarea name="saranBimbel" rows={2} required className={inputClass} />
       </div>
     </>
   );
@@ -236,7 +236,6 @@ export function ReportForm({
 function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Kelas[] }) {
   const [kelasId, setKelasId] = useState("");
   const [partnerIds, setPartnerIds] = useState<string[]>([]);
-  const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporan, null);
 
   const [bulan, setBulan] = useState(new Date().getMonth() + 1);
@@ -244,6 +243,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
   const [tipePeriode, setTipePeriode] = useState("bulanan");
   const [mingguKe, setMingguKe] = useState("");
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
+  const [showAssessment, setShowAssessment] = useState(true); // Default true for bulanan
 
   useEffect(() => {
     if (!state) return;
@@ -362,31 +362,41 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setShowAssessment(!showAssessment)}
-        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
-      >
-        <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-          ▼
-        </span>
-        <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
-      </button>
-
-      <div 
-        className="overflow-hidden transition-all duration-300 ease-in-out"
-        style={{
-          maxHeight: showAssessment ? '800px' : '0',
-          opacity: showAssessment ? 1 : 0,
-          marginTop: showAssessment ? '1rem' : '0',
-          paddingTop: showAssessment ? '1rem' : '0',
-          borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
-        }}
-      >
+      {tipePeriode === "bulanan" ? (
+        // Always visible for bulanan
         <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-          <RatingAndNotesFields isExpanded={showAssessment} />
+          <RatingAndNotesFields isExpanded={true} />
         </div>
-      </div>
+      ) : (
+        // Toggle for mingguan
+        <>
+          <button
+            type="button"
+            onClick={() => setShowAssessment(!showAssessment)}
+            className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
+          >
+            <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+              ▼
+            </span>
+            <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
+          </button>
+
+          <div 
+            className="overflow-hidden transition-all duration-300 ease-in-out"
+            style={{
+              maxHeight: showAssessment ? '800px' : '0',
+              opacity: showAssessment ? 1 : 0,
+              marginTop: showAssessment ? '1rem' : '0',
+              paddingTop: showAssessment ? '1rem' : '0',
+              borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
+            }}
+          >
+            <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
+              <RatingAndNotesFields isExpanded={showAssessment} />
+            </div>
+          </div>
+        </>
+      )}
 
       <ConfirmButton
         variant="brand"
@@ -404,7 +414,6 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelompokList: Kelompok[] }) {
   const [kelompokId, setKelompokId] = useState("");
   const [jumlahIndividu, setJumlahIndividu] = useState<Record<string, string>>({});
-  const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporanKelompok, null);
 
   const [bulan, setBulan] = useState(new Date().getMonth() + 1);
@@ -412,6 +421,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   const [tipePeriode, setTipePeriode] = useState("bulanan");
   const [mingguKe, setMingguKe] = useState("");
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
+  const [showAssessment, setShowAssessment] = useState(true); // Default true for bulanan
 
   useEffect(() => {
     if (!state) return;
@@ -525,31 +535,41 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => setShowAssessment(!showAssessment)}
-        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
-      >
-        <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-          ▼
-        </span>
-        <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
-      </button>
-
-      <div 
-        className="overflow-hidden transition-all duration-300 ease-in-out"
-        style={{
-          maxHeight: showAssessment ? '800px' : '0',
-          opacity: showAssessment ? 1 : 0,
-          marginTop: showAssessment ? '1rem' : '0',
-          paddingTop: showAssessment ? '1rem' : '0',
-          borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
-        }}
-      >
+      {tipePeriode === "bulanan" ? (
+        // Always visible for bulanan
         <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-          <RatingAndNotesFields isExpanded={showAssessment} />
+          <RatingAndNotesFields isExpanded={true} />
         </div>
-      </div>
+      ) : (
+        // Toggle for mingguan
+        <>
+          <button
+            type="button"
+            onClick={() => setShowAssessment(!showAssessment)}
+            className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
+          >
+            <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+              ▼
+            </span>
+            <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
+          </button>
+
+          <div 
+            className="overflow-hidden transition-all duration-300 ease-in-out"
+            style={{
+              maxHeight: showAssessment ? '800px' : '0',
+              opacity: showAssessment ? 1 : 0,
+              marginTop: showAssessment ? '1rem' : '0',
+              paddingTop: showAssessment ? '1rem' : '0',
+              borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
+            }}
+          >
+            <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
+              <RatingAndNotesFields isExpanded={showAssessment} />
+            </div>
+          </div>
+        </>
+      )}
 
       <ConfirmButton
         variant="brand"

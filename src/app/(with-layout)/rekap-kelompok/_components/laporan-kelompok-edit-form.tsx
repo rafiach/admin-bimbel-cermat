@@ -3,9 +3,11 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { updateLaporan, type LaporState } from "@/app/report/actions";
-import { MingguanDatePicker } from "@/app/report/_component/mingguan-date-picker";
+import { updateLaporanKelompok } from "@/app/(with-layout)/rekap-kelompok/actions";
+import { MingguanDatePicker, getWeeksInCalendarGrid } from "@/app/report/_component/mingguan-date-picker";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
+
+type LaporState = { success: boolean; message: string } | null;
 
 const RATING_FIELDS = [
   { name: "pemahamanMateri", label: "Pemahaman Materi" },
@@ -43,32 +45,16 @@ function RatingFields({
   );
 }
 
-function getWeeksInCalendarGrid(bulan: number, tahun: number): number {
-  const firstDay = new Date(Date.UTC(tahun, bulan - 1, 1));
-  const lastDay = new Date(Date.UTC(tahun, bulan, 0));
-  
-  const startOffset = (firstDay.getUTCDay() + 6) % 7;
-  const gridStart = new Date(firstDay);
-  gridStart.setUTCDate(gridStart.getUTCDate() - startOffset);
-  
-  const lastOffset = (lastDay.getUTCDay() + 6) % 7;
-  const gridEnd = new Date(lastDay);
-  gridEnd.setUTCDate(gridEnd.getUTCDate() + (6 - lastOffset));
-  
-  const totalDays = Math.floor((gridEnd.getTime() - gridStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-  return Math.ceil(totalDays / 7);
-}
-
-interface LaporanData {
+interface LaporanKelompokData {
   id: string;
-  kelasId: string;
+  kelompokId: string;
   bulan: number;
   tahun: number;
   tipePeriode: string;
   mingguKe: number;
-  jumlahHadir: number;
+  jumlahKelompok: number;
   jumlahIzin: number;
-  norekTutor: string | null;
+  hargaKelompokFinal: number | null;
   materiDipelajari: string | null;
   pemahamanMateri: number;
   keaktifanBelajar: number;
@@ -76,11 +62,21 @@ interface LaporanData {
   kedisiplinan: number;
   catatanSiswa: string | null;
   saranBimbel: string | null;
-  kelas: { siswa: { nama: string }; tutor: { nama: string } };
+  norekTutor: string | null;
+  kelompok: { 
+    nama: string; 
+    tutor: { nama: string }; 
+    anggota: { siswaId: string; siswa: { nama: string } }[] 
+  };
   tanggalPertemuan: { tanggal: Date }[];
+  anggotaLaporan: { siswaId: string; jumlahIndividu: number }[];
 }
 
-export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
+export default function LaporanKelompokEditForm({ 
+  laporan 
+}: { 
+  laporan: LaporanKelompokData 
+}) {
   const router = useRouter();
   const [bulan, setBulan] = useState(laporan.bulan);
   const [tahun, setTahun] = useState(laporan.tahun);
@@ -88,16 +84,21 @@ export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>(
     laporan.tanggalPertemuan.map((d) => d.tanggal.toISOString().split("T")[0])
   );
+  const [jumlahIndividu, setJumlahIndividu] = useState<Record<string, string>>(
+    Object.fromEntries(
+      laporan.anggotaLaporan.map((a) => [a.siswaId, String(a.jumlahIndividu)])
+    )
+  );
   const [existingDates, setExistingDates] = useState<Set<string>>(new Set());
   const [loadingExisting, setLoadingExisting] = useState(false);
 
-  const [state, formAction] = useActionState<LaporState, FormData>(updateLaporan, null);
+  const [state, formAction] = useActionState<LaporState, FormData>(updateLaporanKelompok, null);
 
   useEffect(() => {
     if (!state) return;
     if (state.success) {
       toast.success(state.message);
-      router.push("/rekap");
+      router.push("/rekap-kelompok");
       router.refresh();
     } else {
       toast.error(state.message);
@@ -105,10 +106,10 @@ export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
   }, [state, router]);
 
   useEffect(() => {
-    if (!laporan.kelasId) return;
+    if (!laporan.kelompokId) return;
     setLoadingExisting(true);
     const params = new URLSearchParams();
-    params.set("kelasId", laporan.kelasId);
+    params.set("kelompokId", laporan.kelompokId);
     params.set("bulan", String(bulan));
     params.set("tahun", String(tahun));
     if (laporan.tipePeriode === "mingguan" && mingguKe) {
@@ -123,7 +124,7 @@ export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
         setLoadingExisting(false);
       })
       .catch(() => setLoadingExisting(false));
-  }, [laporan.kelasId, bulan, tahun, mingguKe, laporan.id]);
+  }, [laporan.kelompokId, bulan, tahun, mingguKe, laporan.id]);
 
   const weeksInMonth = getWeeksInCalendarGrid(bulan, tahun);
 
@@ -138,19 +139,6 @@ export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
           {laporan.tipePeriode}
         </p>
       </div>
-
-      {laporan.tipePeriode === "bulanan" && (
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Hadir</label>
-            <input type="number" name="jumlahHadir" required min={0} defaultValue={laporan.jumlahHadir} className={inputClass} />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
-            <input type="number" name="jumlahIzin" defaultValue={laporan.jumlahIzin} min={0} className={inputClass} />
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -185,41 +173,91 @@ export default function EditLaporanForm({ laporan }: { laporan: LaporanData }) {
           mingguKe={Number(mingguKe)}
           bulan={bulan}
           tahun={tahun}
-          kelasId={laporan.kelasId}
+          kelompokId={laporan.kelompokId}
           excludeLaporanId={laporan.id}
         />
       )}
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
-        <input type="number" name="jumlahIzin" defaultValue={laporan.jumlahIzin} min={0} className={inputClass} />
-      </div>
+      {laporan.tipePeriode === "bulanan" && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
+            <input type="number" name="jumlahKelompok" required min={0} defaultValue={laporan.jumlahKelompok} className={inputClass} />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+            <input type="number" name="jumlahIzin" defaultValue={laporan.jumlahIzin} min={0} className={inputClass} />
+          </div>
+        </div>
+      )}
+
+      {laporan.tipePeriode === "mingguan" && (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              Kelompok Masuk Berapa Kali <span className="text-xs text-dark-6">(otomatis dari tanggal)</span>
+            </label>
+            <input
+              type="number"
+              name="jumlahKelompok"
+              required
+              min={0}
+              value={tanggalPertemuan.length}
+              readOnly
+              className={`${inputClass} bg-[#F7F9FC] dark:bg-dark-2`}
+            />
+            <p className="mt-1 text-xs text-dark-6">Terpilih: {tanggalPertemuan.length} tanggal</p>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+            <input type="number" name="jumlahIzin" defaultValue={laporan.jumlahIzin} min={0} className={inputClass} />
+          </div>
+        </div>
+      )}
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet Tutor</label>
         <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" defaultValue={laporan.norekTutor ?? ""} className={inputClass} />
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Materi yang Dipelajari Bulan Ini</label>
-        <textarea name="materiDipelajari" rows={3} defaultValue={laporan.materiDipelajari ?? ""} className={inputClass} />
+      <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
+        <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siawa, kalau tidak biarkan kosong)</p>
+        <div className="space-y-3">
+          {laporan.kelompok.anggota.map((a) => (
+            <div key={a.siswaId} className="flex items-center justify-between gap-3">
+              <span className="text-sm text-dark dark:text-white">{a.siswa.nama}</span>
+              <input
+                type="number"
+                min={0}
+                placeholder="0"
+                value={jumlahIndividu[a.siswaId] ?? ""}
+                onChange={(e) => setJumlahIndividu((prev) => ({ ...prev, [a.siswaId]: e.target.value }))}
+                className="w-24 rounded-lg border border-stroke bg-transparent px-3 py-2 text-sm outline-none dark:border-dark-3"
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
-      <RatingFields defaults={{ 
-        pemahamanMateri: laporan.pemahamanMateri,
-        keaktifanBelajar: laporan.keaktifanBelajar,
-        kemandirian: laporan.kemandirian,
-        kedisiplinan: laporan.kedisiplinan,
-      }} />
+      <div className="space-y-4">
+        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
+          <RatingFields defaults={{ 
+            pemahamanMateri: laporan.pemahamanMateri,
+            keaktifanBelajar: laporan.keaktifanBelajar,
+            kemandirian: laporan.kemandirian,
+            kedisiplinan: laporan.kedisiplinan,
+          }} />
+        </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Catatan & Saran untuk Siswa</label>
-        <textarea name="catatanSiswa" rows={3} defaultValue={laporan.catatanSiswa ?? ""} className={inputClass} />
-      </div>
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Catatan & Saran untuk Siswa</label>
+          <textarea name="catatanSiswa" rows={3} defaultValue={laporan.catatanSiswa ?? ""} className={inputClass} />
+        </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Saran untuk Bimbel</label>
-        <textarea name="saranBimbel" rows={2} defaultValue={laporan.saranBimbel ?? ""} className={inputClass} />
+        <div>
+          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Saran untuk Bimbel</label>
+          <textarea name="saranBimbel" rows={2} defaultValue={laporan.saranBimbel ?? ""} className={inputClass} />
+        </div>
       </div>
 
       <ConfirmButton
