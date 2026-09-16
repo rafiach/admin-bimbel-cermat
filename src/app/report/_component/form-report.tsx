@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { createLaporan, createLaporanKelompok, type LaporState } from "../actions";
 import { SearchableSelect } from "@/components/FormElements/combobox";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
+import { MingguanDatePicker } from "./mingguan-date-picker";
 
 type Kelas = {
   id: string;
@@ -94,9 +95,42 @@ function RatingAndNotesFields({
   );
 }
 
-function PeriodeFields() {
-  const now = new Date();
-  const [tipePeriode, setTipePeriode] = useState("bulanan");
+function getWeeksInCalendarGrid(bulan: number, tahun: number): number {
+  const firstDay = new Date(Date.UTC(tahun, bulan - 1, 1));
+  const lastDay = new Date(Date.UTC(tahun, bulan, 0));
+  
+  const startOffset = (firstDay.getUTCDay() + 6) % 7;
+  const gridStart = new Date(firstDay);
+  gridStart.setUTCDate(gridStart.getUTCDate() - startOffset);
+  
+  const lastOffset = (lastDay.getUTCDay() + 6) % 7;
+  const gridEnd = new Date(lastDay);
+  gridEnd.setUTCDate(gridEnd.getUTCDate() + (6 - lastOffset));
+  
+  const totalDays = Math.floor((gridEnd.getTime() - gridStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+  return Math.ceil(totalDays / 7);
+}
+
+export function PeriodeFields({ 
+  bulan, 
+  tahun, 
+  onBulanChange, 
+  onTahunChange, 
+  onTipePeriodeChange,
+  onMingguKeChange,
+  tipePeriode,
+  mingguKe,
+}: {
+  bulan: number;
+  tahun: number;
+  onBulanChange: (v: number) => void;
+  onTahunChange: (v: number) => void;
+  onTipePeriodeChange: (v: string) => void;
+  onMingguKeChange: (v: string) => void;
+  tipePeriode: string;
+  mingguKe: string;
+}) {
+  const weeksInMonth = getWeeksInCalendarGrid(bulan, tahun);
 
   return (
     <>
@@ -105,14 +139,14 @@ function PeriodeFields() {
         <div className="grid grid-cols-2 gap-2 rounded-lg bg-[#F7F9FC] p-1 dark:bg-dark-2">
           <button
             type="button"
-            onClick={() => setTipePeriode("bulanan")}
+            onClick={() => onTipePeriodeChange("bulanan")}
             className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "bulanan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
           >
             Bulanan
           </button>
           <button
             type="button"
-            onClick={() => setTipePeriode("mingguan")}
+            onClick={() => onTipePeriodeChange("mingguan")}
             className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "mingguan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
           >
             Mingguan
@@ -124,26 +158,26 @@ function PeriodeFields() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Periode Bulan</label>
-          <select name="bulan" required defaultValue={now.getMonth() + 1} className={inputClass}>
+          <select name="bulan" value={bulan} onChange={(e) => onBulanChange(Number(e.target.value))} className={inputClass}>
             {BULAN.map((b, i) => <option key={b} value={i + 1}>{b}</option>)}
           </select>
         </div>
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tahun</label>
-          <input type="number" name="tahun" required defaultValue={now.getFullYear()} className={inputClass} />
+          <input name="tahun" type="number" value={tahun} onChange={(e) => onTahunChange(Number(e.target.value))} className={inputClass} />
         </div>
       </div>
 
-      {tipePeriode === "mingguan" ? (
+      {tipePeriode === "mingguan" && (
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Minggu Ke</label>
-          <select name="mingguKe" required defaultValue="" className={inputClass}>
+          <select name="mingguKe" required value={mingguKe} onChange={(e) => onMingguKeChange(e.target.value)} className={inputClass}>
             <option value="" disabled>Pilih minggu</option>
-            {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>Minggu ke-{n}</option>)}
+            {Array.from({ length: weeksInMonth }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={n}>Minggu ke-{n}</option>
+            ))}
           </select>
         </div>
-      ) : (
-        <input type="hidden" name="mingguKe" value={0} />
       )}
     </>
   );
@@ -204,6 +238,12 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
   const [partnerIds, setPartnerIds] = useState<string[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporan, null);
+
+  const [bulan, setBulan] = useState(new Date().getMonth() + 1);
+  const [tahun, setTahun] = useState(new Date().getFullYear());
+  const [tipePeriode, setTipePeriode] = useState("bulanan");
+  const [mingguKe, setMingguKe] = useState("");
+  const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
 
   useEffect(() => {
     if (!state) return;
@@ -272,7 +312,28 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
           </div>
         )}
 
-        <PeriodeFields />
+        <PeriodeFields
+          bulan={bulan}
+          tahun={tahun}
+          onBulanChange={setBulan}
+          onTahunChange={setTahun}
+          onTipePeriodeChange={setTipePeriode}
+          onMingguKeChange={setMingguKe}
+          tipePeriode={tipePeriode}
+          mingguKe={mingguKe}
+        />
+
+        {tipePeriode === "mingguan" && mingguKe && (
+          <MingguanDatePicker
+            name="tanggalPertemuan"
+            value={tanggalPertemuan}
+            onChange={setTanggalPertemuan}
+            mingguKe={Number(mingguKe)}
+            bulan={bulan}
+            tahun={tahun}
+            kelasId={kelasId}
+          />
+        )}
 
         <div>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
@@ -281,8 +342,18 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Hadir</label>
-            <input type="number" name="jumlahHadir" required min={0} className={inputClass} />
+            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+              Jumlah Hadir
+            </label>
+            <input
+              type="number"
+              name="jumlahHadir"
+              required
+              min={0}
+              value={tipePeriode === "mingguan" ? tanggalPertemuan.length : undefined}
+              readOnly={tipePeriode === "mingguan"}
+              className={`${inputClass} ${tipePeriode === "mingguan" ? "bg-[#F7F9FC] dark:bg-dark-2" : ""}`}
+            />
           </div>
           <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
@@ -336,6 +407,12 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   const [showAssessment, setShowAssessment] = useState(false);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporanKelompok, null);
 
+  const [bulan, setBulan] = useState(new Date().getMonth() + 1);
+  const [tahun, setTahun] = useState(new Date().getFullYear());
+  const [tipePeriode, setTipePeriode] = useState("bulanan");
+  const [mingguKe, setMingguKe] = useState("");
+  const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
+
   useEffect(() => {
     if (!state) return;
     if (state.success) toast.success(state.message);
@@ -376,7 +453,28 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
 
           {selectedKelompok && (
             <>
-              <PeriodeFields />
+              <PeriodeFields
+                bulan={bulan}
+                tahun={tahun}
+                onBulanChange={setBulan}
+                onTahunChange={setTahun}
+                onTipePeriodeChange={setTipePeriode}
+                onMingguKeChange={setMingguKe}
+                tipePeriode={tipePeriode}
+                mingguKe={mingguKe}
+              />
+
+              {tipePeriode === "mingguan" && mingguKe && (
+                <MingguanDatePicker
+                  name="tanggalPertemuan"
+                  value={tanggalPertemuan}
+                  onChange={setTanggalPertemuan}
+                  mingguKe={Number(mingguKe)}
+                  bulan={bulan}
+                  tahun={tahun}
+                  kelompokId={kelompokId}
+                />
+              )}
 
               <div>
                 <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
@@ -385,8 +483,18 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok Masuk Berapa Kali</label>
-                  <input type="number" name="jumlahKelompok" required min={0} className={inputClass} />
+                  <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                    Kelompok Masuk Berapa Kali
+                  </label>
+                  <input
+                    type="number"
+                    name="jumlahKelompok"
+                    required
+                    min={0}
+                    value={tipePeriode === "mingguan" ? tanggalPertemuan.length : undefined}
+                    readOnly={tipePeriode === "mingguan"}
+                    className={`${inputClass} ${tipePeriode === "mingguan" ? "bg-[#F7F9FC] dark:bg-dark-2" : ""}`}
+                  />
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>

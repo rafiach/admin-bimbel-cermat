@@ -135,6 +135,9 @@ model LaporanBulanan {
   tahun            Int
   tipePeriode      String   @default("bulanan") @map("tipe_periode") // "bulanan" | "mingguan"
   mingguKe         Int      @default(0) @map("minggu_ke") // 0 = laporan bulanan penuh, 1-5 = minggu ke berapa
+
+  tanggalPertemuan LaporanTanggalPertemuan[]
+
   jumlahHadir      Int      @map("jumlah_hadir")
   jumlahIzin       Int      @default(0) @map("jumlah_izin")
   norekTutor       String?  @map("norek_tutor")
@@ -151,6 +154,18 @@ model LaporanBulanan {
 
   @@unique([kelasId, bulan, tahun, mingguKe])
   @@map("laporan_bulanan")
+}
+
+model LaporanTanggalPertemuan {
+  id        String   @id @default(cuid())
+  laporanId String   @map("laporan_id")
+  kelasId   String   @map("kelas_id")
+  tanggal   DateTime @db.Date
+
+  laporan   LaporanBulanan @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+
+  @@unique([kelasId, tanggal])
+  @@map("laporan_tanggal_pertemuan")
 }
 
 model Kelompok {
@@ -193,6 +208,9 @@ model LaporanKelompok {
   tahun              Int
   tipePeriode        String                   @default("bulanan") @map("tipe_periode") // "bulanan" | "mingguan"
   mingguKe           Int                      @default(0) @map("minggu_ke") // 0 = laporan bulanan penuh, 1-5 = minggu ke berapa
+
+  tanggalPertemuan   LaporanTanggalPertemuanKelompok[]
+
   jumlahKelompok     Int                      @map("jumlah_kelompok")
   jumlahIzin         Int                      @default(0) @map("jumlah_izin")
   hargaKelompokFinal Int?                     @map("harga_kelompok_final")
@@ -211,6 +229,18 @@ model LaporanKelompok {
 
   @@unique([kelompokId, bulan, tahun, mingguKe])
   @@map("laporan_kelompok")
+}
+
+model LaporanTanggalPertemuanKelompok {
+  id              String   @id @default(cuid())
+  laporanKelompokId String   @map("laporan_kelompok_id")
+  kelompokId      String   @map("kelompok_id")
+  tanggal         DateTime @db.Date
+
+  laporanKelompok LaporanKelompok @relation(fields: [laporanKelompokId], references: [id], onDelete: Cascade)
+
+  @@unique([kelompokId, tanggal])
+  @@map("laporan_tanggal_pertemuan_kelompok")
 }
 
 model AnggotaLaporanKelompok {
