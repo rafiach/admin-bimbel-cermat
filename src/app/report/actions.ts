@@ -57,11 +57,17 @@ export async function createLaporan(
   const kedisiplinan = Number(formData.get("kedisiplinan"));
   const catatanSiswa = formData.get("catatanSiswa") as string;
   const saranBimbel = formData.get("saranBimbel") as string;
-  const tipePeriode = (formData.get("tipePeriode") as string) || "bulanan";
   const mingguKe = Number(formData.get("mingguKe") || 0);
   const partnerRaw = formData.get("partnerKelasIds") as string;
   const partnerKelasIds = partnerRaw ? JSON.parse(partnerRaw) : [];
 
+  const kelasData = await db.kelas.findUnique({ where: { id: kelasId }, select: { tipePeriode: true } });
+  if (!kelasData) return { success: false, message: "Kelas tidak ditemukan." };
+  const tipePeriode = kelasData.tipePeriode;
+
+  if (tipePeriode === "bulanan" && (!materiDipelajari?.trim() || !catatanSiswa?.trim() || !saranBimbel?.trim())) {
+    return { success: false, message: "Laporan bulanan wajib mengisi materi, catatan siswa, dan saran." };
+  }
   const tanggalRaw = formData.getAll("tanggalPertemuan") as string[];
   const tanggalDipilih = tanggalRaw.filter((d) => d).map((d) => new Date(d));
 
@@ -147,7 +153,6 @@ export async function createLaporanKelompok(
   const kelompokId = formData.get("kelompokId") as string;
   const bulan = Number(formData.get("bulan"));
   const tahun = Number(formData.get("tahun"));
-  const tipePeriode = (formData.get("tipePeriode") as string) || "bulanan";
   const mingguKe = Number(formData.get("mingguKe") || 0);
   const jumlahKelompokInput = Number(formData.get("jumlahKelompok"));
   const jumlahIzin = Number(formData.get("jumlahIzin") || 0);
@@ -160,7 +165,13 @@ export async function createLaporanKelompok(
   const saranBimbel = formData.get("saranBimbel") as string;
   const norekTutor = formData.get("norekTutor") as string;
   const anggotaRaw = formData.get("anggotaIndividuData") as string;
+  const kelompokData = await db.kelompok.findUnique({ where: { id: kelompokId }, select: { tipePeriode: true } });
+  if (!kelompokData) return { success: false, message: "Kelompok tidak ditemukan." };
+  const tipePeriode = kelompokData.tipePeriode;
 
+  if (tipePeriode === "bulanan" && (!materiDipelajari?.trim() || !catatanSiswa?.trim() || !saranBimbel?.trim())) {
+    return { success: false, message: "Laporan bulanan wajib mengisi materi, catatan siswa, dan saran." };
+  }
   const tanggalRaw = formData.getAll("tanggalPertemuan") as string[];
   const tanggalDipilih = tanggalRaw.filter((d) => d).map((d) => new Date(d));
 

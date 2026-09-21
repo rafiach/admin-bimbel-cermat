@@ -39,12 +39,12 @@ export default async function TambahKelasPage() {
             />
           </div>
           <Select
-            label="Tipe"
-            name="tipe"
-            defaultValue="privat"
+            label="Tipe Laporan & Tagihan"
+            name="tipePeriode"
+            defaultValue="bulanan"
             items={[
-              { value: "privat", label: "Privat" },
-              { value: "kelompok", label: "Kelompok" },
+              { value: "bulanan", label: "Bulanan" },
+              { value: "mingguan", label: "Mingguan" },
             ]}
           />
           <InputGroup label="Jadwal" name="jadwal" type="text" placeholder="Misal: Senin & Kamis, 15:00" required />

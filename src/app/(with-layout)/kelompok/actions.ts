@@ -9,6 +9,7 @@ export async function createKelompok(formData: FormData) {
   const nama = formData.get("nama") as string;
   const tutorId = formData.get("tutorId") as string;
   const jadwal = formData.get("jadwal") as string;
+  const tipePeriode = formData.get("tipePeriode") === "mingguan" ? "mingguan" : "bulanan";
   const hargaKelompok = Number(formData.get("hargaKelompok"));
   const feeTutorKelompok = Number(formData.get("feeTutorKelompok"));
   const namaWali = formData.get("namaWali") as string;
@@ -33,6 +34,7 @@ export async function createKelompok(formData: FormData) {
         nama,
         tutorId,
         jadwal,
+        tipePeriode,
         hargaKelompok,
         feeTutorKelompok,
         namaWali,
@@ -73,6 +75,7 @@ export async function deleteKelompok(formData: FormData) {
 export async function updateKelompok(id: string, formData: FormData) {
   const nama = formData.get("nama") as string;
   const jadwal = formData.get("jadwal") as string;
+  const tipePeriode = formData.get("tipePeriode") === "mingguan" ? "mingguan" : "bulanan";
   const hargaKelompok = Number(formData.get("hargaKelompok"));
   const feeTutorKelompok = Number(formData.get("feeTutorKelompok"));
   const namaWali = formData.get("namaWali") as string;
@@ -89,7 +92,7 @@ export async function updateKelompok(id: string, formData: FormData) {
   await db.$transaction([
     db.kelompok.update({
       where: { id },
-      data: { nama, jadwal, hargaKelompok, feeTutorKelompok, namaWali, noHpWali, status },
+      data: { nama, jadwal, tipePeriode, hargaKelompok, feeTutorKelompok, namaWali, noHpWali, status },
     }),
     ...anggotaUpdate.map((a) =>
       db.anggotaKelompok.update({

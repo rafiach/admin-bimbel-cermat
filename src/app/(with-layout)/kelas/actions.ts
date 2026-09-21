@@ -7,13 +7,13 @@ import { redirect } from "next/navigation";
 export async function createKelas(formData: FormData) {
   const siswaId = formData.get("siswaId") as string;
   const tutorId = formData.get("tutorId") as string;
-  const tipe = formData.get("tipe") as string;
+  const tipePeriode = formData.get("tipePeriode") === "mingguan" ? "mingguan" : "bulanan";
   const jadwal = formData.get("jadwal") as string;
   const biayaOrtu = Number(formData.get("biayaOrtu"));
   const feeTutor = Number(formData.get("feeTutor"));
 
   await db.$transaction([
-    db.kelas.create({ data: { siswaId, tutorId, tipe, jadwal, biayaOrtu, feeTutor } }),
+    db.kelas.create({ data: { siswaId, tutorId, tipePeriode, jadwal, biayaOrtu, feeTutor } }),
     db.siswa.update({ where: { id: siswaId }, data: { status: "aktif" } }),
   ])
   revalidatePath("/kelas");
@@ -24,14 +24,14 @@ export async function createKelas(formData: FormData) {
 
 export async function updateKelas(id: string, formData: FormData) {
   const jadwal = formData.get("jadwal") as string;
-  const tipe = formData.get("tipe") as string;
+  const tipePeriode = formData.get("tipePeriode") === "mingguan" ? "mingguan" : "bulanan";
   const biayaOrtu = Number(formData.get("biayaOrtu"));
   const feeTutor = Number(formData.get("feeTutor"));
   const status = formData.get("status") as string;
 
   await db.kelas.update({
     where: { id },
-    data: { jadwal, tipe, biayaOrtu, feeTutor, status },
+    data: { jadwal, tipePeriode, biayaOrtu, feeTutor, status },
   });
 
   revalidatePath("/kelas");

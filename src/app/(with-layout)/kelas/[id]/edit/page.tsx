@@ -29,12 +29,12 @@ export default async function EditKelasPage({
 
         <form action={updateKelasWithId} className="space-y-5.5">
           <Select
-            label="Tipe"
-            name="tipe"
-            defaultValue={kelas.tipe}
+            label="Tipe Laporan & Tagihan"
+            name="tipePeriode"
+            defaultValue={kelas.tipePeriode}
             items={[
-              { value: "privat", label: "Privat" },
-              { value: "kelompok", label: "Kelompok" },
+              { value: "bulanan", label: "Bulanan" },
+              { value: "mingguan", label: "Mingguan" },
             ]}
           />
           <InputGroup label="Jadwal" name="jadwal" type="text" placeholder="Misal: Senin & Kamis, 15:00" defaultValue={kelas.jadwal} required />

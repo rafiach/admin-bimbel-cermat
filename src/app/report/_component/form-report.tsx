@@ -11,13 +11,14 @@ type Kelas = {
   id: string;
   jadwal: string;
   tutorId: string;
-  tipe: string;
+  tipePeriode: string;
   siswa: { nama: string; noHpOrtu: string | null };
 };
 type Kelompok = {
   id: string;
   nama: string;
   tutorId: string;
+  tipePeriode: string;
   anggota: { siswaId: string; siswa: { nama: string } }[];
 };
 type Tutor = { id: string; nama: string };
@@ -47,14 +48,15 @@ const ASSESSMENT_DEFAULTS = {
 };
 
 const inputClass =
-  "w-full rounded-lg border border-stroke bg-transparent px-4 py-3 outline-none focus:border-[#F35C2B] dark:border-dark-3";
-
-function RatingAndNotesFields({ 
-  isExpanded, 
-  defaults = ASSESSMENT_DEFAULTS 
-}: { 
-  isExpanded: boolean; 
-  defaults?: typeof ASSESSMENT_DEFAULTS 
+  "w-full rounded-lg border border-stroke bg-transparent px-4 py-3 text-base outline-none focus:border-[#F35C2B] dark:border-dark-3";
+function RatingAndNotesFields({
+  isExpanded,
+  required = true,
+  defaults = ASSESSMENT_DEFAULTS,
+}: {
+  isExpanded: boolean;
+  required?: boolean;
+  defaults?: typeof ASSESSMENT_DEFAULTS;
 }) {
   if (!isExpanded) {
     return (
@@ -70,13 +72,13 @@ function RatingAndNotesFields({
     <>
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Materi yang Dipelajari Bulan Ini</label>
-        <textarea name="materiDipelajari" rows={3} required className={inputClass} />
+        <textarea name="materiDipelajari" rows={3} required={required} className={inputClass} />
       </div>
 
       {RATING_FIELDS.map((f) => (
         <div key={f.name}>
           <label className="mb-2 block text-sm font-medium text-dark dark:text-white">{f.label} (1-5)</label>
-          <select name={f.name} required defaultValue={defaults[f.name as keyof typeof defaults] as string} className={inputClass}>
+          <select name={f.name} required={required} defaultValue={defaults[f.name as keyof typeof defaults] as string} className={inputClass}>
             {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
           </select>
         </div>
@@ -84,12 +86,12 @@ function RatingAndNotesFields({
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Catatan & Saran untuk Siswa</label>
-        <textarea name="catatanSiswa" rows={3} required className={inputClass} />
+        <textarea name="catatanSiswa" rows={3} required={required} className={inputClass} />
       </div>
 
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Saran untuk Bimbel</label>
-        <textarea name="saranBimbel" rows={2} required className={inputClass} />
+        <textarea name="saranBimbel" rows={2} required={required} className={inputClass} />
       </div>
     </>
   );
@@ -136,21 +138,8 @@ export function PeriodeFields({
     <>
       <div>
         <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Tipe Laporan</label>
-        <div className="grid grid-cols-2 gap-2 rounded-lg bg-[#F7F9FC] p-1 dark:bg-dark-2">
-          <button
-            type="button"
-            onClick={() => onTipePeriodeChange("bulanan")}
-            className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "bulanan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
-          >
-            Bulanan
-          </button>
-          <button
-            type="button"
-            onClick={() => onTipePeriodeChange("mingguan")}
-            className={`rounded-md py-2 text-sm font-medium transition-colors ${tipePeriode === "mingguan" ? "bg-[#F35C2B] text-white" : "text-dark-6"}`}
-          >
-            Mingguan
-          </button>
+        <div className="rounded-lg bg-[#F7F9FC] px-4 py-3 text-sm font-medium capitalize text-dark dark:bg-dark-2 dark:text-white">
+          {tipePeriode}
         </div>
         <input type="hidden" name="tipePeriode" value={tipePeriode} />
       </div>
@@ -235,7 +224,6 @@ export function ReportForm({
 
 function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Kelas[] }) {
   const [kelasId, setKelasId] = useState("");
-  const [partnerIds, setPartnerIds] = useState<string[]>([]);
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporan, null);
 
   const [bulan, setBulan] = useState(new Date().getMonth() + 1);
@@ -243,7 +231,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
   const [tipePeriode, setTipePeriode] = useState("bulanan");
   const [mingguKe, setMingguKe] = useState("");
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
-  const [showAssessment, setShowAssessment] = useState(true); // Default true for bulanan
+  const [showAssessment, setShowAssessment] = useState(true);
 
   useEffect(() => {
     if (!state) return;
@@ -252,26 +240,21 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
   }, [state]);
 
   const kelasTutorIni = kelasList.filter((k) => k.tutorId === tutorId);
-  const selectedKelas = kelasList.find((k) => k.id === kelasId);
-  const partners =
-    selectedKelas?.tipe === "kelompok"
-      ? kelasList.filter(
-          (k) =>
-            k.id !== selectedKelas.id &&
-            k.tutorId === selectedKelas.tutorId &&
-            k.jadwal === selectedKelas.jadwal &&
-            k.tipe === "kelompok",
-        )
-      : [];
+  const selectedKelas = kelasTutorIni.find((k) => k.id === kelasId);
 
-  const handleSubmit = (formData: FormData) => {
-    formData.set("partnerKelasIds", JSON.stringify(partnerIds));
-    formAction(formData);
-  };
+  // Saat kelas dipilih: tipe periode ikut pengaturan kelas
+  useEffect(() => {
+    if (!selectedKelas) return;
+    setTipePeriode(selectedKelas.tipePeriode);
+    setShowAssessment(selectedKelas.tipePeriode === "bulanan");
+    setMingguKe("");
+    setTanggalPertemuan([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedKelas?.id]);
 
   return (
-    <form action={handleSubmit} className="space-y-5">
-      <div className="rounded-lg border border-stroke bg-white p-5 dark:border-dark-3 dark:bg-gray-dark space-y-5">
+    <form action={formAction} className="space-y-5">
+      <div className="space-y-5">
         {tutorId && (
           <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Nama Siswa & Kelas</label>
@@ -279,7 +262,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
               name="kelasId"
               required
               value={kelasId}
-              onChange={(e) => { setKelasId(e.target.value); setPartnerIds([]); }}
+              onChange={(e) => setKelasId(e.target.value)}
               className={inputClass}
             >
               <option value="">Pilih siswa</option>
@@ -290,123 +273,95 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
           </div>
         )}
 
-        {partners.length > 0 && (
-          <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4">
-            <p className="mb-2 text-sm font-medium text-dark dark:text-white">
-              Sesi kelompok ini juga bareng siapa? (centang biar gak usah isi ulang buat mereka)
-            </p>
-            <div className="space-y-2">
-              {partners.map((p) => (
-                <label key={p.id} className="flex items-center gap-2 text-sm text-dark dark:text-white">
-                  <input
-                    type="checkbox"
-                    checked={partnerIds.includes(p.id)}
-                    onChange={(e) =>
-                      setPartnerIds((prev) => (e.target.checked ? [...prev, p.id] : prev.filter((id) => id !== p.id)))
-                    }
-                  />
-                  {p.siswa.nama}
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <PeriodeFields
-          bulan={bulan}
-          tahun={tahun}
-          onBulanChange={setBulan}
-          onTahunChange={setTahun}
-          onTipePeriodeChange={setTipePeriode}
-          onMingguKeChange={setMingguKe}
-          tipePeriode={tipePeriode}
-          mingguKe={mingguKe}
-        />
-
-        {tipePeriode === "mingguan" && mingguKe && (
-          <MingguanDatePicker
-            name="tanggalPertemuan"
-            value={tanggalPertemuan}
-            onChange={setTanggalPertemuan}
-            mingguKe={Number(mingguKe)}
-            bulan={bulan}
-            tahun={tahun}
-            kelasId={kelasId}
-          />
-        )}
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
-          <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
-              Jumlah Hadir
-            </label>
-            <input
-              type="number"
-              name="jumlahHadir"
-              required
-              min={0}
-              value={tipePeriode === "mingguan" ? tanggalPertemuan.length : undefined}
-              readOnly={tipePeriode === "mingguan"}
-              className={`${inputClass} ${tipePeriode === "mingguan" ? "bg-[#F7F9FC] dark:bg-dark-2" : ""}`}
+        {selectedKelas && (
+          <>
+            <PeriodeFields
+              bulan={bulan}
+              tahun={tahun}
+              onBulanChange={setBulan}
+              onTahunChange={setTahun}
+              onTipePeriodeChange={setTipePeriode}
+              onMingguKeChange={setMingguKe}
+              tipePeriode={tipePeriode}
+              mingguKe={mingguKe}
             />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
-            <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
-          </div>
-        </div>
+
+            {tipePeriode === "mingguan" && mingguKe && (
+              <MingguanDatePicker
+                name="tanggalPertemuan"
+                value={tanggalPertemuan}
+                onChange={setTanggalPertemuan}
+                mingguKe={Number(mingguKe)}
+                bulan={bulan}
+                tahun={tahun}
+                kelasId={kelasId}
+              />
+            )}
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
+              <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Hadir</label>
+                <input
+                  key={tipePeriode}
+                  type="number"
+                  name="jumlahHadir"
+                  required
+                  min={0}
+                  value={tipePeriode === "mingguan" ? tanggalPertemuan.length : undefined}
+                  readOnly={tipePeriode === "mingguan"}
+                  className={`${inputClass} ${tipePeriode === "mingguan" ? "bg-[#F7F9FC] dark:bg-dark-2" : ""}`}
+                />
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Jumlah Izin Mendadak</label>
+                <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {tipePeriode === "bulanan" ? (
-        // Always visible for bulanan
-        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-          <RatingAndNotesFields isExpanded={true} />
-        </div>
-      ) : (
-        // Toggle for mingguan
+      {selectedKelas && (
         <>
-          <button
-            type="button"
-            onClick={() => setShowAssessment(!showAssessment)}
-            className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
-          >
-            <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-              ▼
-            </span>
-            <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
-          </button>
-
-          <div 
-            className="overflow-hidden transition-all duration-300 ease-in-out"
-            style={{
-              maxHeight: showAssessment ? '800px' : '0',
-              opacity: showAssessment ? 1 : 0,
-              marginTop: showAssessment ? '1rem' : '0',
-              paddingTop: showAssessment ? '1rem' : '0',
-              borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
-            }}
-          >
-            <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-              <RatingAndNotesFields isExpanded={showAssessment} />
+          {tipePeriode === "bulanan" ? (
+            <div className="space-y-4 rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4 dark:bg-[#F35C2B]/10">
+              <RatingAndNotesFields isExpanded={true} />
             </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowAssessment(!showAssessment)}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10"
+              >
+                <span className={`transition-transform duration-200 ${showAssessment ? "rotate-180" : ""}`}>▼</span>
+                <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan (opsional)"}</span>
+              </button>
+
+              <div className={showAssessment ? "space-y-4 rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4 dark:bg-[#F35C2B]/10" : "hidden"}>
+                <RatingAndNotesFields isExpanded={true} required={false} />
+              </div>
+            </>
+          )}
+
+          <div className="sticky bottom-0 -mx-5 border-t border-stroke bg-white/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur dark:border-dark-3 dark:bg-gray-dark/95 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
+            <ConfirmButton
+              variant="brand"
+              title="Kirim Laporan?"
+              message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
+              confirmLabel="Ya, Kirim"
+              className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
+            >
+              Kirim Laporan
+            </ConfirmButton>
           </div>
         </>
       )}
-
-      <ConfirmButton
-        variant="brand"
-        title="Kirim Laporan?"
-        message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
-        confirmLabel="Ya, Kirim"
-        className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
-      >
-        Kirim Laporan
-      </ConfirmButton>
     </form>
   );
 }
@@ -421,7 +376,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   const [tipePeriode, setTipePeriode] = useState("bulanan");
   const [mingguKe, setMingguKe] = useState("");
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
-  const [showAssessment, setShowAssessment] = useState(true); // Default true for bulanan
+  const [showAssessment, setShowAssessment] = useState(true);
 
   useEffect(() => {
     if (!state) return;
@@ -430,7 +385,18 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   }, [state]);
 
   const kelompokTutorIni = kelompokList.filter((k) => k.tutorId === tutorId);
-  const selectedKelompok = kelompokList.find((k) => k.id === kelompokId);
+  const selectedKelompok = kelompokTutorIni.find((k) => k.id === kelompokId);
+
+  // Saat kelompok dipilih: tipe periode ikut pengaturan kelompok
+  useEffect(() => {
+    if (!selectedKelompok) return;
+    setTipePeriode(selectedKelompok.tipePeriode);
+    setShowAssessment(selectedKelompok.tipePeriode === "bulanan");
+    setMingguKe("");
+    setTanggalPertemuan([]);
+    setJumlahIndividu({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedKelompok?.id]);
 
   const handleSubmit = (formData: FormData) => {
     const anggotaIndividuData = Object.entries(jumlahIndividu)
@@ -444,7 +410,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   return (
     <form action={handleSubmit} className="space-y-5">
       {tutorId && (
-        <div className="rounded-lg border border-stroke bg-white p-5 dark:border-dark-3 dark:bg-gray-dark space-y-5">
+        <div className="space-y-5">
           <div>
             <label className="mb-2 block text-sm font-medium text-dark dark:text-white">Kelompok</label>
             <select
@@ -497,6 +463,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
                     Kelompok Masuk Berapa Kali
                   </label>
                   <input
+                    key={tipePeriode}
                     type="number"
                     name="jumlahKelompok"
                     required
@@ -513,7 +480,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
               </div>
 
               <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
-                <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siawa, kalau tidak biarkan kosong)</p>
+                <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siswa, kalau tidak biarkan kosong)</p>
                 <div className="space-y-3">
                   {selectedKelompok.anggota.map((a) => (
                     <div key={a.siswaId} className="flex items-center justify-between gap-3">
@@ -535,51 +502,42 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
         </div>
       )}
 
-      {tipePeriode === "bulanan" ? (
-        // Always visible for bulanan
-        <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-          <RatingAndNotesFields isExpanded={true} />
-        </div>
-      ) : (
-        // Toggle for mingguan
+      {selectedKelompok && (
         <>
-          <button
-            type="button"
-            onClick={() => setShowAssessment(!showAssessment)}
-            className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] bg-transparent px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10 dark:border-[#F35C2B] dark:text-[#F35C2B] dark:hover:bg-[#F35C2B]/15"
-          >
-            <span className="transition-transform duration-200" style={{ transform: showAssessment ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-              ▼
-            </span>
-            <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan"}</span>
-          </button>
-
-          <div 
-            className="overflow-hidden transition-all duration-300 ease-in-out"
-            style={{
-              maxHeight: showAssessment ? '800px' : '0',
-              opacity: showAssessment ? 1 : 0,
-              marginTop: showAssessment ? '1rem' : '0',
-              paddingTop: showAssessment ? '1rem' : '0',
-              borderTop: showAssessment ? '1px dashed rgb(243 92 43 / 0.4)' : '0',
-            }}
-          >
-            <div className="rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-5 dark:border-[#F35C2B]/40 dark:bg-[#F35C2B]/10 max-h-[70vh] overflow-auto">
-              <RatingAndNotesFields isExpanded={showAssessment} />
+          {tipePeriode === "bulanan" ? (
+            <div className="space-y-4 rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4 dark:bg-[#F35C2B]/10">
+              <RatingAndNotesFields isExpanded={true} />
             </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowAssessment(!showAssessment)}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-[#F35C2B] px-4 py-3 text-sm font-medium text-[#F35C2B] transition-colors hover:bg-[#F35C2B]/10"
+              >
+                <span className={`transition-transform duration-200 ${showAssessment ? "rotate-180" : ""}`}>▼</span>
+                <span>{showAssessment ? "Sembunyikan Penilaian & Catatan" : "Tampilkan Penilaian & Catatan (opsional)"}</span>
+              </button>
+
+              <div className={showAssessment ? "space-y-4 rounded-lg border border-dashed border-[#F35C2B]/40 bg-[#F35C2B]/5 p-4 dark:bg-[#F35C2B]/10" : "hidden"}>
+                <RatingAndNotesFields isExpanded={true} required={false} />
+              </div>
+            </>
+          )}
+
+          <div className="sticky bottom-0 -mx-5 border-t border-stroke bg-white/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur dark:border-dark-3 dark:bg-gray-dark/95 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
+            <ConfirmButton
+              variant="brand"
+              title="Kirim Laporan?"
+              message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
+              confirmLabel="Ya, Kirim"
+              className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
+            >
+              Kirim Laporan
+            </ConfirmButton>
           </div>
         </>
       )}
-
-      <ConfirmButton
-        variant="brand"
-        title="Kirim Laporan?"
-        message="Yakin data yang diisi udah bener? Laporan cuma bisa dikirim sekali per periode, kalau salah harus minta admin benerin manual."
-        confirmLabel="Ya, Kirim"
-        className="w-full rounded-lg bg-[#F35C2B] px-6 py-3 font-medium text-white transition-colors hover:bg-[#d94e21] disabled:opacity-60"
-      >
-        Kirim Laporan
-      </ConfirmButton>
     </form>
   );
 }

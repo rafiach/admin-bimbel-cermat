@@ -11,6 +11,7 @@ import Link from "next/link";
 import { deleteKelompok } from "./actions";
 import { Eye, Loader2, Pencil, Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
+// import { Ta } from "zod/v4/locales";
 
 export const metadata = { title: "Data Kelompok" };
 const PAGE_SIZE = 10;
@@ -45,7 +46,7 @@ export default async function KelompokPage({
 
   return (
     <>
-      <Breadcrumb pageName="Data Kelas" />
+      <Breadcrumb pageName="Data Kelas Kelompok" />
 
       {error && (
         <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
@@ -73,6 +74,7 @@ export default async function KelompokPage({
               <TableHead>Tutor</TableHead>
               <TableHead>Anggota</TableHead>
               <TableHead>Jadwal</TableHead>
+              <TableHead>Tipe Pembayaran</TableHead>
               <TableHead>Biaya Kelompok</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right xl:pr-7.5">Aksi</TableHead>
@@ -90,6 +92,7 @@ export default async function KelompokPage({
                 <TableCell className="text-dark dark:text-white">
                   {k.jadwal || "-"}
                 </TableCell>
+                <TableCell className="capitalize text-dark dark:text-white">{k.tipePeriode}</TableCell>
                 <TableCell className="text-dark dark:text-white">
                   Rp {k.hargaKelompok.toLocaleString("id-ID")}
                 </TableCell>

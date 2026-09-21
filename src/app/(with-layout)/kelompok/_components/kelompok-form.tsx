@@ -72,7 +72,15 @@ export function KelompokForm({
       </div>
 
       <InputGroup label="Jadwal" name="jadwal" type="text" placeholder="Misal: Senin & Kamis, 15:00" required />
-
+      <Select
+        label="Tipe Laporan & Tagihan"
+        name="tipePeriode"
+        defaultValue="bulanan"
+        items={[
+          { value: "bulanan", label: "Bulanan" },
+          { value: "mingguan", label: "Mingguan" },
+        ]}
+      />
       <div className="grid grid-cols-2 gap-4">
         <InputGroup label="Harga Kelompok (per sesi)" name="hargaKelompok" type="number" placeholder="Misal: 50000" required />
         <InputGroup label="Fee Tutor (per sesi kelompok)" name="feeTutorKelompok" type="number" placeholder="Misal: 40000" required />

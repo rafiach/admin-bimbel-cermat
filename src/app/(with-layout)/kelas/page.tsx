@@ -47,7 +47,7 @@ export default async function KelasPage({
   const totalPages = Math.ceil(total / PAGE_SIZE);
   return (
     <>
-      <Breadcrumb pageName="Data Kelas" />
+      <Breadcrumb pageName="Data Kelas Privat" />
       {error && (
         <div className="mb-4 rounded-lg border border-[#D34053]/30 bg-[#D34053]/5 px-4 py-3 text-sm text-[#D34053]">
           {error}
@@ -76,6 +76,7 @@ export default async function KelasPage({
               <TableHead className="xl:pl-7.5">Siswa</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Jadwal</TableHead>
+              <TableHead>Tipe Pembayaran</TableHead>
               <TableHead>Biaya Ortu</TableHead>
               <TableHead>Fee Tutor</TableHead>
               <TableHead>Status</TableHead>
@@ -89,6 +90,7 @@ export default async function KelasPage({
                 <TableCell className="sticky left-0 z-10 xl:pr-7.5 bg-white text-dark dark:text-white dark:bg-[#122031]">{k.siswa.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.tutor.nama}</TableCell>
                 <TableCell className="text-dark dark:text-white">{k.jadwal}</TableCell>
+                <TableCell className="text-dark dark:text-white">{k.tipePeriode}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {k.biayaOrtu.toLocaleString("id-ID")}</TableCell>
                 <TableCell className="text-dark dark:text-white">Rp {k.feeTutor.toLocaleString("id-ID")}</TableCell>
                 <TableCell>

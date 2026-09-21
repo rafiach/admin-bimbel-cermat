@@ -16,9 +16,9 @@ export default async function ReportPage() {
   ]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#FFF3EC] to-gray-2 p-4 dark:from-[#1a1008] dark:to-[#020d1a]">
-      <div className="w-full max-w-lg overflow-hidden rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark">
-        <div className="h-2 bg-[#F35C2B]" />
+    <div className="min-h-dvh bg-gradient-to-b from-[#FFF3EC] to-gray-2 sm:flex sm:items-center sm:justify-center sm:p-4 dark:from-[#1a1008] dark:to-[#020d1a]">
+      <div className="flex min-h-dvh w-full flex-col overflow-hidden bg-white dark:bg-gray-dark sm:min-h-0 sm:max-w-lg sm:rounded-[10px] sm:border sm:border-stroke sm:shadow-1 sm:dark:border-dark-3">
+        <div className="h-2 shrink-0 bg-[#F35C2B]" />
 
         <div className="p-6.5 sm:p-7.5">
           <div className="mb-6 flex items-center gap-3">

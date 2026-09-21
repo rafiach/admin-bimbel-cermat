@@ -42,7 +42,7 @@ export default async function DetailKelasPage({
                 Kelas Privat — {kelas.siswa.nama}
               </h3>
               <p className="mt-1 text-sm text-dark-6">
-                {kelas.tipe} · {kelas.jadwal} · Dibuat {new Date(kelas.createdAt).toLocaleDateString("id-ID")}
+                <span className="capitalize">{kelas.tipePeriode}</span> · {kelas.jadwal} · Dibuat {new Date(kelas.createdAt).toLocaleDateString("id-ID")}
               </p>
             </div>
             <div className="flex gap-2">
@@ -86,7 +86,7 @@ export default async function DetailKelasPage({
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div><p className="text-sm text-dark-6">Jadwal</p><p className="font-medium text-dark dark:text-white">{kelas.jadwal}</p></div>
-            <div><p className="text-sm text-dark-6">Tipe</p><p className="font-medium text-dark dark:text-white capitalize">{kelas.tipe}</p></div>
+            <div><p className="text-sm text-dark-6">Tipe Periode</p><p className="font-medium text-dark dark:text-white capitalize">{kelas.tipePeriode}</p></div>
             <div><p className="text-sm text-dark-6">ID Kelas</p><p className="font-mono text-xs text-dark-6">{kelas.id}</p></div>
           </div>
         </div>

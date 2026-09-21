@@ -11,6 +11,7 @@ type Anggota = { id: string; hargaPrivat: number; feeTutor: number; siswa: { nam
 type KelompokData = {
   nama: string;
   jadwal: string;
+  tipePeriode: string;
   hargaKelompok: number;
   feeTutorKelompok: number;
   namaWali: string | null;
@@ -46,7 +47,15 @@ export function KelompokEditForm({
     <form action={handleSubmit} className="space-y-5.5">
       <InputGroup label="Nama Kelompok" name="nama" type="text" placeholder="" defaultValue={kelompok.nama} required />
       <InputGroup label="Jadwal" name="jadwal" type="text" placeholder="" defaultValue={kelompok.jadwal} required />
-
+      <Select
+        label="Tipe Laporan & Tagihan"
+        name="tipePeriode"
+        defaultValue={kelompok.tipePeriode}
+        items={[
+          { value: "bulanan", label: "Bulanan" },
+          { value: "mingguan", label: "Mingguan" },
+        ]}
+      />
       <div className="grid grid-cols-2 gap-4">
         <InputGroup label="Harga Kelompok (per sesi)" name="hargaKelompok" type="number" placeholder="" defaultValue={String(kelompok.hargaKelompok)} required />
         <InputGroup label="Fee Tutor (per sesi kelompok)" name="feeTutorKelompok" type="number" placeholder="" defaultValue={String(kelompok.feeTutorKelompok)} required />
