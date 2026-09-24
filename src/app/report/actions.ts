@@ -175,8 +175,12 @@ export async function createLaporanKelompok(
   const tanggalRaw = formData.getAll("tanggalPertemuan") as string[];
   const tanggalDipilih = tanggalRaw.filter((d) => d).map((d) => new Date(d));
 
-  // For mingguan, jumlahKelompok is auto-calculated from selected dates
-  const jumlahKelompok = tipePeriode === "mingguan" ? tanggalDipilih.length : jumlahKelompokInput;
+  // For mingguan, jumlahKelompok is manual input (not auto from dates)
+  const jumlahKelompok = jumlahKelompokInput;
+
+  const anggotaIndividu: { siswaId: string; jumlahIndividu: number }[] = anggotaRaw
+    ? JSON.parse(anggotaRaw)
+    : [];
 
   if (!kelompokId || !bulan || !tahun || !norekTutor) {
     return { success: false, message: "Lengkapi semua data wajib dulu ya." };
@@ -186,20 +190,25 @@ export async function createLaporanKelompok(
     if (!mingguKe || mingguKe < 1 || mingguKe > 5) {
       return { success: false, message: "Minggu ke harus dipilih untuk laporan mingguan." };
     }
+    if (!jumlahKelompokInput || jumlahKelompokInput < 1) {
+      return { success: false, message: "Jumlah kelompok wajib diisi minimal 1." };
+    }
     const validDates = getWeekDates(bulan, tahun, mingguKe);
     const validDateStrings = new Set(validDates.map(d => d.toISOString().split("T")[0]));
     const invalidDates = tanggalDipilih.filter(d => !validDateStrings.has(d.toISOString().split("T")[0]));
     if (invalidDates.length > 0) {
       return { success: false, message: "Tanggal pertemuan harus berada di minggu yang dipilih." };
     }
-    if (tanggalDipilih.length === 0) {
-      return { success: false, message: "Minimal 1 tanggal pertemuan wajib dipilih untuk laporan mingguan." };
+    // Validation: total dates must equal jumlahKelompok + sum of individu
+    const totalIndividu = anggotaIndividu.reduce((sum, a) => sum + a.jumlahIndividu, 0);
+    const expectedDates = jumlahKelompokInput + totalIndividu;
+    if (tanggalDipilih.length !== expectedDates) {
+      return {
+        success: false,
+        message: `Jumlah tanggal yang dipilih (${tanggalDipilih.length}) harus sama dengan jumlah kelompok (${jumlahKelompokInput}) + total individu (${totalIndividu}) = ${expectedDates}.`,
+      };
     }
   }
-
-  const anggotaIndividu: { siswaId: string; jumlahIndividu: number }[] = anggotaRaw
-    ? JSON.parse(anggotaRaw)
-    : [];
 
   try {
     await db.$transaction(async (tx) => {
@@ -385,8 +394,12 @@ export async function updateLaporanKelompok(
   const tanggalRaw = formData.getAll("tanggalPertemuan") as string[];
   const tanggalDipilih = tanggalRaw.filter((d) => d).map((d) => new Date(d));
 
-  // For mingguan, jumlahKelompok is auto-calculated from selected dates
-  const jumlahKelompok = tipePeriode === "mingguan" ? tanggalDipilih.length : jumlahKelompokInput;
+  // For mingguan, jumlahKelompok is manual input (not auto from dates)
+  const jumlahKelompok = jumlahKelompokInput;
+
+  const anggotaIndividu: { siswaId: string; jumlahIndividu: number }[] = anggotaRaw
+    ? JSON.parse(anggotaRaw)
+    : [];
 
   if (!laporanId || !bulan || !tahun || !norekTutor) {
     return { success: false, message: "Lengkapi semua data wajib dulu ya." };
@@ -396,20 +409,25 @@ export async function updateLaporanKelompok(
     if (!mingguKe || mingguKe < 1 || mingguKe > 5) {
       return { success: false, message: "Minggu ke harus dipilih untuk laporan mingguan." };
     }
+    if (!jumlahKelompokInput || jumlahKelompokInput < 1) {
+      return { success: false, message: "Jumlah kelompok wajib diisi minimal 1." };
+    }
     const validDates = getWeekDates(bulan, tahun, mingguKe);
     const validDateStrings = new Set(validDates.map(d => d.toISOString().split("T")[0]));
     const invalidDates = tanggalDipilih.filter(d => !validDateStrings.has(d.toISOString().split("T")[0]));
     if (invalidDates.length > 0) {
       return { success: false, message: "Tanggal pertemuan harus berada di minggu yang dipilih." };
     }
-    if (tanggalDipilih.length === 0) {
-      return { success: false, message: "Minimal 1 tanggal pertemuan wajib dipilih untuk laporan mingguan." };
+    // Validation: total dates must equal jumlahKelompok + sum of individu
+    const totalIndividu = anggotaIndividu.reduce((sum, a) => sum + a.jumlahIndividu, 0);
+    const expectedDates = jumlahKelompokInput + totalIndividu;
+    if (tanggalDipilih.length !== expectedDates) {
+      return {
+        success: false,
+        message: `Jumlah tanggal yang dipilih (${tanggalDipilih.length}) harus sama dengan jumlah kelompok (${jumlahKelompokInput}) + total individu (${totalIndividu}) = ${expectedDates}.`,
+      };
     }
   }
-
-  const anggotaIndividu: { siswaId: string; jumlahIndividu: number }[] = anggotaRaw
-    ? JSON.parse(anggotaRaw)
-    : [];
 
   try {
     await db.$transaction(async (tx) => {

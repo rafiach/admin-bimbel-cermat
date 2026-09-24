@@ -39,36 +39,12 @@ export async function NotifGroup({ bulan, tahun: _tahun }: { bulan: number; tahu
     select: { id: true, nama: true },
   });
 
-  // Infer tipe tanpa ubah DB: kelas/kelompok yang pernah punya laporan mingguan dianggap mingguan, sisanya bulanan
-  const mingguanKelasIdsPromise = db.laporanBulanan
-    .findMany({
-      where: { tipePeriode: "mingguan" },
-      select: { kelasId: true },
-      distinct: ["kelasId"],
-    })
-    .then((rows) => rows.map((r) => r.kelasId));
-
-  const mingguanKelompokIdsPromise = db.laporanKelompok
-    .findMany({
-      where: { tipePeriode: "mingguan" },
-      select: { kelompokId: true },
-      distinct: ["kelompokId"],
-    })
-    .then((rows) => rows.map((r) => r.kelompokId));
-
-  const [siswa, mingguanKelasIds, mingguanKelompokIds] = await Promise.all([
-    siswaPromise,
-    mingguanKelasIdsPromise,
-    mingguanKelompokIdsPromise,
-  ]);
-
-  // --- Bulanan: hanya untuk kelas/kelompok yang BUKAN mingguan (infer bulanan) ---
-  // Jika monthlyTarget null (di luar window), skip query
+  // --- Bulanan: kelas/kelompok dengan tipePeriode = "bulanan" ---
   const monthlyKelasPromise = monthlyTarget
     ? db.kelas.findMany({
         where: {
           status: "aktif",
-          ...(mingguanKelasIds.length > 0 ? { id: { notIn: mingguanKelasIds } } : {}),
+          tipePeriode: "bulanan",
           laporan: { none: { bulan: monthlyTarget.bulan, tahun: monthlyTarget.tahun, tipePeriode: "bulanan" } },
         },
         include: { tutor: true, siswa: true },
@@ -80,7 +56,7 @@ export async function NotifGroup({ bulan, tahun: _tahun }: { bulan: number; tahu
     ? db.kelompok.findMany({
         where: {
           status: "aktif",
-          ...(mingguanKelompokIds.length > 0 ? { id: { notIn: mingguanKelompokIds } } : {}),
+          tipePeriode: "bulanan",
           laporan: { none: { bulan: monthlyTarget.bulan, tahun: monthlyTarget.tahun, tipePeriode: "bulanan" } },
         },
         include: { tutor: true },
@@ -88,48 +64,43 @@ export async function NotifGroup({ bulan, tahun: _tahun }: { bulan: number; tahu
       })
     : Promise.resolve([] as any[]);
 
-  // --- Mingguan: hanya untuk kelas/kelompok yang pernah mingguan (infer mingguan), reset tiap Senin ---
-  const weeklyKelasPromise =
-    mingguanKelasIds.length > 0
-      ? db.kelas.findMany({
-          where: {
-            status: "aktif",
-            id: { in: mingguanKelasIds },
-            laporan: {
-              none: {
-                bulan: weeklyTarget.bulan,
-                tahun: weeklyTarget.tahun,
-                mingguKe: weeklyTarget.mingguKe,
-                tipePeriode: "mingguan",
-              },
-            },
-          },
-          include: { tutor: true, siswa: true },
-          orderBy: { tutor: { nama: "asc" } },
-        })
-      : Promise.resolve([] as any[]);
+  // --- Mingguan: kelas/kelompok dengan tipePeriode = "mingguan", reset tiap Senin ---
+  const weeklyKelasPromise = db.kelas.findMany({
+    where: {
+      status: "aktif",
+      tipePeriode: "mingguan",
+      laporan: {
+        none: {
+          bulan: weeklyTarget.bulan,
+          tahun: weeklyTarget.tahun,
+          mingguKe: weeklyTarget.mingguKe,
+          tipePeriode: "mingguan",
+        },
+      },
+    },
+    include: { tutor: true, siswa: true },
+    orderBy: { tutor: { nama: "asc" } },
+  });
 
-  const weeklyKelompokPromise =
-    mingguanKelompokIds.length > 0
-      ? db.kelompok.findMany({
-          where: {
-            status: "aktif",
-            id: { in: mingguanKelompokIds },
-            laporan: {
-              none: {
-                bulan: weeklyTarget.bulan,
-                tahun: weeklyTarget.tahun,
-                mingguKe: weeklyTarget.mingguKe,
-                tipePeriode: "mingguan",
-              },
-            },
-          },
-          include: { tutor: true },
-          orderBy: { tutor: { nama: "asc" } },
-        })
-      : Promise.resolve([] as any[]);
+  const weeklyKelompokPromise = db.kelompok.findMany({
+    where: {
+      status: "aktif",
+      tipePeriode: "mingguan",
+      laporan: {
+        none: {
+          bulan: weeklyTarget.bulan,
+          tahun: weeklyTarget.tahun,
+          mingguKe: weeklyTarget.mingguKe,
+          tipePeriode: "mingguan",
+        },
+      },
+    },
+    include: { tutor: true },
+    orderBy: { tutor: { nama: "asc" } },
+  });
 
-  const [kelasBulananRaw, kelompokBulananRaw, kelasMingguanRaw, kelompokMingguanRaw] = await Promise.all([
+  const [siswa, kelasBulananRaw, kelompokBulananRaw, kelasMingguanRaw, kelompokMingguanRaw] = await Promise.all([
+    siswaPromise,
     monthlyKelasPromise,
     monthlyKelompokPromise,
     weeklyKelasPromise,

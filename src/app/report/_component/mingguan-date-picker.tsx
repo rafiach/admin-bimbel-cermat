@@ -13,6 +13,8 @@ interface Props {
   kelompokId?: string;
   excludeLaporanId?: string;
   disabled?: boolean;
+  maxDates?: number;
+  jumlahKelompok?: number;
 }
 
 const HARI = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
@@ -60,6 +62,8 @@ export function MingguanDatePicker({
   kelompokId,
   excludeLaporanId,
   disabled,
+  maxDates,
+  jumlahKelompok,
 }: Props) {
   const [existingDates, setExistingDates] = useState<Set<string>>(new Set());
   const [loadingExisting, setLoadingExisting] = useState(false);
@@ -115,7 +119,9 @@ export function MingguanDatePicker({
           Tanggal Pertemuan (Minggu ke-{mingguKe}) <span className="text-red-500">*</span>
         </label>
         <span className="text-xs text-dark-6">
-          Terpilih: {value.length} {existingDates.size > 0 && ` | ⚠ ${existingDates.size} tanggal sudah terpakai`}
+          {maxDates !== undefined 
+            ? `Terpilih: ${value.length} dari ${maxDates} tanggal${existingDates.size > 0 ? ` | ⚠ ${existingDates.size} tanggal sudah terpakai` : ''}`
+            : `Terpilih: ${value.length}${existingDates.size > 0 ? ` | ⚠ ${existingDates.size} tanggal sudah terpakai` : ''}`}
         </span>
       </div>
 
@@ -126,6 +132,7 @@ export function MingguanDatePicker({
           const isSelected = value.includes(dateStr);
           const isToday = dateStr === new Date().toISOString().split("T")[0];
           const conflict = isConflict(dateStr);
+          const atMaxDates = maxDates !== undefined && value.length >= maxDates && !isSelected;
           const dayIndex = date.getUTCDay(); // 0=Sun, 1=Mon... 6=Sat
           const dayName = HARI[(dayIndex + 6) % 7]; // Convert Sun=0 to Mon=0
 
@@ -138,23 +145,27 @@ export function MingguanDatePicker({
               key={dateStr}
               type="button"
               onClick={() => toggleDate(dateStr)}
-              disabled={disabled || conflict}
+              disabled={disabled || conflict || atMaxDates}
               className={`
                 relative w-12 h-12 rounded border text-xs font-medium transition-all
                 ${isSelected
                   ? "bg-[#F35C2B] text-white border-[#F35C2B]"
                   : conflict
                     ? "bg-red-50 text-red-500 border-red-200 cursor-not-allowed line-through"
-                    : "bg-white text-dark border-stroke hover:bg-[#F35C2B]/10 hover:border-[#F35C2B] dark:bg-gray-dark dark:text-white dark:border-dark-3 dark:hover:bg-[#F35C2B]/20"
+                    : atMaxDates
+                      ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed dark:bg-dark-2 dark:text-dark-4 dark:border-dark-3"
+                      : "bg-white text-dark border-stroke hover:bg-[#F35C2B]/10 hover:border-[#F35C2B] dark:bg-gray-dark dark:text-white dark:border-dark-3 dark:hover:bg-[#F35C2B]/20"
                 }
-                ${isToday && !isSelected && !conflict ? "ring-2 ring-[#F35C2B]" : ""}
+                ${isToday && !isSelected && !conflict && !atMaxDates ? "ring-2 ring-[#F35C2B]" : ""}
               `}
               aria-pressed={isSelected}
-              aria-disabled={disabled || conflict}
+              aria-disabled={disabled || conflict || atMaxDates}
               title={
                 conflict
                   ? "Sudah digunakan di laporan lain"
-                  : `${dayName}, ${date.getUTCDate()} ${date.getUTCMonth() + 1}/${tahun}`
+                  : atMaxDates
+                    ? `Maksimal ${maxDates} tanggal (${jumlahKelompok} kelompok + individu)`
+                    : `${dayName}, ${date.getUTCDate()} ${date.getUTCMonth() + 1}/${tahun}`
               }
             >
               {date.getUTCDate()}

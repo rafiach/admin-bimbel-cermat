@@ -29,6 +29,7 @@ export default async function EditSiswaPage({
       <div className="rounded-[10px] border border-stroke bg-white p-6.5 shadow-1 dark:border-dark-3 dark:bg-gray-dark sm:p-7.5">
         <form action={updateSiswaWithId} className="space-y-5.5">
           <InputGroup label="Nama Siswa" name="nama" type="text" placeholder="Nama lengkap siswa" defaultValue={siswa.nama} required />
+          <InputGroup label="Alamat" name="alamat" type="text" placeholder="Alamat siswa" defaultValue={siswa.alamat ?? ""}/>
           <InputGroup label="Sekolah" name="sekolah" type="text" placeholder="Nama sekolah" defaultValue={siswa.sekolah ?? ""} />
           <InputGroup label="Kelas" name="kelas" type="text" placeholder="Misal: 5 SD / 8 SMP" defaultValue={siswa.kelas ?? ""} />
           <InputGroup label="Nama Orang Tua" name="namaOrtu" type="text" placeholder="Nama lengkap orang tua" defaultValue={siswa.namaOrtu ?? ""} />

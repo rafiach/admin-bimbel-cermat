@@ -368,6 +368,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
 
 function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelompokList: Kelompok[] }) {
   const [kelompokId, setKelompokId] = useState("");
+  const [jumlahKelompok, setJumlahKelompok] = useState("");
   const [jumlahIndividu, setJumlahIndividu] = useState<Record<string, string>>({});
   const [state, formAction, pending] = useActionState<LaporState, FormData>(createLaporanKelompok, null);
 
@@ -377,6 +378,13 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
   const [mingguKe, setMingguKe] = useState("");
   const [tanggalPertemuan, setTanggalPertemuan] = useState<string[]>([]);
   const [showAssessment, setShowAssessment] = useState(true);
+
+  const jumlahKelompokNum = Number(jumlahKelompok) || 0;
+  const totalIndividu = Object.values(jumlahIndividu).reduce((sum, v) => sum + (Number(v) || 0), 0);
+  const maxDates = jumlahKelompokNum + totalIndividu;
+  const datesSelected = tanggalPertemuan.length;
+  const isMingguanValid = tipePeriode === "mingguan" && jumlahKelompokNum >= 1;
+  const showDateMismatch = tipePeriode === "mingguan" && datesSelected !== maxDates && jumlahKelompokNum >= 1;
 
   useEffect(() => {
     if (!state) return;
@@ -395,6 +403,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
     setMingguKe("");
     setTanggalPertemuan([]);
     setJumlahIndividu({});
+    setJumlahKelompok("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKelompok?.id]);
 
@@ -449,13 +458,23 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
                   bulan={bulan}
                   tahun={tahun}
                   kelompokId={kelompokId}
+                  maxDates={isMingguanValid ? maxDates : undefined}
+                  jumlahKelompok={jumlahKelompokNum}
+                  disabled={!isMingguanValid}
                 />
               )}
 
-              <div>
-                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
-                <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
-              </div>
+              {tipePeriode === "mingguan" && mingguKe && !isMingguanValid && (
+                <p className="text-xs text-[#E53935]">Isi "Kelompok Masuk Berapa Kali" minimal 1 untuk memilih tanggal</p>
+              )}
+
+              {showDateMismatch && (
+                <p className="text-xs text-[#E53935]">
+                  ⚠ Jumlah tanggal ({datesSelected}) tidak sama dengan total yang diharapkan ({maxDates} = kelompok {jumlahKelompokNum} + individu {totalIndividu})
+                </p>
+              )}
+
+              
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -467,10 +486,10 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
                     type="number"
                     name="jumlahKelompok"
                     required
-                    min={0}
-                    value={tipePeriode === "mingguan" ? tanggalPertemuan.length : undefined}
-                    readOnly={tipePeriode === "mingguan"}
-                    className={`${inputClass} ${tipePeriode === "mingguan" ? "bg-[#F7F9FC] dark:bg-dark-2" : ""}`}
+                    min={tipePeriode === "mingguan" ? 1 : 0}
+                    value={tipePeriode === "mingguan" ? jumlahKelompok : undefined}
+                    onChange={tipePeriode === "mingguan" ? (e) => setJumlahKelompok(e.target.value) : undefined}
+                    className={inputClass}
                   />
                 </div>
                 <div>
@@ -478,6 +497,7 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
                   <input type="number" name="jumlahIzin" defaultValue={0} min={0} className={inputClass} />
                 </div>
               </div>
+              
 
               <div className="rounded-lg border border-dashed border-stroke p-4 dark:border-dark-3">
                 <p className="mb-3 text-sm font-medium text-dark dark:text-white">Apakah ada yang masuk sendiri? (kalau ada isi di samping nama siswa, kalau tidak biarkan kosong)</p>
@@ -496,6 +516,11 @@ function KelompokReportForm({ tutorId, kelompokList }: { tutorId: string; kelomp
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-dark dark:text-white">No Rekening / E-Wallet (buat pencairan fee)</label>
+                <input type="text" name="norekTutor" required placeholder="Misal: BCA 1234567890 a.n. Nama Tutor" className={inputClass} />
               </div>
             </>
           )}
