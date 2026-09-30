@@ -349,7 +349,7 @@ function IndividualForm({ tutorId, kelasList }: { tutorId: string; kelasList: Ke
             </>
           )}
 
-          <div className="sticky bottom-0 -mx-5 border-t border-stroke bg-white/95 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur dark:border-dark-3 dark:bg-gray-dark/95 sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-0">
+          <div className="mx-0 border-t border-stroke bg-white px-5 py-3 dark:border-dark-3 dark:bg-gray-dark sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
             <ConfirmButton
               variant="brand"
               title="Kirim Laporan?"
