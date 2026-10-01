@@ -10,7 +10,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
-const FEE_IZIN = 5000;
+const FEE_IZIN = 10000;
 
 export default async function KwitansiGabunganKelompokPage({
   searchParams,
