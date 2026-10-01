@@ -50,7 +50,7 @@ export default async function DetailLaporanPage({
               <p className="mt-1 text-lg font-bold text-dark dark:text-white">Rp {feeTutor.toLocaleString("id-ID")}</p>
               <p className="mt-1 text-xs text-dark-6">
                 {laporan.jumlahHadir}x @Rp {laporan.kelas.feeTutor.toLocaleString("id-ID")}
-                {laporan.jumlahIzin > 0 && ` + ${laporan.jumlahIzin}x @5000 (izin)`}
+                {laporan.jumlahIzin > 0 && ` + ${laporan.jumlahIzin}x @Rp ${FEE_IZIN.toLocaleString("id-ID")} (izin)`}
               </p>
               <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${laporan.statusBayarTutor === "sudah" ? "bg-[#219653]/10 text-[#219653]" : "bg-[#D34053]/10 text-[#D34053]"}`}>
                 {laporan.statusBayarTutor === "sudah" ? "Sudah dibayar" : "Belum dibayar"}
@@ -123,7 +123,7 @@ export default async function DetailLaporanPage({
                 {laporan.jumlahIzin > 0 && (
                   <tr className="border-b border-stroke">
                     <td className="py-2 text-dark">Izin Mendadak</td>
-                    <td className="py-2 text-right text-dark-6">{laporan.jumlahIzin}x @5000</td>
+                    <td className="py-2 text-right text-dark-6">{laporan.jumlahIzin}x @${FEE_IZIN.toLocaleString("id-ID")}</td>
                   </tr>
                 )}
               </tbody>
