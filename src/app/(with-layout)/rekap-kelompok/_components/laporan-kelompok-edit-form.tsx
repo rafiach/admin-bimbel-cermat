@@ -132,7 +132,15 @@ export default function LaporanKelompokEditForm({
     <form action={formAction} className="space-y-5.5">
       <input type="hidden" name="laporanId" value={laporan.id} />
       <input type="hidden" name="tipePeriode" value={laporan.tipePeriode} />
-
+      <input
+        type="hidden"
+        name="anggotaIndividuData"
+        value={JSON.stringify(
+          Object.entries(jumlahIndividu)
+            .filter(([, v]) => v !== "" && Number(v) > 0)
+            .map(([siswaId, v]) => ({ siswaId, jumlahIndividu: Number(v) })),
+        )}
+      />
       <div className="mb-4 p-3 rounded-lg bg-[#F7F9FC] dark:bg-dark-2">
         <label className="text-xs font-medium text-dark-6 uppercase tracking-wide">Tipe Laporan</label>
         <p className="text-sm font-medium text-dark dark:text-white capitalize">
