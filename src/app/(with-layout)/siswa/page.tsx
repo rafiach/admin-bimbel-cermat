@@ -36,7 +36,7 @@ export default async function SiswaPage({
   const [siswa, total] = await Promise.all([
     db.siswa.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { nama: "asc" },
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE,
     }),

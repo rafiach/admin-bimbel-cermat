@@ -16,6 +16,7 @@ import { SubmitButton } from "@/components/FormElements/submit-button";
 import { SearchInput } from "@/components/search-input";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
+import { Pagination } from "@/components/pagination";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Data Tutor" };
@@ -35,7 +36,7 @@ export default async function TutorPage({
   const [tutor, total] = await Promise.all([
     db.tutor.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { nama: "asc" },
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE,
     }),
@@ -148,6 +149,7 @@ export default async function TutorPage({
             )}
           </TableBody>
         </Table>
+        <Pagination currentPage={page} totalPages={totalPages} extraParams={{ q }} />
       </div>
     </>
   );
