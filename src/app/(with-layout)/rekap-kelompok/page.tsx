@@ -10,6 +10,8 @@ import { PeriodeFilterForm } from "@/components/periode-filter-form";
 import { Eye, FileImage, Loader2, Pencil, Trash2 } from "lucide-react";
 import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
+import { resolvePeriode } from "@/lib/periode";
+import { PeriodeNotice } from "@/components/periode-notice";
 
 export const metadata = { title: "Rekap Kelompok" };
 
@@ -26,9 +28,7 @@ export default async function RekapKelompokPage({
   searchParams: Promise<{ bulan?: string; tahun?: string }>;
 }) {
   const params = await searchParams;
-  const now = new Date();
-  const bulan = Number(params.bulan) || now.getMonth() + 1;
-  const tahun = Number(params.tahun) || now.getFullYear();
+  const { bulan, tahun, isDefault } = resolvePeriode(params);
 
   const laporan = await db.laporanKelompok.findMany({
     where: { bulan, tahun },
@@ -88,6 +88,7 @@ export default async function RekapKelompokPage({
       </div>
 
       <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
+        {/* <PeriodeNotice bulan={bulan} tahun={tahun} isDefault={isDefault} /> */}
         <PeriodeFilterForm bulan={bulan} tahun={tahun} />
 
         <div className="mb-5">
