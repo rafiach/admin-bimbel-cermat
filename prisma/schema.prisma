@@ -130,6 +130,7 @@ model Kelas {
 model LaporanBulanan {
   id               String   @id @default(cuid())
   kelasId          String   @map("kelas_id")
+  shareToken       String   @unique @default(dbgenerated("(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''))")) @map("share_token")
   kelas            Kelas    @relation(fields: [kelasId], references: [id], onDelete: Cascade)
   bulan            Int
   tahun            Int
@@ -204,6 +205,7 @@ model AnggotaKelompok {
 model LaporanKelompok {
   id                 String                   @id @default(cuid())
   kelompokId         String                   @map("kelompok_id")
+  shareToken       String   @unique @default(dbgenerated("(replace(gen_random_uuid()::text, '-', '') || replace(gen_random_uuid()::text, '-', ''))")) @map("share_token")  
   kelompok           Kelompok                 @relation(fields: [kelompokId], references: [id], onDelete: Cascade)
   bulan              Int
   tahun              Int

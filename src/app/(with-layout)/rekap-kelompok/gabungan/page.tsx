@@ -1,6 +1,9 @@
 import { Combobox } from "@/components/FormElements/combobox";
 import { db } from "@/lib/db";
 import { GabunganKelompokKwitansi } from "./_component/gabungan-kelompok-kwitansi";
+import { toItemKelompok } from "@/lib/kwitansi";
+import { nomorDariWaLink } from "@/lib/wa-kwitansi";
+import { waLink } from "@/lib/phone";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Kwitansi Gabungan Kelompok" };
@@ -36,42 +39,7 @@ export default async function KwitansiGabunganKelompokPage({
   const namaKelompok = laporan[0]?.kelompok.nama;
   const tutorNama = laporan[0]?.kelompok.tutor.nama;
 
-  const items = laporan.map((l) => {
-    const periode = l.mingguKe > 0 ? `Minggu ke-${l.mingguKe}` : "Bulanan";
-    const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
-
-    const lines = [
-      { key: `${l.id}-kelompok`, label: `Kelompok — ${periode}`, jumlah: l.jumlahKelompok, hargaSatuan: hargaKelompok },
-      ...(l.jumlahIzin > 0
-        ? [{ key: `${l.id}-izin`, label: `Izin Mendadak — ${periode}`, jumlah: l.jumlahIzin, hargaSatuan: FEE_IZIN }]
-        : []),
-      ...l.anggotaLaporan
-        .filter((a) => a.jumlahIndividu > 0)
-        .map((a) => {
-          const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
-          return {
-            key: `${l.id}-${a.siswaId}`,
-            label: `${a.siswa.nama} (individu) — ${periode}`,
-            jumlah: a.jumlahIndividu,
-            hargaSatuan: anggota?.hargaPrivat ?? 0,
-          };
-        }),
-    ];
-
-    return {
-      id: l.id,
-      mingguKe: l.mingguKe,
-      statusBayarOrtu: l.statusBayarOrtu,
-      lines,
-      materiDipelajari: l.materiDipelajari,
-      pemahamanMateri: l.pemahamanMateri,
-      keaktifanBelajar: l.keaktifanBelajar,
-      kemandirian: l.kemandirian,
-      kedisiplinan: l.kedisiplinan,
-      catatanSiswa: l.catatanSiswa,
-      createdAt: l.createdAt.toISOString(),
-    };
-  });
+  const items = laporan.map(toItemKelompok);
 
   return (
     <div className="space-y-5.5">
@@ -112,6 +80,9 @@ export default async function KwitansiGabunganKelompokPage({
       {items.length > 0 && (
         <GabunganKelompokKwitansi
           namaKelompok={namaKelompok!}
+          namaAnggota={laporan[0].kelompok.anggota.map((a) => a.siswa.nama).join(" & ")}
+          namaWali={laporan[0].kelompok.namaWali}
+          nomor={nomorDariWaLink(waLink(laporan[0].kelompok.noHpWali))}
           tutorNama={tutorNama!}
           periodeLabel={`${BULAN[bulan - 1]} ${tahun}`}
           items={items}

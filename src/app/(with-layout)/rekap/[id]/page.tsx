@@ -2,6 +2,11 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { DownloadButton } from "../_component/download-button";
+import { KwitansiPrivat } from "@/components/kwitansi/kwitansi-privat";
+import { linkKwitansi, nomorDariWaLink, pesanKwitansi } from "@/lib/wa-kwitansi";
+import { KirimWAButton } from "@/components/kwitansi/kirim-wa-button";
+import { waLink } from "@/lib/phone";
+import { labelPeriode, tagihanPrivat } from "@/lib/kwitansi";
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Detail Laporan" };
@@ -35,7 +40,18 @@ export default async function DetailLaporanPage({
       <Breadcrumb pageName="Detail Laporan" />
 
       <div className="space-y-5.5">
-        <div className="print:hidden flex items-center justify-end">
+        <div className="print:hidden flex items-center justify-end gap-2">
+          <KirimWAButton
+            nomor={nomorDariWaLink(waLink(laporan.kelas.siswa.noHpOrtu))}
+            pesan={pesanKwitansi({
+              namaPenerima: laporan.kelas.siswa.namaOrtu,
+              namaSiswa: laporan.kelas.siswa.nama,
+              periode: labelPeriode(laporan.bulan, laporan.tahun, laporan.mingguKe),
+              total: tagihanPrivat(laporan.jumlahHadir, laporan.jumlahIzin, laporan.kelas.biayaOrtu),
+              lunas: laporan.statusBayarOrtu === "lunas",
+              link: linkKwitansi(laporan.shareToken),
+            })}
+          />
           <DownloadButton filename={`kwitansi-${laporan.kelas.siswa.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`}/>
         </div>
 
@@ -63,130 +79,7 @@ export default async function DetailLaporanPage({
             </div>
           </div>
         </div>
-
-        <div
-          id="area-cetak"
-          className="relative mx-auto max-w-2xl overflow-hidden rounded-[10px] border border-stroke bg-white shadow-1"
-        >
-          <div className="h-2 bg-[#F35C2B]" />
-
-          {/* Watermark */}
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/logo/logo-icon-bimbel.svg" alt="" className="w-2/3 opacity-[0.15] grayscale" />
-          </div>
-
-          <div className="relative z-10 p-8">
-            <div className="mb-6 flex items-center gap-4 border-b border-stroke pb-6">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/logo/logo-icon-bimbel.svg" alt="Bimbel Cermat" className="h-18 w-18 object-contain" />
-              <div>
-                <h2 className="text-heading-6 font-bold text-dark">Bimbel Cermat</h2>
-                <p className="text-sm text-dark-6">Kwitansi & Rekap Perkembangan Belajar</p>
-              </div>
-            </div>
-
-            <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg p-4 text-sm">
-              <div>
-                <p className="text-dark-6">Nama Siswa</p>
-                <p className="font-medium text-dark">{laporan.kelas.siswa.nama}</p>
-              </div>
-              <div>
-                <p className="text-dark-6">Tutor</p>
-                <p className="font-medium text-dark">{laporan.kelas.tutor.nama}</p>
-              </div>
-              <div>
-                <p className="text-dark-6">Periode</p>
-                <p className="font-medium text-dark">
-                  {BULAN[laporan.bulan - 1]} {laporan.tahun}
-                  {laporan.mingguKe > 0 && ` — Minggu ke-${laporan.mingguKe}`}
-                </p>
-              </div>
-              <div>
-                <p className="text-dark-6">Jadwal</p>
-                <p className="font-medium text-dark">{laporan.kelas.jadwal}</p>
-              </div>
-            </div>
-
-            <table className="mb-6 w-full border-collapse text-sm">
-              <tbody>
-                <tr className="border-b border-stroke">
-                  <td className="py-2 text-dark">Jumlah Hadir</td>
-                  <td className="py-2 text-right text-dark">{laporan.jumlahHadir}x</td>
-                </tr>
-                <tr className="border-b border-stroke">
-                  <td className="py-2 text-dark">Biaya per Pertemuan</td>
-                  <td className="py-2 text-right text-dark">
-                    Rp {laporan.kelas.biayaOrtu.toLocaleString("id-ID")}
-                  </td>
-                </tr>
-                {laporan.jumlahIzin > 0 && (
-                  <tr className="border-b border-stroke">
-                    <td className="py-2 text-dark">Izin Mendadak</td>
-                    <td className="py-2 text-right text-dark-6">{laporan.jumlahIzin}x @${FEE_IZIN.toLocaleString("id-ID")}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-
-            <div className="mb-6 flex items-center justify-between rounded-lg bg-[#F35C2B]/10 px-5 py-4">
-              <div>
-                <p className="text-sm text-dark-6">Total Tagihan</p>
-                <p className="text-heading-6 font-bold text-[#F35C2B]">
-                  Rp {tagihanOrtu.toLocaleString("id-ID")}
-                </p>
-              </div>
-              <span
-                className={
-                  laporan.statusBayarOrtu === "lunas"
-                    ? "rounded-full border-2 border-[#219653] px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-[#219653]"
-                    : "rounded-full border-2 border-[#D34053] px-4 py-1.5 text-sm font-bold uppercase tracking-wide text-[#D34053]"
-                }
-              >
-                {laporan.statusBayarOrtu === "lunas" ? "Lunas" : "Belum Lunas"}
-              </span>
-            </div>
-
-            <div className="mb-4">
-              <h5 className="mb-3 font-medium text-dark">Rekap Perkembangan Belajar</h5>
-
-              {laporan.materiDipelajari && (
-                <p className="mb-3 text-sm text-dark">
-                  <span className="text-dark-6">Materi dipelajari: </span>{laporan.materiDipelajari}
-                </p>
-              )}
-
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex items-center justify-between rounded-lg border border-stroke px-3 py-2">
-                  <span className="text-dark">Pemahaman Materi</span>
-                  <span className="font-medium text-primary">{laporan.pemahamanMateri}/5</span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg border border-stroke px-3 py-2">
-                  <span className="text-dark">Keaktifan Belajar</span>
-                  <span className="font-medium text-primary">{laporan.keaktifanBelajar}/5</span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg border border-stroke px-3 py-2">
-                  <span className="text-dark">Kemandirian</span>
-                  <span className="font-medium text-primary">{laporan.kemandirian}/5</span>
-                </div>
-                <div className="flex items-center justify-between rounded-lg border border-stroke px-3 py-2">
-                  <span className="text-dark">Kedisiplinan</span>
-                  <span className="font-medium text-primary">{laporan.kedisiplinan}/5</span>
-                </div>
-              </div>
-
-              {laporan.catatanSiswa && (
-                <p className="mt-3 text-sm text-dark">
-                  <span className="text-dark-6">Catatan & saran untuk siswa: </span>{laporan.catatanSiswa}
-                </p>
-              )}
-            </div>
-
-            <p className="border-t border-stroke pt-4 text-center text-xs text-dark-6">
-              Terima kasih atas kepercayaannya — Bimbel Cermat
-            </p>
-          </div>
-        </div>
+        <KwitansiPrivat laporan={laporan} />
         <div className="print:hidden mx-auto max-w-2xl space-y-2 rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">
           <p className="text-xs font-medium uppercase tracking-wide text-dark-6">Notes Buat Bimbel</p>
           {laporan.saranBimbel && (

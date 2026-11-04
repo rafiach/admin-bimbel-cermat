@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 const AUTH_ONLY_PATHS = ["/auth/sign-in", "/auth/sign-up", "/auth/forgot-password", "/auth/reset-password"];
 
 // Route yang boleh diakses tanpa login
-const PUBLIC_PATHS = ["/report"];
+const PUBLIC_PATHS = ["/report", "/k/"];
 
 const SESSION_COOKIE_NAME =
   process.env.NODE_ENV === "development"

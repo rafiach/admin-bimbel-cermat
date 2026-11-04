@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { db } from "../db";
 import { sendEmail } from "../email";
+import { tr } from "zod/locales";
 
 if (!process.env.BETTER_AUTH_SECRET) {
   throw new Error("BETTER_AUTH_SECRET is not set.");
@@ -26,7 +27,8 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    autoSignIn: false,
+    disableSignup: true,
+    autoSignIn: true,
     minPasswordLength: 8,
     sendResetPassword: async ({ user, url, token }, request) => {
       await sendEmail({
@@ -45,6 +47,7 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      disableSignup: true,
     },
   },
 

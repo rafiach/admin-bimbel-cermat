@@ -1,6 +1,9 @@
 import { db } from "@/lib/db";
 import { GabunganKwitansi } from "./_component/gabungan-kwitansi";
 import { Combobox } from "@/components/FormElements/combobox";
+import { toItemPrivat } from "@/lib/kwitansi";
+import { nomorDariWaLink } from "@/lib/wa-kwitansi";
+import { waLink } from "@/lib/phone";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Kwitansi Gabungan" };
@@ -33,21 +36,7 @@ export default async function KwitansiGabunganPage({
 
   const namaSiswa = laporan[0]?.kelas.siswa.nama;
 
-  const items = laporan.map((l) => ({
-    id: l.id,
-    tutorNama: l.kelas.tutor.nama,
-    jumlahHadir: l.jumlahHadir,
-    biayaOrtu: l.kelas.biayaOrtu,
-    mingguKe: l.mingguKe,
-    statusBayarOrtu: l.statusBayarOrtu,
-    materiDipelajari: l.materiDipelajari,
-    pemahamanMateri: l.pemahamanMateri,
-    keaktifanBelajar: l.keaktifanBelajar,
-    kemandirian: l.kemandirian,
-    kedisiplinan: l.kedisiplinan,
-    catatanSiswa: l.catatanSiswa,
-    createdAt: l.createdAt.toISOString(),
-  }));
+  const items = laporan.map(toItemPrivat);
 
   return (
     <div className="space-y-5.5">
@@ -87,6 +76,8 @@ export default async function KwitansiGabunganPage({
       {items.length > 0 && (
         <GabunganKwitansi
           namaSiswa={namaSiswa!}
+          namaOrtu={laporan[0].kelas.siswa.namaOrtu}
+          nomor={nomorDariWaLink(waLink(laporan[0].kelas.siswa.noHpOrtu))}
           periodeLabel={`${BULAN[bulan - 1]} ${tahun}`}
           items={items}
           filenamePrefix={`kwitansi-gabungan-${namaSiswa}-${BULAN[bulan - 1]}-${tahun}`}
