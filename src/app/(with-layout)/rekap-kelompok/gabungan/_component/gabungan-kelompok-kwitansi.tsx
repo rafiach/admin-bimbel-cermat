@@ -6,6 +6,7 @@ import { type ItemGabunganKelompok, totalBaris } from "@/lib/kwitansi";
 import { linkGabungan, pesanKwitansi } from "@/lib/wa-kwitansi";
 import { useState } from "react";
 import { DownloadButton } from "../../../rekap/_component/download-button";
+import { Pengaturan } from "@/lib/pengaturan-default";
 
 export function GabunganKelompokKwitansi({
   namaKelompok,
@@ -16,6 +17,7 @@ export function GabunganKelompokKwitansi({
   periodeLabel,
   items,
   filenamePrefix,
+  cfg,
 }: {
   namaKelompok: string;
   namaAnggota: string;
@@ -25,6 +27,7 @@ export function GabunganKelompokKwitansi({
   periodeLabel: string;
   items: ItemGabunganKelompok[];
   filenamePrefix: string;
+  cfg: Pengaturan;
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>(
     items.filter((i) => i.statusBayarOrtu !== "lunas").map((i) => i.id),
@@ -36,14 +39,17 @@ export function GabunganKelompokKwitansi({
 
   const selectedItems = items.filter((i) => selectedIds.includes(i.id));
 
-  const pesan = pesanKwitansi({
+  const pesan = pesanKwitansi(
+  {
     namaPenerima: namaWali,
     namaSiswa: namaAnggota,
     periode: periodeLabel,
     total: totalBaris(selectedItems.flatMap((i) => i.lines)),
     lunas: selectedItems.every((i) => i.statusBayarOrtu === "lunas"),
     link: linkGabungan(selectedItems.map((i) => i.shareToken)),
-  });
+  },
+    cfg,
+  );
 
   return (
     <>
@@ -90,6 +96,7 @@ export function GabunganKelompokKwitansi({
               tutorNama={tutorNama}
               periodeLabel={periodeLabel}
               items={selectedItems}
+              cfg={cfg}
             />
           </div>
         </>

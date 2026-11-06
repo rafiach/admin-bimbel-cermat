@@ -257,3 +257,19 @@ model AnggotaLaporanKelompok {
   @@unique([laporanKelompokId, siswaId])
   @@map("anggota_laporan_kelompok")
 }
+
+model Pengaturan {
+  id                      String   @id @default("default")
+  feeIzinOrtu             Int      @map("fee_izin_ortu")
+  feeIzinTutor            Int      @map("fee_izin_tutor")
+  infoPembayaran          String   @map("info_pembayaran")
+  templatePesanBelumLunas String   @map("template_pesan_belum_lunas")
+  templatePesanLunas      String   @map("template_pesan_lunas")
+  namaBimbel              String   @map("nama_bimbel")
+  subjudulPrivat          String   @map("subjudul_privat")
+  subjudulKelompok        String   @map("subjudul_kelompok")
+  penutupKwitansi         String   @map("penutup_kwitansi")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  @@map("pengaturan")
+}

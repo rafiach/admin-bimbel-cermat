@@ -1,5 +1,6 @@
-import { FEE_IZIN, hitungKelompok, labelPeriode } from "@/lib/kwitansi";
+import { hitungKelompok, labelPeriode } from "@/lib/kwitansi";
 import { Info, KwitansiFrame, RekapBelajar, TotalTagihan } from "./kwitansi-parts";
+import { Pengaturan } from "@/lib/pengaturan-default";
 
 export type KwitansiKelompokData = {
   bulan: number;
@@ -24,13 +25,13 @@ export type KwitansiKelompokData = {
   anggotaLaporan: { siswaId: string; jumlahIndividu: number; siswa: { nama: string } }[];
 };
 
-export function KwitansiKelompok({ laporan }: { laporan: KwitansiKelompokData }) {
+export function KwitansiKelompok({ laporan, cfg }: { laporan: KwitansiKelompokData; cfg: Pengaturan }) {
   const { hargaKelompok, subtotalKelompok, feeIzin, barisIndividu, totalTagihan } =
-    hitungKelompok(laporan);
+    hitungKelompok(laporan, cfg.feeIzinOrtu);
   const namaAnggota = laporan.kelompok.anggota.map((a) => a.siswa.nama).join(" & ");
 
   return (
-    <KwitansiFrame subtitle="Kwitansi Kelompok">
+    <KwitansiFrame subtitle={cfg.subjudulKelompok} cfg={cfg}>
       <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg p-4 text-sm">
         <Info label="Nama Kelompok" value={namaAnggota} />
         <Info label="Tutor" value={laporan.kelompok.tutor.nama} />
@@ -56,7 +57,7 @@ export function KwitansiKelompok({ laporan }: { laporan: KwitansiKelompokData })
             <tr className="border-b border-stroke">
               <td className="py-2 text-dark">Izin Mendadak</td>
               <td className="py-2 text-center text-dark-6">
-                {laporan.jumlahIzin}x @Rp{FEE_IZIN.toLocaleString("id-ID")}
+                {laporan.jumlahIzin}x @Rp{cfg.feeIzinOrtu.toLocaleString("id-ID")}
               </td>
               <td className="py-2 text-right text-dark-6">Rp {feeIzin.toLocaleString("id-ID")}</td>
             </tr>

@@ -7,6 +7,7 @@ import { type ItemGabunganPrivat, totalGabunganPrivat } from "@/lib/kwitansi";
 import { useState } from "react";
 import { DownloadButton } from "../../_component/download-button";
 import { linkGabungan, pesanKwitansi } from "@/lib/wa-kwitansi";
+import { Pengaturan } from "@/lib/pengaturan-default";
 
 export function GabunganKwitansi({
   namaSiswa,
@@ -15,6 +16,7 @@ export function GabunganKwitansi({
   periodeLabel,
   items,
   filenamePrefix,
+  cfg,
 }: {
   namaSiswa: string;
   namaOrtu: string | null;
@@ -22,6 +24,7 @@ export function GabunganKwitansi({
   periodeLabel: string;
   items: ItemGabunganPrivat[];
   filenamePrefix: string;
+  cfg: Pengaturan;
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>(
     items.filter((i) => i.statusBayarOrtu !== "lunas").map((i) => i.id),
@@ -33,14 +36,17 @@ export function GabunganKwitansi({
 
   const selectedItems = items.filter((i) => selectedIds.includes(i.id));
 
-  const pesan = pesanKwitansi({
+  const pesan = pesanKwitansi(
+  {
     namaPenerima: namaOrtu,
     namaSiswa,
     periode: periodeLabel,
-    total: totalGabunganPrivat(selectedItems),
+    total: totalGabunganPrivat(selectedItems, cfg.feeIzinOrtu),
     lunas: selectedItems.every((i) => i.statusBayarOrtu === "lunas"),
     link: linkGabungan(selectedItems.map((i) => i.shareToken)),
-  });
+  },
+  cfg,
+);
 
   return (
     <>
@@ -82,7 +88,7 @@ export function GabunganKwitansi({
           </div>
 
           <div className="mt-5">
-            <KwitansiGabunganPrivat namaSiswa={namaSiswa} periodeLabel={periodeLabel} items={selectedItems} />
+            <KwitansiGabunganPrivat namaSiswa={namaSiswa} periodeLabel={periodeLabel} items={selectedItems} cfg={cfg} />
           </div>
         </>
       ) : (

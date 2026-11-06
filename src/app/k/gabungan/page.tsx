@@ -8,6 +8,7 @@ import {
   totalBaris,
   totalGabunganPrivat,
 } from "@/lib/kwitansi";
+import { getPengaturan } from "@/lib/pengaturan";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -15,6 +16,7 @@ import { cache } from "react";
 export const dynamic = "force-dynamic";
 
 const MAX_TOKEN = 12;
+const cfg = await getPengaturan();
 
 const getGabungan = cache(async (raw: string) => {
   const tokens = [...new Set(raw.split("-"))];
@@ -53,7 +55,10 @@ const getGabungan = cache(async (raw: string) => {
   return null;
 });
 
-function ringkas(data: NonNullable<Awaited<ReturnType<typeof getGabungan>>>) {
+function ringkas(
+  data: NonNullable<Awaited<ReturnType<typeof getGabungan>>>,
+  hargaIzin: number,
+) {
   const f = data.laporan[0];
   const periode = `${BULAN[f.bulan - 1]} ${f.tahun}`;
 
@@ -62,12 +67,12 @@ function ringkas(data: NonNullable<Awaited<ReturnType<typeof getGabungan>>>) {
     return {
       nama: data.laporan[0].kelas.siswa.nama,
       periode,
-      total: totalGabunganPrivat(items),
+      total: totalGabunganPrivat(items, hargaIzin),
       lunas: items.every((i) => i.statusBayarOrtu === "lunas"),
     };
   }
 
-  const items = data.laporan.map(toItemKelompok);
+  const items = data.laporan.map((l) => toItemKelompok(l, hargaIzin));
   return {
     nama: data.laporan[0].kelompok.nama,
     periode,
@@ -83,12 +88,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { t } = await searchParams;
   const data = await getGabungan(t ?? "");
+
   const noIndex = { index: false, follow: false };
 
   if (!data) return { title: { absolute: "Kwitansi tidak ditemukan" }, robots: noIndex };
 
-  const r = ringkas(data);
-  const title = `Kwitansi Bimbel Cermat — ${r.nama}, ${r.periode}`;
+  const r = ringkas(data, cfg.feeIzinOrtu);
+  const title = `Kwitansi ${cfg.namaBimbel} — ${r.nama}, ${r.periode}`;
   const description = `Total tagihan Rp ${r.total.toLocaleString("id-ID")} · ${r.lunas ? "Lunas" : "Belum Lunas"}`;
 
   return {
@@ -109,7 +115,7 @@ export default async function KwitansiGabunganPublikPage({
   const data = await getGabungan(t ?? "");
   if (!data) notFound();
 
-  const r = ringkas(data);
+  const r = ringkas(data, cfg.feeIzinOrtu);
 
   return (
     <main className="min-h-screen bg-gray-2 px-4 py-6">
@@ -118,17 +124,14 @@ export default async function KwitansiGabunganPublikPage({
       </div>
 
       {data.tipe === "privat" ? (
-        <KwitansiGabunganPrivat
-          namaSiswa={r.nama}
-          periodeLabel={r.periode}
-          items={data.laporan.map(toItemPrivat)}
-        />
+        <KwitansiGabunganPrivat namaSiswa={r.nama} periodeLabel={r.periode} items={data.laporan.map(toItemPrivat)} cfg={cfg} />
       ) : (
         <KwitansiGabunganKelompok
           namaKelompok={r.nama}
           tutorNama={data.laporan[0].kelompok.tutor.nama}
           periodeLabel={r.periode}
-          items={data.laporan.map(toItemKelompok)}
+          items={data.laporan.map((l) => toItemKelompok(l, cfg.feeIzinOrtu))}
+          cfg={cfg}
         />
       )}
     </main>

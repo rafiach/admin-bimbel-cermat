@@ -12,7 +12,7 @@ type Kelas = {
   jadwal: string;
   tutorId: string;
   tipePeriode: string;
-  siswa: { nama: string; noHpOrtu: string | null };
+  siswa: { nama: string };
 };
 type Kelompok = {
   id: string;

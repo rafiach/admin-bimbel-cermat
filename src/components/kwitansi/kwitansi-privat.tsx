@@ -1,5 +1,6 @@
-import { FEE_IZIN, labelPeriode, tagihanPrivat } from "@/lib/kwitansi";
+import { labelPeriode, tagihanPrivat } from "@/lib/kwitansi";
 import { Info, KwitansiFrame, RekapBelajar, TotalTagihan } from "./kwitansi-parts";
+import { Pengaturan } from "@/lib/pengaturan-default";
 
 export type KwitansiPrivatData = {
   bulan: number;
@@ -22,12 +23,12 @@ export type KwitansiPrivatData = {
   };
 };
 
-export function KwitansiPrivat({ laporan }: { laporan: KwitansiPrivatData }) {
+export function KwitansiPrivat({ laporan, cfg }: { laporan: KwitansiPrivatData; cfg: Pengaturan }) {
   const { kelas } = laporan;
-  const total = tagihanPrivat(laporan.jumlahHadir, laporan.jumlahIzin, kelas.biayaOrtu);
+  const total = tagihanPrivat(laporan.jumlahHadir, laporan.jumlahIzin, kelas.biayaOrtu, cfg.feeIzinOrtu);
 
   return (
-    <KwitansiFrame subtitle="Kwitansi & Rekap Perkembangan Belajar">
+    <KwitansiFrame subtitle={cfg.subjudulPrivat} cfg={cfg}>
       <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg p-4 text-sm">
         <Info label="Nama Siswa" value={kelas.siswa.nama} />
         <Info label="Tutor" value={kelas.tutor.nama} />
@@ -51,7 +52,7 @@ export function KwitansiPrivat({ laporan }: { laporan: KwitansiPrivatData }) {
             <tr className="border-b border-stroke">
               <td className="py-2 text-dark">Izin Mendadak</td>
               <td className="py-2 text-right text-dark-6">
-                {laporan.jumlahIzin}x @Rp {FEE_IZIN.toLocaleString("id-ID")}
+                {laporan.jumlahIzin}x @Rp {cfg.feeIzinOrtu.toLocaleString("id-ID")}
               </td>
             </tr>
           )}

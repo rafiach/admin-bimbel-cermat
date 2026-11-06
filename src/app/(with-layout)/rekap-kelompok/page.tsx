@@ -12,6 +12,7 @@ import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 import { resolvePeriode } from "@/lib/periode";
 import { PeriodeNotice } from "@/components/periode-notice";
+import { getPengaturan } from "@/lib/pengaturan";
 
 export const metadata = { title: "Rekap Kelompok" };
 
@@ -20,7 +21,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
-const FEE_IZIN = 10000;
+const cfg = await getPengaturan();
 
 export default async function RekapKelompokPage({
   searchParams,
@@ -39,7 +40,7 @@ export default async function RekapKelompokPage({
   const rows = laporan.map((l) => {
     const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
     const totalKelompok = l.jumlahKelompok * hargaKelompok;
-    const feeIzinKelompok = l.jumlahIzin * FEE_IZIN;
+    const feeIzinKelompok = l.jumlahIzin * cfg.feeIzinOrtu;
     const totalIndividu = l.anggotaLaporan.reduce((sum, a) => {
       const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
       return sum + a.jumlahIndividu * (anggota?.hargaPrivat ?? 0);
@@ -50,7 +51,7 @@ export default async function RekapKelompokPage({
       const anggota = l.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
       return sum + a.jumlahIndividu * (anggota?.feeTutor ?? 0);
     }, 0);
-    const feeIzinTutor = l.jumlahIzin * FEE_IZIN;
+    const feeIzinTutor = l.jumlahIzin * cfg.feeIzinTutor;
 
     const totalTagihan = totalKelompok + totalIndividu + feeIzinKelompok;
     const totalFeeTutor = feeTutorKelompok + feeTutorIndividu + feeIzinTutor;

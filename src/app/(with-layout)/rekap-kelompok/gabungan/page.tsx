@@ -4,6 +4,7 @@ import { GabunganKelompokKwitansi } from "./_component/gabungan-kelompok-kwitans
 import { toItemKelompok } from "@/lib/kwitansi";
 import { nomorDariWaLink } from "@/lib/wa-kwitansi";
 import { waLink } from "@/lib/phone";
+import { getPengaturan } from "@/lib/pengaturan";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Kwitansi Gabungan Kelompok" };
@@ -13,7 +14,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
-const FEE_IZIN = 10000;
+const cfg = await getPengaturan();
 
 export default async function KwitansiGabunganKelompokPage({
   searchParams,
@@ -39,7 +40,7 @@ export default async function KwitansiGabunganKelompokPage({
   const namaKelompok = laporan[0]?.kelompok.nama;
   const tutorNama = laporan[0]?.kelompok.tutor.nama;
 
-  const items = laporan.map(toItemKelompok);
+  const items = laporan.map((l) => toItemKelompok(l, cfg.feeIzinOrtu));
 
   return (
     <div className="space-y-5.5">
@@ -87,6 +88,7 @@ export default async function KwitansiGabunganKelompokPage({
           periodeLabel={`${BULAN[bulan - 1]} ${tahun}`}
           items={items}
           filenamePrefix={`kwitansi-gabungan-${namaKelompok}-${BULAN[bulan - 1]}-${tahun}`}
+          cfg={cfg}
         />
       )}
 

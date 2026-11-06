@@ -9,6 +9,7 @@ import { KirimWAButton } from "@/components/kwitansi/kirim-wa-button";
 import { waLink } from "@/lib/phone";
 import { linkKwitansi, nomorDariWaLink, pesanKwitansi } from "@/lib/wa-kwitansi";
 import { labelPeriode } from "@/lib/kwitansi";
+import { getPengaturan } from "@/lib/pengaturan";
 
 export const metadata = { title: "Detail Laporan Kelompok" };
 
@@ -17,7 +18,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
-const FEE_IZIN = 10000;
+const cfg = await getPengaturan();
 
 export default async function DetailRekapKelompokPage({
   params,
@@ -37,7 +38,7 @@ export default async function DetailRekapKelompokPage({
 
   const hargaKelompok = laporan.hargaKelompokFinal ?? laporan.kelompok.hargaKelompok;
   const subtotalKelompok = laporan.jumlahKelompok * hargaKelompok;
-  const feeIzinKelompok = laporan.jumlahIzin * FEE_IZIN;
+  const feeIzinKelompok = laporan.jumlahIzin * cfg.feeIzinOrtu;
 
   const barisIndividu = laporan.anggotaLaporan
     .filter((a) => a.jumlahIndividu > 0)
@@ -60,7 +61,7 @@ export default async function DetailRekapKelompokPage({
     const anggota = laporan.kelompok.anggota.find((ag) => ag.siswaId === a.siswaId);
     return sum + a.jumlahIndividu * (anggota?.feeTutor ?? 0);
   }, 0);
-  const feeIzinTutor = laporan.jumlahIzin * FEE_IZIN;
+  const feeIzinTutor = laporan.jumlahIzin * cfg.feeIzinTutor;
   const totalFeeTutor = feeTutorKelompok + feeTutorIndividu + feeIzinTutor;
 
   return (
@@ -72,14 +73,17 @@ export default async function DetailRekapKelompokPage({
           <div className="print:hidden flex justify-end gap-2">
             <KirimWAButton
               nomor={nomorDariWaLink(waLink(laporan.kelompok.noHpWali))}
-              pesan={pesanKwitansi({
-                namaPenerima: laporan.kelompok.namaWali,
-                namaSiswa: namaAnggota,
-                periode: labelPeriode(laporan.bulan, laporan.tahun, laporan.mingguKe),
-                total: totalTagihan,
-                lunas: laporan.statusBayarOrtu === "lunas",
-                link: linkKwitansi(laporan.shareToken),
-              })}
+              pesan={pesanKwitansi(
+                {
+                  namaPenerima: laporan.kelompok.namaWali,
+                  namaSiswa: namaAnggota,
+                  periode: labelPeriode(laporan.bulan, laporan.tahun, laporan.mingguKe),
+                  total: totalTagihan,
+                  lunas: laporan.statusBayarOrtu === "lunas",
+                  link: linkKwitansi(laporan.shareToken),
+                },
+                cfg,
+              )}
             />
             <DownloadButton filename={`kwitansi-kelompok-${laporan.kelompok.nama}-${BULAN[laporan.bulan - 1]}-${laporan.tahun}`} />
           </div>
@@ -100,7 +104,7 @@ export default async function DetailRekapKelompokPage({
                     + {barisIndividu.map((b) => `${b.jumlah}x ${b.nama} @${b.harga.toLocaleString("id-ID")}`).join(", ")}
                   </p>
                 )}
-                {laporan.jumlahIzin > 0 && <p>+ {laporan.jumlahIzin}x @Rp {FEE_IZIN.toLocaleString("id-ID")} (izin)</p>}
+                {laporan.jumlahIzin > 0 && <p>+ {laporan.jumlahIzin}x @Rp {cfg.feeIzinTutor.toLocaleString("id-ID")} (izin)</p>}
               </div>
               <span className={`mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${laporan.statusBayarTutor === "sudah" ? "bg-[#219653]/10 text-[#219653]" : "bg-[#D34053]/10 text-[#D34053]"}`}>
                 {laporan.statusBayarTutor === "sudah" ? "Sudah dibayar" : "Belum dibayar"}
@@ -114,7 +118,7 @@ export default async function DetailRekapKelompokPage({
           </div>
         </div>
 
-        <KwitansiKelompok laporan={laporan} />
+        <KwitansiKelompok laporan={laporan} cfg={cfg} />
 
         {laporan.saranBimbel && (
           <div className="print:hidden mx-auto max-w-2xl rounded-[10px] border border-dashed border-stroke bg-white p-4 dark:border-dark-3 dark:bg-gray-dark">

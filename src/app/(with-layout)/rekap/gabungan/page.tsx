@@ -4,10 +4,11 @@ import { Combobox } from "@/components/FormElements/combobox";
 import { toItemPrivat } from "@/lib/kwitansi";
 import { nomorDariWaLink } from "@/lib/wa-kwitansi";
 import { waLink } from "@/lib/phone";
+import { getPengaturan } from "@/lib/pengaturan";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Kwitansi Gabungan" };
-
+const cfg = await getPengaturan();
 const BULAN = [
   "Januari", "Februari", "Maret", "April", "Mei", "Juni",
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
@@ -81,6 +82,7 @@ export default async function KwitansiGabunganPage({
           periodeLabel={`${BULAN[bulan - 1]} ${tahun}`}
           items={items}
           filenamePrefix={`kwitansi-gabungan-${namaSiswa}-${BULAN[bulan - 1]}-${tahun}`}
+          cfg={cfg}
         />
       )}
 

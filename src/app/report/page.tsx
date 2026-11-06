@@ -5,15 +5,37 @@ import { ReportForm } from "./_component/form-report";
 export const metadata = { title: "Lapor Kehadiran - Bimbel Cermat" };
 
 export default async function ReportPage() {
-  const [tutorList, kelasList, kelompokList] = await Promise.all([
-    db.tutor.findMany({ where: { status: "aktif" }, orderBy: { nama: "asc" } }),
-    db.kelas.findMany({ where: { status: "aktif" }, include: { siswa: true }, orderBy: { jadwal: "asc" } }),
-    db.kelompok.findMany({
-      where: { status: "aktif" },
-      include: { anggota: { include: { siswa: true } } },
-      orderBy: { nama: "asc" },
-    }),
-  ]);
+ const [tutorList, kelasList, kelompokList] = await Promise.all([
+  db.tutor.findMany({
+    where: { status: "aktif" },
+    select: { id: true, nama: true },
+    orderBy: { nama: "asc" },
+  }),
+  db.kelas.findMany({
+    where: { status: "aktif" },
+    select: {
+      id: true,
+      jadwal: true,
+      tutorId: true,
+      tipePeriode: true,
+      siswa: { select: { nama: true } },
+    },
+    orderBy: { jadwal: "asc" },
+  }),
+  db.kelompok.findMany({
+    where: { status: "aktif" },
+    select: {
+      id: true,
+      nama: true,
+      tutorId: true,
+      tipePeriode: true,
+      anggota: {
+        select: { siswaId: true, siswa: { select: { nama: true } } },
+      },
+    },
+    orderBy: { nama: "asc" },
+  }),
+]);
 
   return (
     <div className="min-h-dvh bg-gradient-to-b from-[#FFF3EC] to-gray-2 sm:flex sm:items-center sm:justify-center sm:p-4 dark:from-[#1a1008] dark:to-[#020d1a]">

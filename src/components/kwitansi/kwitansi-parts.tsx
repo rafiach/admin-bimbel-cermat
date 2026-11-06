@@ -1,3 +1,5 @@
+import { Pengaturan } from "@/lib/pengaturan-default";
+
 const RATING = [
   ["Pemahaman Materi", "pemahamanMateri"],
   ["Keaktifan Belajar", "keaktifanBelajar"],
@@ -7,9 +9,11 @@ const RATING = [
 
 export function KwitansiFrame({
   subtitle,
+  cfg,
   children,
 }: {
   subtitle: string;
+  cfg: Pengaturan;
   children: React.ReactNode;
 }) {
   return (
@@ -27,9 +31,9 @@ export function KwitansiFrame({
       <div className="relative z-10 p-8">
         <div className="mb-6 flex items-center gap-4 border-b border-stroke pb-6">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/logo/logo-icon-bimbel.svg" alt="Bimbel Cermat" className="h-18 w-18 object-contain" />
+          <img src="/images/logo/logo-icon-bimbel.svg" alt= {cfg.namaBimbel} className="h-18 w-18 object-contain" />
           <div>
-            <h2 className="text-heading-6 font-bold text-dark">Bimbel Cermat</h2>
+            <h2 className="text-heading-6 font-bold text-dark">{cfg.namaBimbel}</h2>
             <p className="text-sm text-dark-6">{subtitle}</p>
           </div>
         </div>
@@ -37,7 +41,7 @@ export function KwitansiFrame({
         {children}
 
         <p className="border-t border-stroke pt-4 text-center text-xs text-dark-6">
-          Terima kasih atas kepercayaannya — Bimbel Cermat
+          {cfg.penutupKwitansi}
         </p>
       </div>
     </div>

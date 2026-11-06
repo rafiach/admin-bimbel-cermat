@@ -3,26 +3,32 @@ export const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ] as const;
 
-export const FEE_IZIN = 10000;
-
 export function labelPeriode(bulan: number, tahun: number, mingguKe: number) {
   return `${BULAN[bulan - 1]} ${tahun}${mingguKe > 0 ? ` — Minggu ke-${mingguKe}` : ""}`;
 }
 
-export function tagihanPrivat(jumlahHadir: number, jumlahIzin: number, biayaOrtu: number) {
-  return jumlahHadir * biayaOrtu + jumlahIzin * FEE_IZIN;
+export function tagihanPrivat(
+  jumlahHadir: number,
+  jumlahIzin: number,
+  biayaOrtu: number,
+  hargaIzin: number,
+) {
+  return jumlahHadir * biayaOrtu + jumlahIzin * hargaIzin;
 }
 
-export function hitungKelompok(l: {
-  jumlahKelompok: number;
-  jumlahIzin: number;
-  hargaKelompokFinal: number | null;
-  kelompok: { hargaKelompok: number; anggota: { siswaId: string; hargaPrivat: number }[] };
-  anggotaLaporan: { siswaId: string; jumlahIndividu: number; siswa: { nama: string } }[];
-}) {
+export function hitungKelompok(
+  l: {
+    jumlahKelompok: number;
+    jumlahIzin: number;
+    hargaKelompokFinal: number | null;
+    kelompok: { hargaKelompok: number; anggota: { siswaId: string; hargaPrivat: number }[] };
+    anggotaLaporan: { siswaId: string; jumlahIndividu: number; siswa: { nama: string } }[];
+  },  
+  hargaIzin: number
+) {
   const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
   const subtotalKelompok = l.jumlahKelompok * hargaKelompok;
-  const feeIzin = l.jumlahIzin * FEE_IZIN;
+  const feeIzin = l.jumlahIzin * hargaIzin;
 
   const barisIndividu = l.anggotaLaporan
     .filter((a) => a.jumlahIndividu > 0)
@@ -71,30 +77,36 @@ export type ItemGabunganKelompok = RekapFields & {
 
 export function totalGabunganPrivat(
   items: { jumlahHadir: number; jumlahIzin: number; biayaOrtu: number }[],
+  hargaIzin: number,
 ) {
-  return items.reduce((s, i) => s + tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu), 0);
+  return items.reduce(
+    (s, i) => s + tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu, hargaIzin),
+    0,
+  );
 }
 
 export function totalBaris(lines: BarisKwitansi[]) {
   return lines.reduce((s, l) => s + l.jumlah * l.hargaSatuan, 0);
 }
 
-export function barisKelompok(l: {
-  id: string;
-  mingguKe: number;
-  jumlahKelompok: number;
-  jumlahIzin: number;
-  hargaKelompokFinal: number | null;
-  kelompok: { hargaKelompok: number; anggota: { siswaId: string; hargaPrivat: number }[] };
-  anggotaLaporan: { siswaId: string; jumlahIndividu: number; siswa: { nama: string } }[];
-}): BarisKwitansi[] {
+export function barisKelompok(
+  l: {
+    id: string;
+    mingguKe: number;
+    jumlahKelompok: number;
+    jumlahIzin: number;
+    hargaKelompokFinal: number | null;
+    kelompok: { hargaKelompok: number; anggota: { siswaId: string; hargaPrivat: number }[] };
+    anggotaLaporan: { siswaId: string; jumlahIndividu: number; siswa: { nama: string } }[];
+  },
+  hargaIzin: number): BarisKwitansi[] {
   const periode = l.mingguKe > 0 ? `Minggu ke-${l.mingguKe}` : "Bulanan";
   const hargaKelompok = l.hargaKelompokFinal ?? l.kelompok.hargaKelompok;
 
   return [
     { key: `${l.id}-kelompok`, label: `Kelompok — ${periode}`, jumlah: l.jumlahKelompok, hargaSatuan: hargaKelompok },
     ...(l.jumlahIzin > 0
-      ? [{ key: `${l.id}-izin`, label: `Izin Mendadak — ${periode}`, jumlah: l.jumlahIzin, hargaSatuan: FEE_IZIN }]
+      ? [{ key: `${l.id}-izin`, label: `Izin Mendadak — ${periode}`, jumlah: l.jumlahIzin, hargaSatuan: hargaIzin }]
       : []),
     ...l.anggotaLaporan
       .filter((a) => a.jumlahIndividu > 0)
@@ -145,13 +157,14 @@ export function toItemKelompok(
       statusBayarOrtu: string;
       createdAt: Date;
     },
+  hargaIzin: number
 ): ItemGabunganKelompok {
   return {
     id: l.id,
     shareToken: l.shareToken,
     mingguKe: l.mingguKe,
     statusBayarOrtu: l.statusBayarOrtu,
-    lines: barisKelompok(l),
+    lines: barisKelompok(l, hargaIzin),
     materiDipelajari: l.materiDipelajari,
     pemahamanMateri: l.pemahamanMateri,
     keaktifanBelajar: l.keaktifanBelajar,

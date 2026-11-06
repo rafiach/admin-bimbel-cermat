@@ -5,6 +5,7 @@ import {
   totalBaris,
 } from "@/lib/kwitansi";
 import { Info, KwitansiFrame, RekapBelajar, TotalTagihan } from "./kwitansi-parts";
+import { Pengaturan } from "@/lib/pengaturan-default";
 
 function terbaru<T extends { createdAt: string }>(items: T[]) {
   return items.reduce((a, b) => (b.createdAt > a.createdAt ? b : a));
@@ -17,22 +18,24 @@ export function KwitansiGabunganPrivat({
   namaSiswa,
   periodeLabel,
   items,
+  cfg,
 }: {
   namaSiswa: string;
   periodeLabel: string;
   items: ItemGabunganPrivat[];
+  cfg: Pengaturan;
 }) {
   if (items.length === 0) return null;
 
   const total = items.reduce(
-    (s, i) => s + tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu),
+    (s, i) => s + tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu, cfg.feeIzinOrtu),
     0,
   );
   const lunas = items.every((i) => i.statusBayarOrtu === "lunas");
   const terakhir = terbaru(items);
 
   return (
-    <KwitansiFrame subtitle="Kwitansi & Rekap Perkembangan Belajar">
+    <KwitansiFrame subtitle= {cfg.subjudulPrivat} cfg={cfg}>
       <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg bg-[#F7F9FC] p-4 text-sm">
         <Info label="Nama Siswa" value={namaSiswa} />
         <Info label="Periode" value={periodeLabel} />
@@ -56,7 +59,7 @@ export function KwitansiGabunganPrivat({
                 {i.jumlahHadir}x{i.jumlahIzin > 0 && <span className="text-dark-6"> + {i.jumlahIzin}x izin</span>}
               </td>
               <td className="py-2 text-right text-dark">
-                Rp {tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu).toLocaleString("id-ID")}
+                Rp {tagihanPrivat(i.jumlahHadir, i.jumlahIzin, i.biayaOrtu, cfg.feeIzinOrtu).toLocaleString("id-ID")}
               </td>
             </tr>
           ))}
@@ -79,11 +82,13 @@ export function KwitansiGabunganKelompok({
   tutorNama,
   periodeLabel,
   items,
+  cfg,
 }: {
   namaKelompok: string;
   tutorNama: string;
   periodeLabel: string;
   items: ItemGabunganKelompok[];
+  cfg: Pengaturan;
 }) {
   if (items.length === 0) return null;
 
@@ -93,7 +98,7 @@ export function KwitansiGabunganKelompok({
   const terakhir = terbaru(items);
 
   return (
-    <KwitansiFrame subtitle="Kwitansi & Rekap Perkembangan Belajar">
+    <KwitansiFrame subtitle= {cfg.subjudulKelompok} cfg={cfg}>
       <div className="mb-6 grid grid-cols-2 gap-3 rounded-lg bg-[#F7F9FC] p-4 text-sm">
         <Info label="Nama Kelompok" value={namaKelompok} />
         <Info label="Tutor" value={tutorNama} />

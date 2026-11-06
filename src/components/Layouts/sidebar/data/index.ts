@@ -1,3 +1,4 @@
+import { Settings } from "lucide-react";
 import * as Icons from "../icons";
 
 export const NAV_DATA = [
@@ -49,6 +50,12 @@ export const NAV_DATA = [
             url: "/rekap-kelompok",
           },
         ],
+      },
+            {
+        title: "Pengaturan",
+        url: "/setting",
+        icon: Settings,
+        items: [],
       },
       {
         title: "Profile",

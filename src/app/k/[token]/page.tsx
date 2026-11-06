@@ -3,6 +3,7 @@ import { KwitansiKelompok } from "@/components/kwitansi/kwitansi-kelompok";
 import { KwitansiPrivat } from "@/components/kwitansi/kwitansi-privat";
 import { db } from "@/lib/db";
 import { BULAN, hitungKelompok, tagihanPrivat } from "@/lib/kwitansi";
+import { getPengaturan } from "@/lib/pengaturan";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -41,14 +42,15 @@ export async function generateMetadata({
 
   if (!data) return { title: { absolute: "Kwitansi tidak ditemukan" }, robots: noIndex };
 
+  const cfg = await getPengaturan();
   const l = data.laporan;
   const nama = data.tipe === "privat" ? data.laporan.kelas.siswa.nama : data.laporan.kelompok.nama;
   const total =
     data.tipe === "privat"
-      ? tagihanPrivat(data.laporan.jumlahHadir, data.laporan.jumlahIzin, data.laporan.kelas.biayaOrtu)
-      : hitungKelompok(data.laporan).totalTagihan;
+      ? tagihanPrivat(data.laporan.jumlahHadir, data.laporan.jumlahIzin, data.laporan.kelas.biayaOrtu, cfg.feeIzinOrtu)
+      : hitungKelompok(data.laporan, cfg.feeIzinOrtu).totalTagihan;
 
-  const title = `Kwitansi Bimbel Cermat — ${nama}, ${BULAN[l.bulan - 1]} ${l.tahun}`;
+  const title = `Kwitansi ${cfg.namaBimbel} — ${nama}, ${BULAN[l.bulan - 1]} ${l.tahun}`;
   const description = `Total tagihan Rp ${total.toLocaleString("id-ID")} · ${
     l.statusBayarOrtu === "lunas" ? "Lunas" : "Belum Lunas"
   }`;
@@ -75,6 +77,7 @@ export default async function KwitansiPublikPage({
   const { token } = await params;
   const data = await getKwitansi(token);
   if (!data) notFound();
+  const cfg = await getPengaturan();
 
   const l = data.laporan;
   const nama = data.tipe === "privat" ? data.laporan.kelas.siswa.nama : data.laporan.kelompok.nama;
@@ -86,9 +89,9 @@ export default async function KwitansiPublikPage({
       </div>
 
       {data.tipe === "privat" ? (
-        <KwitansiPrivat laporan={data.laporan} />
+        <KwitansiPrivat laporan={data.laporan} cfg={cfg}/>
       ) : (
-        <KwitansiKelompok laporan={data.laporan} />
+        <KwitansiKelompok laporan={data.laporan} cfg={cfg}/>
       )}
     </main>
   );

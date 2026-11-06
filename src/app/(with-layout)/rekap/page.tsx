@@ -13,6 +13,7 @@ import { SubmitButton } from "@/components/FormElements/submit-button";
 import { ConfirmButton } from "@/components/FormElements/confirm-button";
 import { resolvePeriode } from "@/lib/periode";
 import { PeriodeNotice } from "@/components/periode-notice";
+import { getPengaturan } from "@/lib/pengaturan";
 
 
 export const metadata = { title: "Rekap & Pembayaran" };
@@ -22,9 +23,7 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
-// fee kompensasi
-const FEE_IZIN = 10000;
-
+const cfg = await getPengaturan();
 export default async function RekapPage({
   searchParams,
 }: {
@@ -40,8 +39,8 @@ export default async function RekapPage({
   });
 
   const rows = laporan.map((l) => {
-    const tagihanOrtu = l.jumlahHadir * l.kelas.biayaOrtu + l.jumlahIzin * FEE_IZIN;
-    const feeTutor = l.jumlahHadir * l.kelas.feeTutor + l.jumlahIzin * FEE_IZIN;
+    const tagihanOrtu = l.jumlahHadir * l.kelas.biayaOrtu + l.jumlahIzin * cfg.feeIzinOrtu;
+    const feeTutor = l.jumlahHadir * l.kelas.feeTutor + l.jumlahIzin * cfg.feeIzinTutor;
     return { ...l, tagihanOrtu, feeTutor };
   });
 
